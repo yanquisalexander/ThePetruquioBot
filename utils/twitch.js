@@ -4,4 +4,4 @@ export const isFollower = async (username, channel) => {
     return true;
 }
 
-export const knownBots = ["streamelements", "streamlabs"];
+export const knownBots = ["streamelements", "streamlabs", "nightbot"];

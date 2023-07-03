@@ -27,7 +27,6 @@ export const langList = [
 ];
 
 export const translate = async (message, command, username) => {
-  console.log(`Translating to ${command}`);
   const targetLang = command;
   let messageText = message.substring(command.length + 2); // Remove the command and space
 

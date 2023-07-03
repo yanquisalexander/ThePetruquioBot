@@ -27,7 +27,7 @@ export const getRandomFact = () => {
     const facts = [
       // en inglés
       "My creator was inspired by Sikorama's TangerineBot to create me!",
-      "I was created using Node.js and the tmi.js library.",
+      "I was created using NodeJS and the tmijs library.",
       "My creator's cat's name is Kyra CoolCat 😺",
       "The name of my creator is Alexander (https://twitch.tv/alexitoo_uy) 🎮",
       "Did you know that Kappa is one of the most popular emotes on Twitch? Kappa",

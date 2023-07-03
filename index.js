@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 import { Bot } from './bot.js';
+import Channel from './app/models/Channel.js';
 import {
     getRandomGreeting,
     canReceiveGreeting,
@@ -18,12 +19,24 @@ import {
 import { handleCommand } from './modules/commands.js';
 import { knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
+import { railwayConnected } from './utils/environment.js';
 
-dotenv.config();
+try {
+    dotenv.config();
+    console.log(chalk.blue('Environment variables loaded'));
+} catch (error) {
+    console.error(chalk.bgBlack.red('Missing .env file'));
+    process.exit(-1);
+}
+
 
 if (!process.env.BOT_NAME || !process.env.BOT_PASSWORD) {
     console.error(chalk.bgBlack.red('Missing BOT_NAME or BOT_PASSWORD in .env file'));
     process.exit(-1);
+}
+
+if (!railwayConnected) {
+    console.error(chalk.yellow('Missing RAILWAY_API_KEY in .env file. You cannot use !restart command'));
 }
 
 Bot.connect()
@@ -33,12 +46,16 @@ Bot.connect()
     .catch(console.error);
 
 const onConnectedHandler = (address, port) => {
-    console.log(chalk.bgWhite.magenta.bold(`Connected to Twitch as ${Bot.getUsername()}`));
+    console.log(chalk.bgWhite.magenta.bold(`Connected to Twitch as ${Bot.getUsername()} (${address}:${port})`));
 };
 
 const processMessage = async ({ channel, context, username, message }) => {
     const isModerator = context.mod || Boolean(context.badges?.broadcaster);
     const isBroadcaster = isModerator && context.badges.broadcaster;
+
+    const channelData = await Channel.getChannelByName(channel.replace('#', ''));
+
+    console.log(channelData)
 
     if (!activeUsers[channel]) {
         activeUsers[channel] = {};
@@ -58,7 +75,7 @@ const processMessage = async ({ channel, context, username, message }) => {
         activeUsers[channel][username] = Date.now();
         const isBot = knownBots.includes(username.toLowerCase());
         const greetingMessage = getRandomGreeting(username, isBot);
-        return addGreetingToStack(channel, greetingMessage);
+        addGreetingToStack(channel, greetingMessage);
     }
 
     const isCommand = message.startsWith('!');
@@ -98,6 +115,34 @@ const onNoticeHandler = (channel, msgid, message) => {
     }
 };
 
+const onRaidedHandler = async (channel, username, viewers) => {
+    console.log(channel, username, viewers);
+    const raiderData = await Channel.getChannelByName(username);
+    const targetChannel = await Channel.getChannelByName(channel.replace('#', ''));
+
+    if (!raiderData) {
+        // No specific raider data found, send a generic raid message
+        return Bot.say(channel, `@${username} has raided with ${viewers} viewers! PogChamp`);
+    }
+
+    const { shoutOutPresentation } = raiderData.settings;
+    const { autoShoutOut } = targetChannel.settings;
+
+    if (shoutOutPresentation) {
+        if (autoShoutOut.enabled) {
+            let message = shoutOutPresentation.replace('${username}', username).replace('${viewers}', viewers);
+
+            if (!Bot.isMod(channel, Bot.getUsername())) {
+                // Remove links from the shoutout message
+                message = message.replace(/https?:\/\/\S+/g, '');
+            }
+
+            return Bot.say(channel, message);
+        }
+    }
+};
+
+
 // Cada 10 segundos, verificar si hay alguien a quien saludar
 setInterval(() => {
     try {
@@ -121,3 +166,4 @@ Bot.on('join', (channel, username, self) => {
         console.log(chalk.yellow.bold(`Joined ${channel}`));
     }
 });
+Bot.on('raided', onRaidedHandler)

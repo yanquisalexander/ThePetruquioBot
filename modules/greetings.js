@@ -5,10 +5,10 @@ import { isFollower, knownBots } from "../utils/twitch.js";
 const cooldown = 21600000; // 6 hours
 
 const greetings = [
-    "Hola que tal, #username? #emote",
-    "¡Bienvenido/a, #username! #emote",
-    "Saludos, #username. ¿Cómo estás? #emote",
-    "Hola #username, ¡qué bueno verte por aquí! #emote",
+    "Hola que tal, @#username? #emote",
+    "¡Bienvenido/a, @#username! #emote",
+    "Saludos, @#username. ¿Cómo estás? #emote",
+    "Hola @#username, ¡qué bueno verte por aquí! #emote",
 ];
 
 const botGreetings = [
@@ -34,6 +34,15 @@ export const addGreetingToStack = (channel, message, options) => {
 };
 
 const canReceiveGreeting = (channel, username, channelOwner) => {
+
+    if (username.toLowerCase() === 'alexitoo_uy' && channelOwner.toLowerCase() !== 'alexitoo_uy') {
+        // Verificar si el usuario es el creador del bot
+        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
+            return false;
+        }
+        addGreetingToStack(channel, 'Meet Alexitoo, my creator. They are a talented individual who has brought me to life! Make sure to check out their channel and show them some love. twitch.tv/alexitoo_uy');
+    }
+
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
         // Verificar si ha pasado el cooldown para el propietario del canal
@@ -45,6 +54,7 @@ const canReceiveGreeting = (channel, username, channelOwner) => {
         activeUsers[channel][username] = Date.now(); // Actualizar el tiempo del último mensaje del propietario del canal
         return false;
     }
+
 
     // Comprobar si el usuario es seguidor del canal
     if (isFollower(username)) {
