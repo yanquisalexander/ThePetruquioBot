@@ -84,6 +84,21 @@ class Channel {
         const values = [this.id];
         await db.query(query, values);
     }
+
+    static async checkSharedBans(username) {
+        const query = `
+          SELECT COUNT(*) AS ban_count
+          FROM bans b
+          INNER JOIN channels c ON c.id = b.channel_id
+          INNER JOIN teams t ON t.team_id = c.team_id
+          WHERE t.team_id = $1
+          AND b.banned_user = $2
+        `;
+        const values = [this.team_id, username];
+        const { rows } = await db.query(query, values);
+        const banCount = parseInt(rows[0].ban_count);
+        return banCount >= 3; // Verificar si se ha alcanzado el límite de bans compartidos para el usuario
+    }
 }
 
 export default Channel;

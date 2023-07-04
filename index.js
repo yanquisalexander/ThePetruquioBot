@@ -54,6 +54,12 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isBroadcaster = isModerator && context.badges.broadcaster;
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
+    const greetingsEnabled = channelData.settings.greetings.enabled
+
+    //TODO: Ban compartido 
+    //console.log(await Channel.checkSharedBans(username))
+
+
 
     console.log(channelData)
 
@@ -71,17 +77,23 @@ const processMessage = async ({ channel, context, username, message }) => {
         return Bot.say(channel, `@${username}, ${getRandomBotResponse()}`);
     }
 
-    if (canReceiveGreeting(channel, username, channel.replace('#', ''))) {
-        activeUsers[channel][username] = Date.now();
-        const isBot = knownBots.includes(username.toLowerCase());
-        const greetingMessage = getRandomGreeting(username, isBot);
-        addGreetingToStack(channel, greetingMessage);
-    }
 
-    const isCommand = message.startsWith('!');
-    if (isCommand) {
-        const args = message.slice(1).split(' ');
-        await handleCommand({ channel, context, username, message, toUser: args[1] });
+    if (greetingsEnabled) {
+        if (canReceiveGreeting(channel, username, channel.replace('#', ''))) {
+            activeUsers[channel][username] = Date.now();
+            const isBot = knownBots.includes(username.toLowerCase());
+            const greetingMessage = getRandomGreeting(username, isBot);
+            addGreetingToStack(channel, greetingMessage);
+        }
+
+        const isCommand = message.startsWith('!');
+        if (isCommand) {
+            const args = message.slice(1).split(' ');
+            await handleCommand({ channel, context, username, message, toUser: args[1] });
+        }
+    }
+    else {
+        console.log(chalk.bgWhite.magenta.bold(`Greetings are disabled in ${channel}`));
     }
 };
 
