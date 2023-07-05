@@ -1,5 +1,6 @@
 import tmi from 'tmi.js'
 import dotenv from 'dotenv'
+import { KMI } from './lib/kick.js'
 dotenv.config()
 
 
@@ -10,3 +11,18 @@ export const Bot = new tmi.Client({
     },
     channels: process.env.CHANNELS.split(',')
 })
+
+export const KickBot = new KMI([],
+    process.env.KICK_BOT_TOKEN
+)
+
+
+export const sendMessage = (channel, message, platform = 'twitch') => {
+    if (platform === 'twitch') {
+        Bot.say(channel, message);
+    }
+    else if (platform === 'kick') {
+        console.log({ channel, message, platform })
+        KickBot.say(channel, message);
+    }
+};
