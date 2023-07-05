@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
+import './lib/twitch-auth.js';
 import chalk from 'chalk';
-import { Bot } from './bot.js';
+import { Bot, KickBot, sendMessage } from './bot.js';
 import Channel from './app/models/Channel.js';
 import {
     getRandomGreeting,
@@ -17,7 +18,7 @@ import {
     getRandomOnClearChat,
 } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
-import { knownBots } from './utils/twitch.js';
+import { getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 
@@ -38,6 +39,7 @@ if (!process.env.BOT_NAME || !process.env.BOT_PASSWORD) {
 if (!railwayConnected) {
     console.error(chalk.yellow('Missing RAILWAY_API_KEY in .env file. You cannot use !restart command'));
 }
+
 
 Bot.connect()
     .then(() => {
@@ -60,21 +62,22 @@ const processMessage = async ({ channel, context, username, message }) => {
     //console.log(await Channel.checkSharedBans(username))
 
 
-
-    console.log(channelData)
-
     if (!activeUsers[channel]) {
         activeUsers[channel] = {};
     }
 
-    if (autoTranslateUsers[username]) {
+    if(!autoTranslateUsers[channel]){
+        autoTranslateUsers[channel] = {};
+    }
+
+    if (autoTranslateUsers[channel][username]) {
         const translatedMessage = await translate(message, 'en', username);
         sendMessage(channel, translatedMessage);
         return;
     }
 
     if (message.toLowerCase().includes(`@${Bot.getUsername().toLowerCase()}`)) {
-        return Bot.say(channel, `@${username}, ${getRandomBotResponse()}`);
+        return sendMessage(channel, `@${username}, ${getRandomBotResponse()}`);
     }
 
 
@@ -97,9 +100,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     }
 };
 
-const sendMessage = (channel, message) => {
-    Bot.say(channel, message);
-};
+
 
 const onMessageHandler = (channel, context, message, self) => {
     if (context.username === Bot.getUsername() || self) return;
