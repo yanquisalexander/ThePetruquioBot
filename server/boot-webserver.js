@@ -11,11 +11,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 WebServer.use(bodyParser.json());
-WebServer.use(express.static(join(__dirname, '../', 'client', '.nuxt')));
 
 WebServer.get('*', (req, res) => {
     try {
-        res.sendFile(join(__dirname, '../', 'client', '.nuxt', 'index.html'));
+        res.sendFile(join(__dirname, '..', 'client', 'dist', 'index.html'));
     } catch (error) {
         res.json({ error: error.message });
     }
