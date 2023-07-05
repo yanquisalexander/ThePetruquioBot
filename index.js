@@ -66,7 +66,7 @@ const processMessage = async ({ channel, context, username, message }) => {
         activeUsers[channel] = {};
     }
 
-    if(!autoTranslateUsers[channel]){
+    if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
 
@@ -89,14 +89,14 @@ const processMessage = async ({ channel, context, username, message }) => {
             addGreetingToStack(channel, greetingMessage);
         }
 
-        const isCommand = message.startsWith('!');
-        if (isCommand) {
-            const args = message.slice(1).split(' ');
-            await handleCommand({ channel, context, username, message, toUser: args[1] });
-        }
     }
     else {
         console.log(chalk.bgWhite.magenta.bold(`Greetings are disabled in ${channel}`));
+    }
+    const isCommand = message.startsWith('!');
+    if (isCommand) {
+        const args = message.slice(1).split(' ');
+        await handleCommand({ channel, context, username, message, toUser: args[1] });
     }
 };
 
