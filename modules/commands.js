@@ -1,12 +1,9 @@
-import { Bot } from "../bot.js";
+import { Bot, sendMessage } from "../bot.js";
 import { autoTranslateUsers } from "../memory_variables.js";
 import { getRandomFact } from "./random-responses.js";
 import { langExpl, langList, translate } from "./translate.js";
 import { replaceVariables } from "../utils/variable-replacement.js";
 
-const sendMessage = (channel, message) => {
-    Bot.say(channel, message);
-}
 
 export const handleCommand = async ({ channel, context, username, message, toUser }) => {
     const args = message.slice(1).split(' ');
@@ -39,9 +36,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'autotranslate':
             const user = args[0].toLowerCase();
             if (user) {
-                autoTranslateUsers[user] = true;
+                autoTranslateUsers[channel][user] = true;
                 setTimeout(() => {
-                    delete autoTranslateUsers[user];
+                    delete autoTranslateUsers[channel][user];
                 }, 5 * 60 * 1000); // 5 minutos
                 sendMessage(channel, `Los mensajes de @${user} serán traducidos automáticamente al idioma del canal durante los próximos 5 minutos.`);
             } else {
