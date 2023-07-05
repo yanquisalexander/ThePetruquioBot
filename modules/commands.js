@@ -3,28 +3,16 @@ import { autoTranslateUsers } from "../memory_variables.js";
 import { getRandomFact } from "./random-responses.js";
 import { langExpl, langList, translate } from "./translate.js";
 import { replaceVariables } from "../utils/variable-replacement.js";
+import SpectatorLocation from "../app/models/SpectatorLocation.js";
+import WorldMap from "../app/models/WorldMap.js";
 
 
 export const handleCommand = async ({ channel, context, username, message, toUser }) => {
     const args = message.slice(1).split(' ');
     const command = args.shift().toLowerCase();
     switch (command) {
-        case 'hola':
-            return sendMessage(channel, await replaceVariables({ commandResponse: 'Sender: ${sender} ${fetch https://api.yanquisalexander.me/ping} toUser: ${touser} randomNum: ${randomNum 200-500}', channel, username, toUser }));
         case 'chao':
             return sendMessage(channel, `Chao, @${username}!`);
-        case 'bot':
-            return sendMessage(channel, `Soy un bot creado por @${process.env.BOT_CREATOR}!`);
-        case 'so':
-            return sendMessage(channel, `Recomiendo visitar el canal de @${process.env.BOT_CREATOR} en https://twitch.tv/${process.env.BOT_CREATOR}!`);
-        case 'discord':
-            return sendMessage(channel, `Únete a nuestro Discord en https://discord.gg/${process.env.DISCORD_INVITE}!`);
-        case 'twitter':
-            return sendMessage(channel, `Síguenos en Twitter en https://twitter.com/${process.env.TWITTER_USERNAME}!`);
-        case 'instagram':
-            return sendMessage(channel, `Síguenos en Instagram en https://instagram.com/${process.env.INSTAGRAM_USERNAME}!`);
-        case 'youtube':
-            return sendMessage(channel, `Síguenos en YouTube en https://youtube.com/${process.env.YOUTUBE_USERNAME}!`);
         case 'whoami':
             return sendMessage(channel, `Eres ${username}!`);
         case 'comandos':
@@ -32,7 +20,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'lang':
             return sendMessage(channel, langExpl[Math.floor(Math.random() * langExpl.length)]);
         case 'random':
-            return sendMessage(channel, `@${username}, ${getRandomFact()}`)
+            return sendMessage(channel, `@${username}, ${getRandomFact()}`);
         case 'autotranslate':
             const user = args[0].toLowerCase();
             if (user) {
@@ -44,6 +32,37 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             } else {
                 sendMessage(channel, `Debes especificar un nombre de usuario después del comando !autotranslate.`);
             }
+            return;
+        case 'from':
+            const location = args.join(' ');
+            if (location) {
+                const spectatorLocation = new SpectatorLocation(username, location);
+                await spectatorLocation.getGeocode();
+                await spectatorLocation.save();
+                sendMessage(channel, `Tu ubicación ha sido registrada correctamente.`);
+            } else {
+                sendMessage(channel, `Debes especificar una ubicación después del comando !from.`);
+            }
+            return;
+        case 'msg':
+            const messageContent = args.join(' ');
+            if (messageContent) {
+                const worldMap = new WorldMap(username, channel, true, messageContent, messageContent);
+                await worldMap.save();
+                sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
+            } else {
+                sendMessage(channel, `Debes especificar un mensaje después del comando !msg.`);
+            }
+            return;
+        case 'show':
+            const showMap = new WorldMap(username, channel, true);
+            await showMap.save();
+            sendMessage(channel, `Tu ubicación será mostrada en el mapa.`);
+            return;
+        case 'hide':
+            const hideMap = new WorldMap(username, channel, false);
+            await hideMap.save();
+            sendMessage(channel, `Tu ubicación no será mostrada en el mapa.`);
             return;
         default:
             if (langList.includes(command)) {

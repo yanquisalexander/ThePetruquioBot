@@ -21,6 +21,7 @@ import { handleCommand } from './modules/commands.js';
 import { getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
+import { WebServer } from './server/boot-webserver.js';
 
 try {
     dotenv.config();
@@ -39,6 +40,8 @@ if (!process.env.BOT_NAME || !process.env.BOT_PASSWORD) {
 if (!railwayConnected) {
     console.error(chalk.yellow('Missing RAILWAY_API_KEY in .env file. You cannot use !restart command'));
 }
+
+await WebServer.boot();
 
 
 Bot.connect()
