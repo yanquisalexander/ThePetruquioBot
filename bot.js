@@ -1,6 +1,7 @@
 import tmi from 'tmi.js'
 import dotenv from 'dotenv'
 import { KMI } from './lib/kick.js'
+import Channel from './app/models/Channel.js'
 dotenv.config()
 
 
@@ -9,7 +10,7 @@ export const Bot = new tmi.Client({
         username: process.env.BOT_NAME,
         password: process.env.BOT_PASSWORD
     },
-    channels: process.env.CHANNELS.split(',')
+    channels: await Channel.getAutoJoinChannels()
 })
 
 export const KickBot = new KMI([],

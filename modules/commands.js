@@ -5,6 +5,8 @@ import { langExpl, langList, translate } from "./translate.js";
 import { replaceVariables } from "../utils/variable-replacement.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import WorldMap from "../app/models/WorldMap.js";
+import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
+import { HelixClient, getChannelInfo } from "../utils/twitch.js";
 
 
 export const handleCommand = async ({ channel, context, username, message, toUser }) => {
@@ -47,7 +49,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'msg':
             const messageContent = args.join(' ');
             if (messageContent) {
-                const worldMap = new WorldMap(username, channel, true, messageContent, messageContent);
+                const worldMap = new WorldMap(username, channel.replace('#', ''), true, messageContent, messageContent);
                 await worldMap.save();
                 sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
             } else {
@@ -55,15 +57,60 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'show':
-            const showMap = new WorldMap(username, channel, true);
+            const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
             sendMessage(channel, `Tu ubicación será mostrada en el mapa.`);
             return;
         case 'hide':
-            const hideMap = new WorldMap(username, channel, false);
+            const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             sendMessage(channel, `Tu ubicación no será mostrada en el mapa.`);
             return;
+        case 'emote':
+            const pinEmote = args[0];
+            if (pinEmote) {
+                let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/1.0`
+                const emoteMap = new WorldMap(username, channel.replace('#', ''), true, emoteUrl);
+                await emoteMap.save();
+                sendMessage(channel, `@${username}, tu Pin se ha sido guardado correctamente.`);
+            } else {
+                sendMessage(channel, `@${username}, Debes especificar un emote después del comando !emote.`);
+            }
+            return;
+        case 'join':
+            if (channel.replace('#', '') === Bot.getUsername()) {
+                console.log(channel);
+                let joinChannel = channel; // Por defecto, unirse al canal actual
+                if (username === 'alexitoo_uy') {
+                    if(args.length > 0) {
+                        joinChannel = args[0].toLowerCase(); // Si el usuario es "alexitoo_uy", se acepta el parámetro como nombre de canal
+                    } else {
+                        return sendMessage(channel, `¡Debes especificar un canal después del comando !join!`);
+                    }
+                }
+
+                let channelInfo = await getChannelInfo(joinChannel)
+                try {
+                    await Channel.addChannel({
+                        name: joinChannel,
+                        team_id: null,
+                        twitch_id: channelInfo.id,
+                        settings: { ...SETTINGS_MODEL },
+                        auto_connect: true
+                    })
+
+                    Bot.join(joinChannel)
+
+                } catch (error) {
+                    return sendMessage(channel, `¡El bot no se ha podido unir al canal ${joinChannel}!`);
+                }
+
+                return sendMessage(channel, `¡El bot se ha unido al canal ${joinChannel} correctamente!`);
+            }
+            return;
+
+
+
         default:
             if (langList.includes(command)) {
                 let translated = await translate(message, command, username)

@@ -1,6 +1,6 @@
 import { db } from "../../lib/database.js";
 
-let SETTINGS_MODEL = {
+export const SETTINGS_MODEL = {
     language: 'es',
     about: null,
     shoutOutPresentation: null,
@@ -44,6 +44,17 @@ class Channel {
         );
         return channels;
     }
+
+    // Método para obtener un array de canales a los que se debe unir automáticamente
+
+    static async getAutoJoinChannels() {
+        const query = 'SELECT name FROM channels WHERE auto_connect = true';
+        const { rows } = await db.query(query);
+        const channels = rows.map((row) => row.name);
+        return channels;
+    }
+
+
 
     // Método estático para obtener un canal por su nombre desde la base de datos
     static async getChannelByName(name) {
@@ -99,6 +110,20 @@ class Channel {
         const banCount = parseInt(rows[0].ban_count);
         return banCount >= 3; // Verificar si se ha alcanzado el límite de bans compartidos para el usuario
     }
+
+    static async addChannel({ name, twitch_id, settings, team_id, auto_connect }) {
+        const query = `
+            INSERT INTO channels (name, twitch_id, settings, team_id, auto_connect)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id
+        `;
+        const values = [name.toLowerCase(), twitch_id, settings, team_id, auto_connect];
+        const { rows } = await db.query(query, values);
+        const newChannelId = rows[0].id;
+        return newChannelId;
+    }
+
+
 }
 
 export default Channel;

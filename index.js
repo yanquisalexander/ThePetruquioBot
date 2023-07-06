@@ -59,7 +59,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isBroadcaster = isModerator && context.badges.broadcaster;
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
-    const greetingsEnabled = channelData.settings.greetings.enabled
+    const greetingsEnabled = channelData?.settings?.greetings?.enabled || false;
 
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))
