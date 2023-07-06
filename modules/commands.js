@@ -49,6 +49,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'msg':
             const messageContent = args.join(' ');
             if (messageContent) {
+                if(messageContent.length > 100) {
+                    return sendMessage(channel, `@${username}, el mensaje no puede ser mayor a 100 caracteres.`);
+                }
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, messageContent, messageContent);
                 await worldMap.save();
                 sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
@@ -79,7 +82,6 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'join':
             if (channel.replace('#', '') === Bot.getUsername()) {
-                console.log(channel);
                 let joinChannel = channel; // Por defecto, unirse al canal actual
                 if (username === 'alexitoo_uy') {
                     if (args.length > 0) {
