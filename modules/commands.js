@@ -59,12 +59,12 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'show':
             const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
-            sendMessage(channel, `Tu ubicación será mostrada en el mapa.`);
+            sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             return;
         case 'hide':
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
-            sendMessage(channel, `Tu ubicación no será mostrada en el mapa.`);
+            sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
             const pinEmote = args[0];

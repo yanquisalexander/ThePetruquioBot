@@ -10,7 +10,7 @@ export const Bot = new tmi.Client({
         username: process.env.BOT_NAME,
         password: process.env.BOT_PASSWORD
     },
-    channels: await Channel.getAutoJoinChannels()
+    channels: process.env.NODE_ENV === 'production' ? await Channel.getAutoJoinChannels() : process.env.CHANNELS.split(',')
 })
 
 export const KickBot = new KMI([],
