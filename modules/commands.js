@@ -82,7 +82,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 console.log(channel);
                 let joinChannel = channel; // Por defecto, unirse al canal actual
                 if (username === 'alexitoo_uy') {
-                    if(args.length > 0) {
+                    if (args.length > 0) {
                         joinChannel = args[0].toLowerCase(); // Si el usuario es "alexitoo_uy", se acepta el parámetro como nombre de canal
                     } else {
                         return sendMessage(channel, `¡Debes especificar un canal después del comando !join!`);
@@ -109,8 +109,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
 
-
-
+        case 'map':
+            return sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
         default:
             if (langList.includes(command)) {
                 let translated = await translate(message, command, username)
