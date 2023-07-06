@@ -52,7 +52,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 if(messageContent.length > 100) {
                     return sendMessage(channel, `@${username}, el mensaje no puede ser mayor a 100 caracteres.`);
                 }
-                const worldMap = new WorldMap(username, channel.replace('#', ''), true, messageContent, messageContent);
+                const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
                 await worldMap.save();
                 sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
             } else {
