@@ -1,11 +1,16 @@
 import { Router } from 'express'
 import WorldMapRouter from './world-map.js'
+import StatsRouter from './stats.js'
 
 let routes = Router()
 let RouterMap = [
     {
         path: '/map',
         handler: WorldMapRouter
+    },
+    {
+        path: '/stats',
+        handler: StatsRouter
     },
     {
         path: '*',

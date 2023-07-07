@@ -27,3 +27,5 @@ export const sendMessage = (channel, message, platform = 'twitch') => {
         KickBot.say(channel, message);
     }
 };
+
+export const bootedAt = Date.now()
