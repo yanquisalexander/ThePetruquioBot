@@ -18,7 +18,7 @@ import {
     getRandomOnClearChat,
 } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
-import { getChannelInfo, knownBots } from './utils/twitch.js';
+import { HelixEventListener, getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
@@ -42,6 +42,8 @@ if (!railwayConnected) {
 }
 
 await WebServer.boot();
+
+
 
 
 Bot.connect()

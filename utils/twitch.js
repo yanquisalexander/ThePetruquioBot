@@ -1,5 +1,6 @@
 import { ApiClient } from '@twurple/api';
 import { getAccessToken, authProvider } from '../lib/twitch-auth.js';
+import { EventSubWsListener } from '@twurple/eventsub-ws';
 
 export const HelixClient = new ApiClient({
     authProvider
@@ -11,6 +12,9 @@ export const isFollower = async (username, channel) => {
 
 export const knownBots = ["streamelements", "streamlabs", "nightbot"];
 
+export const HelixEventListener = new EventSubWsListener({
+    apiClient: HelixClient
+})
 
 
 

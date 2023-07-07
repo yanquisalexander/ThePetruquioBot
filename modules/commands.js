@@ -72,7 +72,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'emote':
             const pinEmote = args[0];
             if (pinEmote) {
-                let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/1.0`
+                let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
                 const emoteMap = new WorldMap(username, channel.replace('#', ''), true, emoteUrl);
                 await emoteMap.save();
                 sendMessage(channel, `@${username}, tu Pin se ha sido guardado correctamente.`);
