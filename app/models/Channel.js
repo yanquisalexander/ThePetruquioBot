@@ -1,6 +1,7 @@
 import { db } from "../../lib/database.js";
 
 export const SETTINGS_MODEL = {
+    muted: false,
     language: 'es',
     about: null,
     shoutOutPresentation: null,
