@@ -18,7 +18,7 @@ import {
     getRandomOnClearChat,
 } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
-import { HelixEventListener, getChannelInfo, knownBots } from './utils/twitch.js';
+import { getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
@@ -184,4 +184,4 @@ Bot.on('join', (channel, username, self) => {
         console.log(chalk.yellow.bold(`Joined ${channel}`));
     }
 });
-Bot.on('raided', onRaidedHandler)
+//Bot.on('raided', onRaidedHandler)

@@ -27,6 +27,7 @@
     "node-gtrans": "^1.6.1",
     "pg": "^8.11.1",
     "pusher-js": "^8.2.0",
+    "tesjs": "^1.0.2",
     "tmi.js": "^1.8.5",
     "tough-cookie": "^4.1.3"
   }

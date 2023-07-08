@@ -30,6 +30,7 @@ let RouterMap = [
     }
 ]
 
+
 RouterMap.map(route => {
     routes.use(route.path, route.handler)
 })
