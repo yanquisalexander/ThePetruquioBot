@@ -13,7 +13,7 @@ const tes = new TES({
     },
     listener: {
         type: "webhook",
-        baseURL: process.env.NODE_ENV === "production" ? "api.petruquiobot.live" : "https://api-local.petruquiobot.live",
+        baseURL: process.env.NODE_ENV === "production" ? "https://api.petruquiobot.live" : "https://api-local.petruquiobot.live",
         secret: 'WEBHOOKS_SECRET', // this should be different from your client secret and should also be using an environment variable,
         server: WebServer
     }
