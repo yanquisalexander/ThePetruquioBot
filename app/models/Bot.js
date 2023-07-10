@@ -1,3 +1,5 @@
+import { db } from "../../lib/database.js";
+
 class BotModel {
 
   static async addBan(channel) {
