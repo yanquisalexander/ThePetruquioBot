@@ -118,7 +118,7 @@ const onMessageHandler = (channel, context, message, self) => {
 
 const onChatClearedHandler = (channel) => {
     console.log(chalk.bgWhite.magenta.bold(`Chat has been cleared in ${channel}`));
-    Bot.say(channel, getRandomOnClearChat());
+    //Bot.say(channel, getRandomOnClearChat());
 };
 
 const onWhisperHandler = (from, context, message, self) => {
