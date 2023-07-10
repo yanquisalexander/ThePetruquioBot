@@ -65,8 +65,8 @@ const processMessage = async ({ channel, context, username, message }) => {
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
     const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
     const settings = channelData?.settings || {};
-    console.log(settings)
-    const greetingsEnabled = settings?.greetings?.enabled || false;
+    const greetingsEnabled = settings?.enableGreetings.value || false;
+    const isMuted = settings?.botMuted.value || false;
 
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))
@@ -79,6 +79,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
+    if(isMuted) return;
 
     if (autoTranslateUsers[channel][username]) {
         const translatedMessage = await translate(message, 'en', username);
