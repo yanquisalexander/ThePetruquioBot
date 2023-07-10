@@ -9,7 +9,7 @@ class BotModel {
     await db.query(query, values);
 
     // Actualizar el valor de auto_connect a false en la tabla channels
-    const updateQuery = 'UPDATE channels SET auto_connect = false WHERE channel_id = $1';
+    const updateQuery = 'UPDATE channels SET auto_connect = false WHERE twitch_id = $1';
     const updateValues = [channel];
     await db.query(updateQuery, updateValues);
   }

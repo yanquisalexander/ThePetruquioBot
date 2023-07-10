@@ -131,7 +131,7 @@ const onNoticeHandler = async (channel, msgid, message) => {
         console.log('>>>>', 'NOTICE', channel, msgid, message);
         if (msgid === 'msg_banned') {
             const chan = channel.toLowerCase().substring(1);
-            let channelData = await Channel.getChannelByName(chan);
+            let channelData = await getChannelInfo(chan);
             await BotModel.addBan(channelData.id)
             console.log(`Bot has been banned on ${chan} channel :(`);
             
