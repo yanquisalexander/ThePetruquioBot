@@ -4,7 +4,7 @@ import Cache from "../Cache.js";
 const ChannelsCache = new Cache();
 
 export const SETTINGS_MODEL = {
-  botMuted: {
+  bot_muted: {
     type: 'boolean',
     value: false,
   },
@@ -16,35 +16,35 @@ export const SETTINGS_MODEL = {
     type: 'string',
     value: '',
   },
-  shoutOutPresentation: {
+  shoutout_presentation: {
     type: 'string',
     value: '',
   },
-  enableTranslation: {
+  enable_translation: {
     type: 'boolean',
     value: false,
   },
-  enableConversation: {
+  enable_conversation: {
     type: 'boolean',
     value: false,
   },
-  conversationPrompt: {
+  conversation_prompt: {
     type: 'string',
     value: '',
   },
-  enableDetoxify: {
+  enable_detoxify: {
     type: 'boolean',
     value: false,
   },
-  enableGreetings: {
+  enable_greetings: {
     type: 'boolean',
     value: false,
   },
-  enableCommunityMap: {
+  enable_community_map: {
     type: 'boolean',
     value: true,
   },
-  enableAutoShoutout: {
+  enable_auto_shoutout: {
     type: 'boolean',
     value: true,
   },

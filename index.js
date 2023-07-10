@@ -65,8 +65,8 @@ const processMessage = async ({ channel, context, username, message }) => {
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
     const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
     const settings = channelData?.settings || {};
-    const greetingsEnabled = settings?.enableGreetings.value || false;
-    const isMuted = settings?.botMuted.value || false;
+    const greetingsEnabled = settings?.enable_greetings.value || false;
+    const isMuted = settings?.bot_muted.value || false;
 
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))
