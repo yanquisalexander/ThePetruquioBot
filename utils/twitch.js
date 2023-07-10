@@ -18,7 +18,6 @@ export const isFollower = async (username, channel) => {
         const channelInfo = await HelixClient.users.getUserByName(channel);
         const follows = await HelixClient.users.getFollows({ user, followedUser: channelInfo });
         const follower = follows.total > 0;
-        console.log(follower);
         return follower;
     } catch (error) {
         console.error(`Error al verificar si es seguidor: ${error}`);
