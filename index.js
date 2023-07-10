@@ -59,9 +59,13 @@ const onConnectedHandler = (address, port) => {
 const processMessage = async ({ channel, context, username, message }) => {
     const isModerator = context.mod || Boolean(context.badges?.broadcaster);
     const isBroadcaster = isModerator && context.badges.broadcaster;
+    channel = channel.slice(1);
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
-    const greetingsEnabled = channelData?.settings?.greetings?.enabled || false;
+    const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
+    const settings = channelData?.settings || {};
+    console.log(settings)
+    const greetingsEnabled = settings?.greetings?.enabled || false;
 
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))

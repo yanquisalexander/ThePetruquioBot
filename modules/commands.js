@@ -81,8 +81,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'join':
-            if (channel.replace('#', '') === Bot.getUsername()) {
-                let joinChannel = channel; // Por defecto, unirse al canal actual
+            if (channel === Bot.getUsername()) {
+                let joinChannel = username; // Por defecto, unirse al canal actual
                 if (username === 'alexitoo_uy') {
                     if (args.length > 0) {
                         joinChannel = args[0].toLowerCase(); // Si el usuario es "alexitoo_uy", se acepta el parámetro como nombre de canal

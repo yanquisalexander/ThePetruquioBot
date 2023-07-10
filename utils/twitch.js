@@ -1,6 +1,7 @@
 import { ApiClient } from '@twurple/api';
 import { getAccessToken, authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import { EventSubWsListener } from '@twurple/eventsub-ws';
+import Cache from '../app/Cache.js';
 
 export const AppClient = new ApiClient({
     authProvider: appTokenProvider
@@ -11,18 +12,34 @@ export const HelixClient = new ApiClient({
 });
 
 export const isFollower = async (username, channel) => {
-    return true;
+    let channelData = TwitchCache.get(channel)
+    try {
+        const user = await HelixClient.users.getUserByName(username);
+        const follower = await HelixClient.users.getFollows({ user, followedUser: channelData.id });
+        console.log(follower.total > 0);
+        return follower.total > 0;
+    } catch (error) {
+        console.error(`Error al verificar si es follower: ${error}`);
+        return false;
+    }
 }
 
 export const knownBots = ["streamelements", "streamlabs", "nightbot"];
 
+const TwitchCache = new Cache();
 
 
 
 
 export const getChannelInfo = async (channelName) => {
+    const cachedData = TwitchCache.get(channelName);
+    if (cachedData) {
+        return cachedData;
+    }
+
     try {
         const user = await HelixClient.users.getUserByName(channelName);
+        TwitchCache.set(channelName, user);
         return user;
     } catch (error) {
         console.error(`Error al obtener la información del broadcaster: ${error}`);

@@ -34,7 +34,6 @@ export const addGreetingToStack = (channel, message, options) => {
 };
 
 const canReceiveGreeting = (channel, username, channelOwner) => {
-
     if (username.toLowerCase() === 'alexitoo_uy' && channelOwner.toLowerCase() !== 'alexitoo_uy') {
         // Verificar si el usuario es el creador del bot
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
@@ -57,7 +56,7 @@ const canReceiveGreeting = (channel, username, channelOwner) => {
 
 
     // Comprobar si el usuario es seguidor del canal
-    if (isFollower(username)) {
+    if (isFollower(username, channel.slice(1))) {
         // Comprobar si el usuario ha pasado al menos 6 horas desde su último mensaje
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
             return false;

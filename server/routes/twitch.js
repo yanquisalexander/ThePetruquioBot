@@ -4,7 +4,7 @@ import TES from "tesjs";
 import { WebServer } from "../boot-webserver.js";
 
 const TwitchRouter = Router();
-
+/* 
 // initialize TESjs
 const tes = new TES({
     identity: {
@@ -21,12 +21,14 @@ const tes = new TES({
      let c = await getChannelInfo('alexitoo_uy')
 tes.subscribe('channel.channel_points_custom_reward_redemption.add', { 
     broadcaster_user_id: c.id // the id of the channel you want to listen to
+}).catch(err => {
+    console.log(err)
 })
 
 tes.on('channel.channel_points_custom_reward_redemption.add', async (event) => {
     console.log(event)
     // do something with the event
-})
+}) */
 
 
 export default TwitchRouter;
