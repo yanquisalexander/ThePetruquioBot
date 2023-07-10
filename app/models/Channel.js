@@ -1,5 +1,5 @@
 import { db } from "../../lib/database.js";
-import Cache from "../cache.js";
+import Cache from "../Cache.js";
 
 const ChannelsCache = new Cache();
 
