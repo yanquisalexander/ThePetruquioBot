@@ -162,7 +162,7 @@ class Channel {
     const banValues = [twitch_id];
     const banResult = await db.query(banQuery, banValues);
     if (banResult.rows.length > 0) {
-      throw new Error('El bot ha sido baneado en este canal.');
+      throw new Error('Bot has been banned from this channel');
     }
 
     const query = `
