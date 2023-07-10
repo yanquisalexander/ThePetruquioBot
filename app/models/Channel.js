@@ -89,7 +89,7 @@ class Channel {
   // Método estático para obtener un canal por su nombre desde la base de datos
   static async getChannelByName(name) {
     let cachedChannel = ChannelsCache.get(`channel-${name}`);
-    if(cachedChannel) {
+    if (cachedChannel) {
       return cachedChannel;
     }
     const query = 'SELECT * FROM channels WHERE LOWER(name) = $1'; // Buscar por el nombre en minúsculas
@@ -107,7 +107,7 @@ class Channel {
       settings: settings,
     })
     ChannelsCache.set(`channel-${name}`, channel);
-    
+
     return channel;
   }
 
@@ -157,16 +157,25 @@ class Channel {
   }
 
   static async addChannel({ name, twitch_id, settings, team_id, auto_connect }) {
+    // Verificar si el canal está baneado en la tabla bot_bans
+    const banQuery = 'SELECT channel_id FROM bot_bans WHERE channel_id = $1';
+    const banValues = [twitch_id];
+    const banResult = await db.query(banQuery, banValues);
+    if (banResult.rows.length > 0) {
+      throw new Error('El bot ha sido baneado en este canal.');
+    }
+
     const query = `
-            INSERT INTO channels (name, twitch_id, settings, team_id, auto_connect)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id
-        `;
+      INSERT INTO channels (name, twitch_id, settings, team_id, auto_connect)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+    `;
     const values = [name.toLowerCase(), twitch_id, settings, team_id, auto_connect];
     const { rows } = await db.query(query, values);
     const newChannelId = rows[0].id;
     return newChannelId;
   }
+
 
 
 }

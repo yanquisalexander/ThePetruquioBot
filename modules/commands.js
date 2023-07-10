@@ -104,10 +104,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     Bot.join(joinChannel)
 
                 } catch (error) {
-                    return sendMessage(channel, `¡El bot no se ha podido unir al canal ${joinChannel}!`);
+                    return sendMessage(channel, `¡El bot no se ha podido unir al canal de @${joinChannel}! - ${error}`);
                 }
 
-                return sendMessage(channel, `¡El bot se ha unido al canal ${joinChannel} correctamente!`);
+                return sendMessage(channel, `¡El bot se ha unido al canal de @${joinChannel} correctamente!`);
             }
             return;
 

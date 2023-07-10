@@ -134,8 +134,10 @@ const onNoticeHandler = async (channel, msgid, message) => {
             let channelData = await getChannelInfo(chan);
             await BotModel.addBan(channelData.id)
             console.log(`Bot has been banned on ${chan} channel :(`);
-            
+            Bot.part(channel);
+            console.log(`Bot has left ${chan} channel`);
         }
+
     } catch (e) {
         console.error(e);
     }
