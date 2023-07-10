@@ -22,6 +22,7 @@ import { getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
+import BotModel from './app/models/Bot.js';
 
 try {
     dotenv.config();
@@ -125,12 +126,15 @@ const onWhisperHandler = (from, context, message, self) => {
     console.log(chalk.bgWhite.blue.bold(`Whisper received from ${from}: ${message}`));
 };
 
-const onNoticeHandler = (channel, msgid, message) => {
+const onNoticeHandler = async (channel, msgid, message) => {
     try {
         console.log('>>>>', 'NOTICE', channel, msgid, message);
         if (msgid === 'msg_banned') {
             const chan = channel.toLowerCase().substring(1);
+            let channelData = await Channel.getChannelByName(chan);
+            await BotModel.addBan(channelData.id)
             console.log(`Bot has been banned on ${chan} channel :(`);
+            
         }
     } catch (e) {
         console.error(e);
