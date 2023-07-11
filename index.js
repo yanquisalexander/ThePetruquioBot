@@ -60,7 +60,7 @@ const onConnectedHandler = (address, port) => {
 const processMessage = async ({ channel, context, username, message }) => {
     const isModerator = context.mod || Boolean(context.badges?.broadcaster);
     const isBroadcaster = isModerator && context.badges.broadcaster;
-    channel = channel.slice(1);
+    channel = channel.replace('#', '');
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
     const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
@@ -187,6 +187,9 @@ setInterval(() => {
 
 Bot.on('connected', onConnectedHandler);
 Bot.on('chat', onMessageHandler);
+Bot.on('disconnected', (reason) => {
+    console.log(chalk.bgWhite.magenta.bold(`Disconnected from Twitch: ${reason}`));
+})
 Bot.on('clearchat', onChatClearedHandler);
 Bot.on('whisper', onWhisperHandler);
 Bot.on('notice', onNoticeHandler);
@@ -195,4 +198,5 @@ Bot.on('join', (channel, username, self) => {
         console.log(chalk.yellow.bold(`Joined ${channel}`));
     }
 });
+
 //Bot.on('raided', onRaidedHandler)
