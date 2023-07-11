@@ -8,6 +8,9 @@ import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
 import { HelixClient, getChannelInfo } from "../utils/twitch.js";
 
+const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
+const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
+
 
 export const handleCommand = async ({ channel, context, username, message, toUser }) => {
     const args = message.slice(1).split(' ');
@@ -49,7 +52,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'msg':
             const messageContent = args.join(' ');
             if (messageContent) {
-                if(messageContent.length > 100) {
+                if (messageContent.length > 100) {
                     return sendMessage(channel, `@${username}, el mensaje no puede ser mayor a 100 caracteres.`);
                 }
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
@@ -100,8 +103,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         settings: { ...SETTINGS_MODEL },
                         auto_connect: true
                     })
-
-                    Bot.join(joinChannel)
+                    if (process.env.NODE_ENV === 'production') {
+                        Bot.join(joinChannel)
+                    }
 
                 } catch (error) {
                     return sendMessage(channel, `¡El bot no se ha podido unir al canal de @${joinChannel}! - ${error.message}`);
@@ -111,6 +115,36 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
 
+        case 'part':
+            if (channel === Bot.getUsername()) {
+                let partChannel = username; // Por defecto, salir del canal del usuario que envió el comando
+                if (username === 'alexitoo_uy') {
+                    if (args.length > 0) {
+                        partChannel = args[0].toLowerCase(); // Si el usuario es "alexitoo_uy", se acepta el parámetro como nombre de canal
+                        Bot.part(partChannel).then(async () => {
+                            await Channel.deleteChannelByName(partChannel)
+                            return sendMessage(channel, `¡El bot se ha desconectado del canal de @${partChannel} correctamente!`);
+                        }).catch((error) => {
+                            return sendMessage(channel, `¡El bot no se ha podido salir del canal de @${partChannel}! - ${error.message}`);
+                        })
+
+                    } else {
+                        return sendMessage(channel, `¡Debes especificar un canal después del comando !part!`);
+                    }
+                }
+
+                try {
+                    Bot.part(partChannel).then(async () => {
+                        await Channel.deleteChannelByName(partChannel)
+                        return sendMessage(channel, `¡El bot se ha desconectado del canal de @${partChannel} correctamente!`);
+                    }).catch((error) => {
+                        return sendMessage(channel, `¡El bot no se ha podido salir del canal de @${partChannel}! - ${error.message}`);
+                    })
+                } catch (error) {
+                    return sendMessage(channel, `¡El bot no se ha podido salir del canal de @${partChannel}! - ${error.message}`);
+                }
+            }
+            return;
         case 'map':
             return sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
         default:

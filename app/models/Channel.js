@@ -136,10 +136,25 @@ class Channel {
 
   // Método para eliminar el canal de la base de datos
   async delete() {
-    const query = 'DELETE FROM channels WHERE id = $1';
-    const values = [this.id];
+    const query = 'DELETE FROM channels WHERE name = $1';
+    const values = [this.name];
     await db.query(query, values);
   }
+
+  static async deleteChannelByName(channelName) {
+    try {
+
+      const query = 'DELETE FROM channels WHERE name = $1';
+      const values = [channelName];
+      await db.query(query, values);
+
+      console.log(`Canal ${channelName} eliminado de la base de datos`);
+    } catch (error) {
+      console.log(`Error al eliminar el canal ${channelName} de la base de datos: ${error}`);
+      throw error.message;
+    }
+  }
+
 
   static async checkSharedBans(username) {
     const query = `
