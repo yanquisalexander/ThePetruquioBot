@@ -1,6 +1,5 @@
 import tmi from 'tmi.js'
 import dotenv from 'dotenv'
-import { KMI } from './lib/kick.js'
 import Channel from './app/models/Channel.js'
 dotenv.config()
 
@@ -13,9 +12,7 @@ export const Bot = new tmi.Client({
     channels: process.env.NODE_ENV === 'production' ? await Channel.getAutoJoinChannels() : process.env.CHANNELS.split(',')
 })
 
-export const KickBot = new KMI([],
-    process.env.KICK_BOT_TOKEN
-)
+
 
 
 export const sendMessage = (channel, message, platform = 'twitch') => {

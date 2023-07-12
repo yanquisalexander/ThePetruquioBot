@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { db } from "../../lib/database.js";
 import Cache from "../Cache.js";
 
@@ -8,11 +9,11 @@ export const SETTINGS_MODEL = {
     type: 'boolean',
     value: false,
   },
-  language: {
+  channel_language: {
     type: 'string',
     value: 'es',
   },
-  about: {
+  channel_about: {
     type: 'string',
     value: '',
   },
@@ -100,6 +101,13 @@ class Channel {
     }
     const channelData = rows[0];
     const settings = { ...SETTINGS_MODEL, ...channelData.settings };
+    Object.keys(settings).reduce((acc, key) => {
+      if (!(key in SETTINGS_MODEL)) {
+        console.log(chalk.yellow(`WARNING: The setting "${key}" is not defined in the model`));
+        delete settings[key];
+      }
+      return acc;
+    }, {});
     let channel = new Channel({
       id: channelData.id,
       name: channelData.name,

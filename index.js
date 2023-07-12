@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import './lib/twitch-auth.js';
 import chalk from 'chalk';
-import { Bot, KickBot, sendMessage } from './bot.js';
+import { Bot, sendMessage } from './bot.js';
 import Channel from './app/models/Channel.js';
 import {
     getRandomGreeting,
@@ -23,6 +23,19 @@ import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
 import BotModel from './app/models/Bot.js';
+
+// Clear console on start to avoid clutter from previous sessions (in production mode) 
+console.clear();
+
+
+
+// Monkey patching console.log to add timestamp to logs
+const originalLog = console.log;
+console.log = (...args) => {
+    originalLog(`[${new Date().toLocaleString()}]`, ...args);
+};
+
+
 
 try {
     dotenv.config();
@@ -79,7 +92,10 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
-    if(isMuted) return;
+    if(isMuted) {
+        console.log(chalk.yellow.bold(`Bot is muted in ${channel} :(`));
+        return;
+    }
 
     if (autoTranslateUsers[channel][username]) {
         const translatedMessage = await translate(message, 'en', username);
@@ -93,16 +109,13 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
     if (greetingsEnabled) {
-        if (canReceiveGreeting(channel, username, channel.replace('#', ''))) {
+        if (canReceiveGreeting(channel, username, channel)) {
             activeUsers[channel][username] = Date.now();
             const isBot = knownBots.includes(username.toLowerCase());
             const greetingMessage = getRandomGreeting(username, isBot);
             addGreetingToStack(channel, greetingMessage);
         }
 
-    }
-    else {
-        console.log(chalk.bgWhite.magenta.bold(`Greetings are disabled in ${channel}`));
     }
     const isCommand = message.startsWith('!');
     if (isCommand) {
@@ -195,7 +208,7 @@ Bot.on('whisper', onWhisperHandler);
 Bot.on('notice', onNoticeHandler);
 Bot.on('join', (channel, username, self) => {
     if (self) {
-        console.log(chalk.yellow.bold(`Joined ${channel}`));
+        console.log(chalk.green.bold(`Joined ${channel}`));
     }
 });
 
