@@ -48,7 +48,7 @@ const formatSettingName = (setting) => {
     try {
       const channelData = await Channel.getChannelByName(channel);
       if (channelData.settings.hasOwnProperty(setting) && typeof channelData.settings[setting] === 'object' && channelData.settings[setting].hasOwnProperty('value')) {
-        channelData.settings[setting].value = value;
+        channelData.settings[setting].value = parsedValue;
       }
     await channelData.updateSettings();
     if(setting === 'bot-muted' && value === true) return;
