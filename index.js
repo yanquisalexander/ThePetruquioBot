@@ -113,6 +113,7 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
     if (Settings.enable_greetings) {
+        if(Settings.bot_muted) return; // Don't greet if bot is muted
         if (canReceiveGreeting(channel, username, channel)) {
             activeUsers[channel][username] = Date.now();
             const isBot = knownBots.includes(username.toLowerCase());
