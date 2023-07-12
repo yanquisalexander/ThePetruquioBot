@@ -39,7 +39,7 @@ const canReceiveGreeting = (channel, username, channelOwner) => {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
             return false;
         }
-        addGreetingToStack(channel, 'Meet Alexitoo, my creator. They are a talented individual who has brought me to life! Make sure to check out their channel and show them some love. twitch.tv/alexitoo_uy');
+        addGreetingToStack(channel, 'Meet Alexitoo, my creator 😸. They are a talented individual who has brought me to life! Make sure to check out their channel and show them some love. twitch.tv/alexitoo_uy');
     }
 
     // Verificar si el usuario es el propietario del canal
