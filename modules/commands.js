@@ -7,12 +7,61 @@ import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
 import { HelixClient, getChannelInfo } from "../utils/twitch.js";
+import { channel } from "diagnostics_channel";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
 
+const formatSettingName = (setting) => {
+    // Reemplazar guiones medios por guiones bajos
+    let formattedName = setting.replace(/-/g, '_');
+  
+    // Convertir formato camelCase a formato con guiones bajos
+    formattedName = formattedName.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  
+    return formattedName;
+  };
+  
 
-export const handleCommand = async ({ channel, context, username, message, toUser }) => {
+  const updateSetting = async (channel, setting, value) => {
+    // Obtener el tipo de ajuste
+    const settingType = SETTINGS_MODEL[setting].type;
+  
+    // Convertir el valor según el tipo de ajuste
+    let parsedValue;
+    if (settingType === 'boolean') {
+      // Convertir valores booleanos alternativos a true o false
+      if (value === 'on' || value === '1') {
+        parsedValue = true;
+      } else if (value === 'off' || value === '0') {
+        parsedValue = false;
+      } else {
+        Bot.say(channel, `El valor ${value} no es válido para el ajuste ${setting}`);
+        return;
+      }
+    } else if (settingType === 'string') {
+      parsedValue = value; // Para ajustes de tipo string, no se requiere ninguna conversión
+    }
+  
+  
+    // Guardar los cambios en la base de datos
+    try {
+      const channelData = await Channel.getChannelByName(channel);
+      if (channelData.settings.hasOwnProperty(setting) && typeof channelData.settings[setting] === 'object' && channelData.settings[setting].hasOwnProperty('value')) {
+        channelData.settings[setting].value = value;
+      }
+    await channelData.updateSettings();
+    if(setting === 'bot-muted' && value === true) return;
+    Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
+    } catch (error) {
+      Bot.say(channel, `Ha ocurrido un error al intentar actualizar el ajuste ${setting}`);
+      console.error(error);
+    }
+  }
+  
+
+
+export const handleCommand = async ({ channel, context, username, message, toUser, isModerator }) => {
     const args = message.slice(1).split(' ');
     const command = args.shift().toLowerCase();
     switch (command) {
@@ -147,6 +196,39 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'map':
             return sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
+            case 'set':
+                // Verificar si el usuario es un moderador
+                if (!isModerator) {
+                  return;
+                }
+              
+                // Verificar si se proporcionó un ajuste y un valor
+                if (args.length < 2) {
+                  Bot.say(channel, `@${username}, Uso correcto: !set <ajuste> <valor>`);
+                  return;
+                }
+              
+                // Obtener el ajuste y el valor del mensaje
+                const setting = args[0];
+                const value = args.slice(1).join(' ');
+              
+                // Verificar si el ajuste es válido según SETTINGS_MODEL en formato camelCase
+                if (setting in SETTINGS_MODEL) {
+                  await updateSetting(channel, setting, value);
+                }
+                // Verificar si el ajuste es válido según SETTINGS_MODEL en formato con guiones medios
+                else {
+                  const formattedSetting = formatSettingName(setting);
+                  if (formattedSetting in SETTINGS_MODEL) {
+                   await updateSetting(channel, formattedSetting, value);
+                  } else {
+                    Bot.say(channel, `@${username}, El ajuste "${setting}" no existe.`);
+                  }
+                }
+              
+                break;
+              
+
         default:
             if (langList.includes(command)) {
                 let translated = await translate(message, command, username)

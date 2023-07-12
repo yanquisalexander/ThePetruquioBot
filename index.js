@@ -92,7 +92,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
-    if(isMuted) {
+    if (isMuted && !isModerator) {
         console.log(chalk.yellow.bold(`Bot is muted in ${channel} :(`));
         return;
     }
@@ -120,7 +120,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isCommand = message.startsWith('!');
     if (isCommand) {
         const args = message.slice(1).split(' ');
-        await handleCommand({ channel, context, username, message, toUser: args[1] });
+        await handleCommand({ channel, context, username, message, toUser: args[1], isModerator });
     }
 };
 
