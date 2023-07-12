@@ -77,10 +77,14 @@ const processMessage = async ({ channel, context, username, message }) => {
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
     const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
-    const settings = channelData?.settings || {};
-    const greetingsEnabled = settings.enable_greetings.value || false;
-    const isMuted = settings?.bot_muted.value || false;
+    const settings = channelData.settings || {};
+    let Settings = {};
 
+    Object.entries(settings).reduce((acc, [key, setting]) => {
+        acc[key] = setting.value;
+        return acc;
+      }, Settings);
+      
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))
 
@@ -92,7 +96,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
-    if (isMuted && !isModerator) {
+    if (Settings.bot_muted && !isModerator) {
         console.log(chalk.yellow.bold(`Bot is muted in ${channel} :(`));
         return;
     }
@@ -108,7 +112,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     }
 
 
-    if (greetingsEnabled) {
+    if (Settings.enable_greetings) {
         if (canReceiveGreeting(channel, username, channel)) {
             activeUsers[channel][username] = Date.now();
             const isBot = knownBots.includes(username.toLowerCase());
