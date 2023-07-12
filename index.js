@@ -71,7 +71,7 @@ const onConnectedHandler = (address, port) => {
 };
 
 const processMessage = async ({ channel, context, username, message }) => {
-    const isModerator = context.mod || Boolean(context.badges?.broadcaster);
+    const isModerator = context.mod || Boolean(context.badges?.broadcaster) || context.username === 'alexitoo_uy' // Bot owner;
     const isBroadcaster = isModerator && context.badges.broadcaster;
     channel = channel.replace('#', '');
 
