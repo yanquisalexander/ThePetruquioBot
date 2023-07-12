@@ -28,14 +28,17 @@ export const SETTINGS_MODEL = {
   enable_conversation: {
     type: 'boolean',
     value: false,
+    experimental: true,
   },
   conversation_prompt: {
     type: 'string',
     value: '',
+    experimental: true,
   },
   enable_detoxify: {
     type: 'boolean',
     value: false,
+    experimental: true,
   },
   enable_greetings: {
     type: 'boolean',
