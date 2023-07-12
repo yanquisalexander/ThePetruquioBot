@@ -152,6 +152,8 @@ class Channel {
     await db.query(query, values);
   }
 
+
+
   static async deleteChannelByName(channelName) {
     try {
 
@@ -202,7 +204,30 @@ class Channel {
     return newChannelId;
   }
 
+  static async addAuditory(twitchId, action, data) {
+    try {
+      const query = 'INSERT INTO channels_audits (twitch_id, action, data) VALUES ($1, $2, $3)';
+      const values = [twitchId, action, JSON.stringify(data)];
+      await db.query(query, values);
 
+      console.log('Registro de auditoría agregado correctamente.');
+    } catch (error) {
+      console.error('Error al agregar el registro de auditoría:', error);
+      throw error;
+    }
+  }
+
+  async getAuditory() {
+    try {
+      const query = 'SELECT * FROM channels_audits WHERE twitch_id = $1';
+      const values = [this.twitch_id];
+      const { rows } = await db.query(query, values);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener el registro de auditoría:', error);
+      throw error;
+    }
+  }
 
 }
 

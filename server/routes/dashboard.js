@@ -53,6 +53,24 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
     }   
   });
   
+  DashboardRouter.get('/auditories', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+      const channel = await Channel.getChannelByName(req.user.username);
+      const auditories = await channel.getAuditories();
+
+      res.json({
+        data: auditories
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        errors: [
+          "Something went wrong while trying to get the auditories."
+        ],
+        error_type: "internal_server_error"
+      });
+    }
+  });
   
 
 export default DashboardRouter;

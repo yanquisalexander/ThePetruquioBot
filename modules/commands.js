@@ -23,7 +23,7 @@ const formatSettingName = (setting) => {
   };
   
 
-  const updateSetting = async (channel, setting, value) => {
+  const updateSetting = async (channel, setting, value, username) => {
     // Obtener el tipo de ajuste
     const settingType = SETTINGS_MODEL[setting].type;
   
@@ -46,11 +46,16 @@ const formatSettingName = (setting) => {
   
     // Guardar los cambios en la base de datos
     try {
-      const channelData = await Channel.getChannelByName(channel);
-      if (channelData.settings.hasOwnProperty(setting) && typeof channelData.settings[setting] === 'object' && channelData.settings[setting].hasOwnProperty('value')) {
-        channelData.settings[setting].value = parsedValue;
+      const currentChannel = await Channel.getChannelByName(channel);
+      if (currentChannel.settings.hasOwnProperty(setting) && typeof currentChannel.settings[setting] === 'object' && currentChannel.settings[setting].hasOwnProperty('value')) {
+        currentChannel.settings[setting].value = parsedValue;
       }
-    await channelData.updateSettings();
+    await currentChannel.updateSettings();
+    await Channel.addAuditory(currentChannel.twitch_id, 'UPDATE_SETTING', {
+        user: username,
+        setting,
+        value: parsedValue
+    })
     if(setting === 'bot-muted' && value === true) return;
     Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
     } catch (error) {
@@ -214,13 +219,13 @@ export const handleCommand = async ({ channel, context, username, message, toUse
               
                 // Verificar si el ajuste es válido según SETTINGS_MODEL en formato camelCase
                 if (setting in SETTINGS_MODEL) {
-                  await updateSetting(channel, setting, value);
+                  await updateSetting(channel, setting, value, username);
                 }
                 // Verificar si el ajuste es válido según SETTINGS_MODEL en formato con guiones medios
                 else {
                   const formattedSetting = formatSettingName(setting);
                   if (formattedSetting in SETTINGS_MODEL) {
-                   await updateSetting(channel, formattedSetting, value);
+                   await updateSetting(channel, formattedSetting, value, username);
                   } else {
                     Bot.say(channel, `@${username}, El ajuste "${setting}" no existe.`);
                   }
