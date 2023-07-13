@@ -217,7 +217,7 @@ class Channel {
     }
   }
 
-  async getAuditory() {
+  async getAuditories() {
     try {
       const query = 'SELECT * FROM channels_audits WHERE twitch_id = $1';
       const values = [this.twitch_id];
