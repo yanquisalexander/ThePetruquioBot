@@ -8,6 +8,7 @@ import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
 import { HelixClient, getChannelInfo } from "../utils/twitch.js";
 import { channel } from "diagnostics_channel";
+import { pusher } from "../lib/pusher.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -98,6 +99,12 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 const spectatorLocation = new SpectatorLocation(username, location);
                 await spectatorLocation.getGeocode();
                 await spectatorLocation.save();
+                await pusher.trigger(`map-${channel}`, 'user-location', {
+                    username,
+                    locationName: spectatorLocation.location,
+                    latitude: spectatorLocation.latitude,
+                    longitude: spectatorLocation.longitude
+                });
                 sendMessage(channel, `Tu ubicación ha sido registrada correctamente.`);
             } else {
                 sendMessage(channel, `Debes especificar una ubicación después del comando !from.`);
