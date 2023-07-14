@@ -103,6 +103,33 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
   }
 });
 
+DashboardRouter.get('/recommended-actions', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const channel = await Channel.getChannelByName(req.user.username);
+
+    const recommendedActions = [];
+
+    if (channel.settings.enable_community_map.value === false) {
+      recommendedActions.push({
+        type: 'ENABLE_COMMUNITY_MAP',
+      });
+    }
+
+    res.json({
+      data: recommendedActions
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      errors: [
+        "Something went wrong while trying to get the recommended actions."
+      ],
+      error_type: "internal_server_error"
+    });
+  }
+});
+
+
 DashboardRouter.get('/bot-status', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const channel = await Channel.getChannelByName(req.user.username);
