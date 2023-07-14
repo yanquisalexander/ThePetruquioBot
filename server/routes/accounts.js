@@ -57,6 +57,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 description,
                 profile_image_url
             });
+            
 
             let profile = await user.getProfile();
 

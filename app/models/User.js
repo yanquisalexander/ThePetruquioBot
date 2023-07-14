@@ -1,11 +1,12 @@
 import { db } from "../../lib/database.js";
 
 class User {
-  constructor(id, twitchId, username, email) {
+  constructor(id, twitchId, username, email, admin = false) {
     this.id = id;
     this.twitchId = twitchId;
     this.username = username;
     this.email = email;
+    this.admin = admin;
   }
 
   static async findById(id) {
@@ -28,7 +29,7 @@ class User {
     try {
       const result = await db.query(query, values);
       const userData = result.rows[0];
-      return new User(userData.id, userData.twitch_id, userData.username, userData.email);
+      return new User(userData.id, userData.twitch_id, userData.username, userData.email, userData.admin);
     } catch (error) {
         console.log(error);
       throw new Error('Failed to find user by Twitch ID');

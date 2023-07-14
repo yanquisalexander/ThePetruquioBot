@@ -105,12 +105,14 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
 
 DashboardRouter.get('/bot-status', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    let joinedAt = botJoinedChannels[`#${req.user.username}`];
+    const channel = await Channel.getChannelByName(req.user.username);
+    const joinedAt = botJoinedChannels[`#${req.user.username}`];
     if (joinedAt) {
       res.json({
         data: {
           status: 'online',
-          joined_at: joinedAt
+          joined_at: joinedAt,
+          muted: channel.settings.bot_muted.value
         }
       });
     }
