@@ -219,7 +219,7 @@ class Channel {
 
   async getAuditories() {
     try {
-      const query = 'SELECT * FROM channels_audits WHERE twitch_id = $1';
+      const query = 'SELECT * FROM channels_audits WHERE twitch_id = $1 ORDER BY timestamp DESC';
       const values = [this.twitch_id];
       const { rows } = await db.query(query, values);
       return rows;

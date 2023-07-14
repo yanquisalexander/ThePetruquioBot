@@ -12,6 +12,7 @@ import {
     activeUsers,
     greetingsStack,
     autoTranslateUsers,
+    botJoinedChannels,
 } from './memory_variables.js';
 import {
     getRandomBotResponse,
@@ -213,6 +214,9 @@ Bot.on('whisper', onWhisperHandler);
 Bot.on('notice', onNoticeHandler);
 Bot.on('join', (channel, username, self) => {
     if (self) {
+        botJoinedChannels[channel] = {
+            joinedAt: Date.now()
+        };
         console.log(chalk.green.bold(`Joined ${channel}`));
     }
 });

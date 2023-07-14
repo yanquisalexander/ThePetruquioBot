@@ -2,6 +2,7 @@ import axios from "axios";
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../app/models/User.js";
+import UserToken from "../../app/models/UserToken.js";
 import passport from "../../lib/passport.js";
 
 const AccountsRouter = Router();
@@ -11,7 +12,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
     console.log(req.body);
     const code = req.body.code;
 
-    let access_token = await axios.post('https://id.twitch.tv/oauth2/token', {
+    let twitchTokens = await axios.post('https://id.twitch.tv/oauth2/token', {
         client_id: process.env.TWITCH_CLIENT_ID,
         client_secret: process.env.TWITCH_CLIENT_SECRET,
         code,
@@ -19,14 +20,16 @@ AccountsRouter.post("/get-token", async (req, res) => {
         redirect_uri: process.env.NODE_ENV === 'development' ? 'http://localhost:8888/api/auth/callback/twitch' : 'https://petruquio.live/api/auth/callback/twitch'
     })
 
-    access_token = access_token.data.access_token;
+    twitchTokens = twitchTokens.data
+
+
 
 
     try {
         // Validar el access_token con Twitch
         const tokenValid = await axios.get('https://id.twitch.tv/oauth2/validate', {
             headers: {
-                Authorization: `Bearer ${access_token}`
+                Authorization: `Bearer ${twitchTokens.access_token}`
             }
         });
 
@@ -36,7 +39,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
             // Obtener información del usuario desde Twitch
             const userInfo = await axios.get('https://api.twitch.tv/helix/users', {
                 headers: {
-                    Authorization: `Bearer ${access_token}`,
+                    Authorization: `Bearer ${twitchTokens.access_token}`,
                     'Client-Id': process.env.TWITCH_CLIENT_ID
                 }
             });
@@ -55,13 +58,29 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 profile_image_url
             });
 
-            const customToken = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '30d' });
+            let profile = await user.getProfile();
+
+            user = {
+                ...user,
+                profile
+            }
+
+            let token = await UserToken.findByUserId(user.id);
+            UserToken.update
+            if (token) {
+                await UserToken.update(user.id, twitchTokens.access_token, twitchTokens.refresh_token);
+            } else {
+                await UserToken.create(user.id, twitchTokens.access_token, twitchTokens.refresh_token);
+            }
+
+            // Crear un JWT personalizado para el usuario
+            const customToken = jwt.sign({user}, process.env.JWT_SECRET, { expiresIn: '30d' });
 
             // Enviar el JWT personalizado al cliente
             res.json({ token: customToken });
         }
     } catch (error) {
-        console.error(error);
+        console.log(error);
         return res.status(500).json({ message: 'Failed to get token from Twitch' });
     }
 });
@@ -71,6 +90,8 @@ AccountsRouter.get("/me", passport.authenticate('jwt', { session: false }), (req
   
     res.json({ user });
   });
+
+//AccountsRouter
   
 
 export default AccountsRouter;
