@@ -57,6 +57,11 @@ const formatSettingName = (setting) => {
         setting,
         value: parsedValue
     })
+    pusher.trigger(`settings-${channel}`, 'update', {
+        username,
+        setting,
+        value: parsedValue
+    });
     if(setting === 'bot-muted' && value === true) return;
     Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
     } catch (error) {
