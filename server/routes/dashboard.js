@@ -7,6 +7,8 @@ import UserToken from "../../app/models/UserToken.js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 import { botJoinedChannels } from "../../memory_variables.js";
+import { merge } from "lodash-es";
+import { SETTINGS_MODEL } from "../../app/models/Channel.js";
 
 const DashboardRouter = Router();
 
@@ -106,6 +108,7 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
 DashboardRouter.get('/recommended-actions', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const channel = await Channel.getChannelByName(req.user.username);
+    channel.settings = merge({}, SETTINGS_MODEL, channel.settings)
 
     const recommendedActions = [];
 

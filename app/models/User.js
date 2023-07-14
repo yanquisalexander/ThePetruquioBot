@@ -1,4 +1,6 @@
+import { Bot } from "../../bot.js";
 import { db } from "../../lib/database.js";
+import Channel from "./Channel.js";
 
 class User {
   constructor(id, twitchId, username, email, admin = false) {
@@ -29,6 +31,9 @@ class User {
     try {
       const result = await db.query(query, values);
       const userData = result.rows[0];
+      if(!userData) {
+        return null;
+      }
       return new User(userData.id, userData.twitch_id, userData.username, userData.email, userData.admin);
     } catch (error) {
         console.log(error);
@@ -95,6 +100,14 @@ class User {
     try {
       const result = await db.query(query, values);
       const userData = result.rows[0];
+      await Channel.addChannel({
+        name: username,
+        team_id: null,
+        twitch_id: twitchId,
+        settings: {},
+        auto_connect: true
+    })
+      Bot.join(`#${username}`);
       return new User(userData.id, userData.twitch_id, userData.username, userData.email);
     } catch (error) {
       console.log(error);
