@@ -1,6 +1,8 @@
 import chalk from "chalk";
 import { db } from "../../lib/database.js";
 import Cache from "../Cache.js";
+import { langList } from "../../modules/translate.js";
+import { merge } from "lodash-es";
 
 const ChannelsCache = new Cache();
 
@@ -10,8 +12,10 @@ export const SETTINGS_MODEL = {
     value: false,
   },
   channel_language: {
-    type: 'string',
+    type: 'list',
     value: 'es',
+    options: langList
+
   },
   channel_about: {
     type: 'string',
@@ -103,7 +107,7 @@ class Channel {
       return null;
     }
     const channelData = rows[0];
-    const settings = { ...SETTINGS_MODEL, ...channelData.settings };
+    const settings = merge({}, SETTINGS_MODEL, channelData.settings);
     Object.keys(settings).reduce((acc, key) => {
       if (!(key in SETTINGS_MODEL)) {
         console.log(chalk.yellow(`WARNING: The setting "${key}" is not defined in the model`));
