@@ -72,21 +72,22 @@ const formatSettingName = (setting) => {
   
 
 
-export const handleCommand = async ({ channel, context, username, message, toUser, isModerator }) => {
+export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
     const args = message.slice(1).split(' ');
     const command = args.shift().toLowerCase();
     switch (command) {
-        case 'chao':
-            return sendMessage(channel, `Chao, @${username}!`);
-        case 'whoami':
-            return sendMessage(channel, `Eres ${username}!`);
-        case 'comandos':
-            return sendMessage(channel, `!hola, !chao, !bot, !so, !discord, !twitter, !instagram, !youtube, !donar, !comandos`);
         case 'lang':
+            if(!settings.enable_translation) return;
+
             return sendMessage(channel, langExpl[Math.floor(Math.random() * langExpl.length)]);
         case 'random':
             return sendMessage(channel, `@${username}, ${getRandomFact()}`);
         case 'autotranslate':
+            if(!isModerator) return;
+            if(!settings.enable_translation) {
+                console.log(chalk.yellow.bold(`Translation is disabled in ${channel}`));
+                return
+            }
             const user = args[0].toLowerCase();
             if (user) {
                 autoTranslateUsers[channel][user] = true;
@@ -251,7 +252,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
               
 
         default:
-            if (langList.includes(command)) {
+            if (langList.includes(command) && settings.enable_translation) {
                 let translated = await translate(message, command, username)
                 sendMessage(channel, translated)
             }
