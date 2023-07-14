@@ -32,9 +32,9 @@ const formatSettingName = (setting) => {
     let parsedValue;
     if (settingType === 'boolean') {
       // Convertir valores booleanos alternativos a true o false
-      if (value === 'on' || value === '1') {
+      if (value === 'on' || value === '1' || value === 'true') {
         parsedValue = true;
-      } else if (value === 'off' || value === '0') {
+      } else if (value === 'off' || value === '0' || value === 'false') {
         parsedValue = false;
       } else {
         Bot.say(channel, `El valor ${value} no es válido para el ajuste ${setting}`);
