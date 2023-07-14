@@ -126,7 +126,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isCommand = message.startsWith('!');
     if (isCommand) {
         const args = message.slice(1).split(' ');
-        await handleCommand({ channel, context, username, message, toUser: args[1], isModerator });
+        await handleCommand({ channel, context, username, message, toUser: args[1], isModerator, settings: Settings });
     }
 };
 
