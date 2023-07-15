@@ -110,6 +110,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'from':
+            if(!settings.enable_community_map) return;
             const location = args.join(' ');
             if (location) {
                 const spectatorLocation = new SpectatorLocation(username, location);
@@ -127,6 +128,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'msg':
+            if(!settings.enable_community_map) return;
             const messageContent = args.join(' ');
             if (messageContent) {
                 if (messageContent.length > 100) {
@@ -140,16 +142,19 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'show':
+            if(!settings.enable_community_map) return;
             const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             return;
         case 'hide':
+            if(!settings.enable_community_map) return;
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
+            if(!settings.enable_community_map) return;
             const pinEmote = args[0];
             if (pinEmote) {
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
@@ -227,7 +232,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'map':
-            return sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
+            if(!settings.enable_community_map) return;
+            sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
+            break;
             case 'set':
                 // Verificar si el usuario es un moderador
                 if (!isModerator) {
