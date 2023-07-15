@@ -31,12 +31,12 @@ class User {
     try {
       const result = await db.query(query, values);
       const userData = result.rows[0];
-      if(!userData) {
+      if (!userData) {
         return null;
       }
       return new User(userData.id, userData.twitch_id, userData.username, userData.email, userData.admin);
     } catch (error) {
-        console.log(error);
+      console.log(error);
       throw new Error('Failed to find user by Twitch ID');
     }
   }
@@ -100,14 +100,18 @@ class User {
     try {
       const result = await db.query(query, values);
       const userData = result.rows[0];
-      await Channel.addChannel({
-        name: username,
-        team_id: null,
-        twitch_id: twitchId,
-        settings: {},
-        auto_connect: true
-    })
-      Bot.join(`#${username}`);
+      let channel = await Channel.findByTwitchId(twitchId);
+      if (!channel) {
+        await Channel.addChannel({
+          name: username,
+          team_id: null,
+          twitch_id: twitchId,
+          settings: {},
+          auto_connect: true
+        })
+
+        Bot.join(`#${username}`);
+      }
       return new User(userData.id, userData.twitch_id, userData.username, userData.email);
     } catch (error) {
       console.log(error);
