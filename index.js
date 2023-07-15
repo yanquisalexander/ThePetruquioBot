@@ -13,20 +13,20 @@ import {
     greetingsStack,
     autoTranslateUsers,
     botJoinedChannels,
+    whisperedUsers,
 } from './memory_variables.js';
 import {
     getRandomBotResponse,
     getRandomOnClearChat,
 } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
-import { getChannelInfo, knownBots } from './utils/twitch.js';
+import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
 import BotModel from './app/models/Bot.js';
 
-// Clear console on start to avoid clutter from previous sessions (in production mode) 
-console.clear();
+
 
 
 
@@ -36,7 +36,8 @@ console.log = (...args) => {
     originalLog(`[${new Date().toLocaleString()}]`, ...args);
 };
 
-
+// Clear console on start to avoid clutter from previous sessions (in production mode) 
+console.clear();
 
 try {
     dotenv.config();
@@ -142,8 +143,23 @@ const onChatClearedHandler = (channel) => {
     //Bot.say(channel, getRandomOnClearChat());
 };
 
-const onWhisperHandler = (from, context, message, self) => {
+const onWhisperHandler = async (from, context, message, self) => {
     console.log(chalk.bgWhite.blue.bold(`Whisper received from ${from}: ${message}`));
+    if(whisperedUsers[from] && Date.now() - whisperedUsers[from] < 1000 * 60 * 60 * 24) return; // Don't answer if whispered in the last 24 hours
+    if (self) return;
+    whisperedUsers[from] = Date.now();
+
+    const toUser = await getChannelInfo(from.replace('#', ''));
+    await HelixClient.whispers.sendWhisper(process.env.TWITCH_USER_ID, toUser.id, `Hello ${context['display-name']}, I'm a bot created by Alexitoo_UY!`);
+    setTimeout(() => {
+        HelixClient.whispers.sendWhisper(process.env.TWITCH_USER_ID, toUser.id, `¿Want to know more about me? Type !help in my channel! GlitchCat `);
+    }, 2000)
+    setTimeout(() => {
+        HelixClient.whispers.sendWhisper(process.env.TWITCH_USER_ID, toUser.id, `Need to change my settings? VoHiYo Go to https://petruquio.live/dashboard `);
+    }, 4000)
+    setTimeout(() => {
+        HelixClient.whispers.sendWhisper(process.env.TWITCH_USER_ID, toUser.id, `Thanks for using me! <3`);
+    }, 6000)
 };
 
 const onNoticeHandler = async (channel, msgid, message) => {
@@ -189,7 +205,6 @@ const onRaidedHandler = async (channel, username, viewers) => {
         }
     }
 };
-
 
 // Cada 10 segundos, verificar si hay alguien a quien saludar
 setInterval(() => {
