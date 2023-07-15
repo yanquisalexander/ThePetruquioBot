@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import routes from "./routes/index.js";
 import passport from '../lib/passport.js'
+import status from 'express-status-monitor' 
 const PORT = process.env.PORT || 3000;
 
 export const WebServer = express();
@@ -18,8 +19,7 @@ const __dirname = dirname(__filename);
 
 WebServer.use(cors('*'))
 WebServer.use(passport.initialize())
-WebServer.use(bodyParser.json());
-WebServer.use('/', async (req, res, next) => {
+WebServer.use('/', bodyParser.json(), async (req, res, next) => {
   try {
     const twitchRouter = await import('./routes/twitch.js');
     twitchRouter.default(req, res, next);
@@ -29,14 +29,20 @@ WebServer.use('/', async (req, res, next) => {
   }
 });
 
-import('express-status-monitor')
-  .then(statusMonitor => {
-    WebServer.use(statusMonitor.default());
-  })
+
+
+WebServer.use(status())
 
 WebServer.use('/api/', routes)
 
-
+WebServer.get('*', (req, res) => {
+  res.status(404).json({
+    errors: [
+      "Apparently the requested URL or Resource could not be found 😿."
+    ],
+    error_type: "not_found"
+  })
+})
 
 
 
