@@ -75,6 +75,16 @@ const formatSettingName = (setting) => {
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
     const args = message.slice(1).split(' ');
     const command = args.shift().toLowerCase();
+    if(command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
+        command = 'from';
+    }
+    if(command === 'mostrar') {
+        command = 'show';
+    }
+    if(command === 'ocultar') {
+        command = 'hide';
+    }
+    
     switch (command) {
         case 'lang':
             if(!settings.enable_translation) return;
