@@ -34,7 +34,7 @@ import('express-status-monitor')
     WebServer.use(statusMonitor.default());
   })
 
-WebServer.use('/', routes)
+WebServer.use('/api/', routes)
 
 
 
