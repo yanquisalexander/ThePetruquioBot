@@ -1,16 +1,14 @@
 import { Router } from "express";
-import axios from "axios";
 import passport from "../../lib/passport.js";
 import Channel from "../../app/models/Channel.js";
-import { AppClient, HelixClient } from "../../utils/twitch.js";
+import { AppClient } from "../../utils/twitch.js";
 import UserToken from "../../app/models/UserToken.js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
 import { botJoinedChannels, rewardsSubs } from "../../memory_variables.js";
 import { merge } from "lodash-es";
 import { SETTINGS_MODEL } from "../../app/models/Channel.js";
-import { TwitchEventSub } from "../boot-webserver.js";
-import { pusher } from "../../lib/pusher.js";
+import { subscribeToFirstRankingEvents } from "../boot-webserver.js";
 
 const DashboardRouter = Router();
 
@@ -63,30 +61,7 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
     }
 
     if (channel.settings.enable_first_ranking.value) {
-      if (channel.settings.first_ranking_twitch_reward.value) {
-        // Verificar si ya existe una suscripción a este evento
-        if (rewardsSubs[req.user.username]) {
-          // Si existe, no hacer nada
-        } else {
-          // Si no existe, crear una nueva suscripción
-          console.log(`Trying to subscribe to channel ${channel.name} for first ranking`);
-          let rewardListener = TwitchEventSub.onChannelRedemptionAdd(channel.twitch_id, async (event) => {
-            let cachedChannel = await Channel.getChannelByName(channel.name);
-            if (event.rewardId === cachedChannel.settings.first_ranking_twitch_reward.value) {
-              console.log(`${event.userName} has redeemed ${event.rewardTitle} on channel ${channel.name}`);
-              await pusher.trigger(`channel-${channel.name}`, 'first-ranking', {
-                user: event.userName,
-                reward: event.rewardTitle
-              });
-              await Channel.addToRanking(event.userName, event.broadcasterId)
-            }
-          })
-
-          // Save the subscription id to the memory variables to be able to delete it later or check if it exists
-          rewardsSubs[channel.name] = rewardListener.id
-        }
-      }
-
+      subscribeToFirstRankingEvents(channel);
     }
 
     // Guardar los cambios en la base de datos
