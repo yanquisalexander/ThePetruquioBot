@@ -1,9 +1,10 @@
+// main.js
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import chalk from "chalk";
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 import routes from "./routes/index.js";
 import passport from '../lib/passport.js'
 import status from 'express-status-monitor'
@@ -11,26 +12,82 @@ import { EventSubMiddleware } from '@twurple/eventsub-http';
 import { AppClient } from "../utils/twitch.js";
 import Channel from "../app/models/Channel.js";
 import { pusher } from "../lib/pusher.js";
-import { rewardsSubs } from "../memory_variables.js";
+import { eventSubListeners } from "../memory_variables.js";
 import { sendMessage } from "../bot.js";
+
 const PORT = process.env.PORT || 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const WebServer = express();
-
-
 export const TwitchEventSub = new EventSubMiddleware({
   apiClient: AppClient,
   hostName: process.env.NODE_ENV === 'production' ? 'api.petruquio.live' : 'api-local.petruquio.live',
   pathPrefix: '/twitch/eventsub',
-  secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT'
+  secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT',
+  legacySecrets: false,
 });
 
-export const subscribeToFirstRankingEvents = (channel) => {
+// Middlewares
+WebServer.use(cors('*'));
+WebServer.use(passport.initialize());
+WebServer.use(status());
+WebServer.use('/api/', bodyParser.json(), routes);
+
+// Error handling
+WebServer.use((err, req, res, next) => {
+  res.status(500).json({ error: err });
+});
+
+// Routes
+WebServer.get('*', (req, res) => {
+  res.status(404).json({
+    errors: [
+      "Apparently the requested URL or Resource could not be found 😿."
+    ],
+    error_type: "not_found"
+  });
+});
+
+// Boot
+WebServer.boot = async () => {
+  await subscribeToEventsForAllChannels();
+  TwitchEventSub.apply(WebServer);
+  WebServer.listen(PORT, async () => {
+    console.log(chalk.blue(`PetruquioBot WebServer listening on port ${PORT}`));
+    TwitchEventSub.markAsReady();
+  });
+};
+
+// Subscribe to events for a channel
+export const subscribeToEvents = async (channel) => {
+  if (channel.settings.enable_live_notification.value) {
+    await subscribeToLiveNotificationEvents(channel);
+  } else {
+    // Remove listener if exists
+    if (eventSubListeners[`${channel.name}-live`]) {
+      eventSubListeners[`${channel.name}-live`].stop();
+      delete eventSubListeners[`${channel.name}-live`];
+    }
+  }
+
+  if (channel.settings.enable_first_ranking.value) {
+    await subscribeToFirstRankingEvents(channel);
+  } else {
+    // Remove listener if exists
+    if (eventSubListeners[`${channel.name}-reward`]) {
+      eventSubListeners[`${channel.name}-reward`].stop();
+      delete eventSubListeners[`${channel.name}-reward`];
+    }
+  }
+};
+
+// Subscribe to first ranking events
+const subscribeToFirstRankingEvents = async (channel) => {
   if (channel.settings.first_ranking_twitch_reward.value) {
-    console.log(`Trying to subscribe to channel ${channel.name} for first ranking`);
     const rewardListener = TwitchEventSub.onChannelRedemptionAdd(channel.twitch_id, async (event) => {
       const cachedChannel = await Channel.getChannelByName(channel.name);
-      if(!cachedChannel.settings.enable_first_ranking.value) {
+      if (!cachedChannel.settings.enable_first_ranking.value) {
         console.log(`Channel ${channel.name} has first ranking disabled. Skipping...`);
         return;
       }
@@ -45,73 +102,46 @@ export const subscribeToFirstRankingEvents = (channel) => {
       }
     });
 
-    // Guardar el ID de la suscripción en variables de memoria para poder eliminarlo más tarde o verificar si existe
-    rewardsSubs[channel.name] = rewardListener.id;
+    // Guardar la suscripción en variables de memoria para poder eliminarlo más tarde
+    eventSubListeners[`${channel.name}-reward`] = rewardListener;
   } else {
     console.log(`Channel ${channel.name} has first ranking enabled but no reward selected. Skipping...`);
   }
-}
+};
 
-
-// On Boot, check if there are channels with first ranking enabled and subscribe to the event
-Channel.getRankingEnabledChannels().then(channels => {
-  channels.forEach(channel => {
-    if (channel.settings.enable_first_ranking.value) {
-      console.log(`Channel ${channel.name} has first ranking enabled`);
-      subscribeToFirstRankingEvents(channel);
+// Subscribe to live notification events
+const subscribeToLiveNotificationEvents = async (channel) => {
+  const liveListener = TwitchEventSub.onStreamOnline(channel.twitch_id, async (event) => {
+    const cachedChannel = await Channel.getChannelByName(channel.name);
+    if (!cachedChannel.settings.enable_live_notification.value) {
+      console.log(`Channel ${channel.name} has live notifications disabled. Skipping...`);
+      return;
     }
+    const stream = await event.getStream();
+    const title = stream?.title ? stream.title : '';
+    const message = cachedChannel.settings.live_notification_message.value
+      .replace('#channel', channel.name)
+      .replace('#title', title);
+    sendMessage(channel.name, message);
   });
-});
+  eventSubListeners[`${channel.name}-live`] = liveListener;
+};
 
+// Subscribe to events for all channels
+const subscribeToEventsForAllChannels = async () => {
+  const channels = await Channel.getAllChannels();
+  for (const channel of channels) {
+    const cachedChannel = await Channel.getChannelByName(channel.name);
+    await subscribeToEvents(cachedChannel);
+  }
+};
+
+// Event subscription handlers
 TwitchEventSub.onSubscriptionCreateFailure(async (event) => {
-  console.log(`Subscription to ${event.subscription.type} failed. Reason: ${event.reason}`);
-})
+  console.log(`Subscription to ${event} failed.`);
+});
 
 TwitchEventSub.onSubscriptionCreateSuccess(async (event) => {
-  console.log(`Subscription to ${event.subscription.type} created.`);
-})
-
-
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-
-
-WebServer.use(cors('*'))
-WebServer.use(passport.initialize())
-
-
-
-WebServer.use(status())
-
-WebServer.use('/api/', bodyParser.json(), routes)
-
-WebServer.use
-
-WebServer.get('*', (req, res) => {
-  res.status(404).json({
-    errors: [
-      "Apparently the requested URL or Resource could not be found 😿."
-    ],
-    error_type: "not_found"
-  })
-})
-
-
-TwitchEventSub.apply(WebServer);
-
-
-WebServer.use((err, req, res, next) => {
-  res.status(500).json({ error: err });
+  console.log(`Subscription to ${event} created.`);
 });
-
-
-WebServer.boot = async () => {
-  WebServer.listen(PORT, async () => {
-    console.log(chalk.blue(`PetruquioBot WebServer listening on port ${PORT}`));
-    TwitchEventSub.markAsReady();
-  })
-}
 

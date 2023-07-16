@@ -10,4 +10,4 @@ export const botJoinedChannels = [];
 
 export const whisperedUsers = [];
 
-export const rewardsSubs = [];
+export const eventSubListeners = [];

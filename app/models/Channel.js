@@ -62,7 +62,7 @@ export const SETTINGS_MODEL = {
   },
   live_notification_message: {
     type: 'string',
-    value: '¡#user está en vivo! ¡Vamos a apoyarlo! - #title'
+    value: '¡#channel está en vivo! ¡Vamos a apoyarlo! - #title'
   },
   enable_first_ranking: {
     type: 'boolean',

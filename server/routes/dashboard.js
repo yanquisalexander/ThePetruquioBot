@@ -5,10 +5,10 @@ import { AppClient } from "../../utils/twitch.js";
 import UserToken from "../../app/models/UserToken.js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import { botJoinedChannels, rewardsSubs } from "../../memory_variables.js";
+import { botJoinedChannels } from "../../memory_variables.js";
 import { merge } from "lodash-es";
 import { SETTINGS_MODEL } from "../../app/models/Channel.js";
-import { subscribeToFirstRankingEvents } from "../boot-webserver.js";
+import { subscribeToEvents } from "../boot-webserver.js";
 
 const DashboardRouter = Router();
 
@@ -60,9 +60,7 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
       }
     }
 
-    if (channel.settings.enable_first_ranking.value) {
-      subscribeToFirstRankingEvents(channel);
-    }
+    await subscribeToEvents(channel)
 
     // Guardar los cambios en la base de datos
     await channel.updateSettings();
