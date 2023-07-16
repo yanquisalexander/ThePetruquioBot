@@ -9,3 +9,5 @@ export const autoTranslateUsers = [];
 export const botJoinedChannels = [];
 
 export const whisperedUsers = [];
+
+export const rewardsSubs = [];

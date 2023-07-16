@@ -6,17 +6,31 @@ import { AppClient, HelixClient } from "../../utils/twitch.js";
 import UserToken from "../../app/models/UserToken.js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import { botJoinedChannels } from "../../memory_variables.js";
+import { botJoinedChannels, rewardsSubs } from "../../memory_variables.js";
 import { merge } from "lodash-es";
 import { SETTINGS_MODEL } from "../../app/models/Channel.js";
+import { TwitchEventSub } from "../boot-webserver.js";
+import { pusher } from "../../lib/pusher.js";
 
 const DashboardRouter = Router();
 
 DashboardRouter.get("/bot-settings", passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const channel = await Channel.getChannelByName(req.user.username);
+    let settings = channel.settings;
+    const HIDDEN_CONDITIONS = {
+      live_notification_message: () => !settings.enable_live_notification.value,
+      first_ranking_twitch_reward: () => !settings.enable_first_ranking.value,
+    };
+
+    // Agregar el campo 'hidden' a cada ajuste según las condiciones definidas
+    for (const settingName in settings) {
+      if (HIDDEN_CONDITIONS.hasOwnProperty(settingName)) {
+        settings[settingName].hidden = HIDDEN_CONDITIONS[settingName]();
+      }
+    }
     res.json({
-      data: channel.settings
+      data: settings
     });
   } catch (error) {
     res.status(500).json({
@@ -35,11 +49,44 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
     const channel = await Channel.getChannelByName(req.user.username);
     const updatedSettings = req.body; // Supongamos que el cuerpo de la solicitud contiene un objeto con los ajustes modificados { key: value }
 
-    // Iterar sobre cada ajuste modificado y actualizarlo en el objeto de ajustes del canal
+    // Iterar sobre cada ajuste modificado y actualizar solo la clave "value" en el objeto de ajustes del canal
     for (const key in updatedSettings) {
       if (channel.settings.hasOwnProperty(key) && typeof channel.settings[key] === 'object' && channel.settings[key].hasOwnProperty('value')) {
         channel.settings[key].value = updatedSettings[key];
+        // Eliminar las demás claves del objeto excepto "value"
+        for (const prop in channel.settings[key]) {
+          if (prop !== 'value') {
+            delete channel.settings[key][prop];
+          }
+        }
       }
+    }
+
+    if (channel.settings.enable_first_ranking.value) {
+      if (channel.settings.first_ranking_twitch_reward.value) {
+        // Verificar si ya existe una suscripción a este evento
+        if (rewardsSubs[req.user.username]) {
+          // Si existe, no hacer nada
+        } else {
+          // Si no existe, crear una nueva suscripción
+          console.log(`Trying to subscribe to channel ${channel.name} for first ranking`);
+          let rewardListener = TwitchEventSub.onChannelRedemptionAdd(channel.twitch_id, async (event) => {
+            let cachedChannel = await Channel.getChannelByName(channel.name);
+            if (event.rewardId === cachedChannel.settings.first_ranking_twitch_reward.value) {
+              console.log(`${event.userName} has redeemed ${event.rewardTitle} on channel ${channel.name}`);
+              await pusher.trigger(`channel-${channel.name}`, 'first-ranking', {
+                user: event.userName,
+                reward: event.rewardTitle
+              });
+              await Channel.addToRanking(event.userName, event.broadcasterId)
+            }
+          })
+
+          // Save the subscription id to the memory variables to be able to delete it later or check if it exists
+          rewardsSubs[channel.name] = rewardListener.id
+        }
+      }
+
     }
 
     // Guardar los cambios en la base de datos
@@ -164,7 +211,39 @@ DashboardRouter.get('/bot-status', passport.authenticate('jwt', { session: false
     });
   }
 });
-    
+
+DashboardRouter.get('/channel-point-rewards', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const channel = await Channel.getChannelByName(req.user.username);
+    const token = await UserToken.findByUserId(req.user.id);
+    const TwitchClient = new ApiClient({
+      authProvider: new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.twitch_token),
+    })
+
+    const rewardsData = await TwitchClient.channelPoints.getCustomRewards(channel.twitch_id);
+    let rewards = []
+    rewardsData.map(reward => {
+      rewards.push({
+        id: reward.id,
+        title: reward.title,
+        icon: reward.getImageUrl(1),
+        background_color: reward.backgroundColor,
+      })
+    })
+    res.json({
+      data: rewards
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      errors: [
+        "Something went wrong while trying to get the channel point rewards."
+      ],
+      error_type: "internal_server_error"
+    });
+  }
+});
+
 
 
 export default DashboardRouter;

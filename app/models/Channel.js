@@ -56,7 +56,23 @@ export const SETTINGS_MODEL = {
     type: 'boolean',
     value: true,
   },
-};
+  enable_live_notification: {
+    type: 'boolean',
+    value: false
+  },
+  live_notification_message: {
+    type: 'string',
+    value: '¡#user está en vivo! ¡Vamos a apoyarlo! - #title'
+  },
+  enable_first_ranking: {
+    type: 'boolean',
+    value: false,
+  },
+  first_ranking_twitch_reward: {
+    type: 'channel_point',
+    value: '',
+  }
+}
 
 
 
@@ -229,6 +245,28 @@ class Channel {
       return rows;
     } catch (error) {
       console.error('Error al obtener el registro de auditoría:', error);
+      throw error;
+    }
+  }
+
+  static async getRankingEnabledChannels() {
+    try {
+      // query, con value anidado
+      const query = "SELECT * FROM channels WHERE settings->'enable_first_ranking'->>'value' = 'true'";
+      const { rows } = await db.query(query);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener los canales con ranking habilitado:', error);
+      throw error;
+    }
+  }
+
+  static async addToRanking(username, twitchId) {
+    try {
+      const query = 'INSERT INTO users_ranking (username, twitch_id) VALUES ($1, $2)';
+      await db.query(query, [username, twitchId]);
+    } catch (error) {
+      console.error('Error adding user to ranking:', error);
       throw error;
     }
   }
