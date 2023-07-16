@@ -159,6 +159,16 @@ class Channel {
   }
 
   async updateSettings() {
+    // Iterar sobre cada ajuste modificado y eliminar las propiedades que no son necesarias
+    for (const key in this.settings) {
+      if (this.settings.hasOwnProperty(key) && typeof this.settings[key] === 'object' && this.settings[key].hasOwnProperty('value')) {
+        for (const prop in this.settings[key]) {
+          if (prop !== 'value') {
+            delete this.settings[key][prop];
+          }
+        }
+      }
+    }
     const query = 'UPDATE channels SET settings = $1 WHERE id = $2';
     const values = [this.settings, this.id];
     ChannelsCache.remove(`channel-${this.name}`)

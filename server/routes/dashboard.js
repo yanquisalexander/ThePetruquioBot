@@ -51,12 +51,6 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
     for (const key in updatedSettings) {
       if (channel.settings.hasOwnProperty(key) && typeof channel.settings[key] === 'object' && channel.settings[key].hasOwnProperty('value')) {
         channel.settings[key].value = updatedSettings[key];
-        // Eliminar las demás claves del objeto excepto "value"
-        for (const prop in channel.settings[key]) {
-          if (prop !== 'value') {
-            delete channel.settings[key][prop];
-          }
-        }
       }
     }
 
