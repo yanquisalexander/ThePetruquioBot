@@ -112,35 +112,42 @@ class Channel {
 
   // Método estático para obtener un canal por su nombre desde la base de datos
   static async getChannelByName(name) {
-    let cachedChannel = ChannelsCache.get(`channel-${name}`);
+    const cachedChannel = ChannelsCache.get(`channel-${name}`);
     if (cachedChannel) {
       return cachedChannel;
     }
+
     const query = 'SELECT * FROM channels WHERE LOWER(name) = $1'; // Buscar por el nombre en minúsculas
     const values = [name.toLowerCase()]; // Convertir el nombre a minúsculas
+
     const { rows } = await db.query(query, values);
+
     if (rows.length === 0) {
       return null;
     }
+
     const channelData = rows[0];
     const settings = merge({}, SETTINGS_MODEL, channelData.settings);
-    Object.keys(settings).reduce((acc, key) => {
+
+    Object.keys(settings).forEach((key) => {
       if (!(key in SETTINGS_MODEL)) {
         console.log(chalk.yellow(`WARNING: The setting "${key}" is not defined in the model`));
         delete settings[key];
       }
-      return acc;
-    }, {});
-    let channel = new Channel({
+    });
+
+    const channel = new Channel({
       id: channelData.id,
       name: channelData.name,
       twitch_id: channelData.twitch_id,
       settings: settings,
-    })
+    });
+
     ChannelsCache.set(`channel-${name}`, channel);
 
     return channel;
   }
+
 
 
   // Método para guardar el canal en la base de datos
@@ -267,6 +274,18 @@ class Channel {
       await db.query(query, [username, twitchId]);
     } catch (error) {
       console.error('Error adding user to ranking:', error);
+      throw error;
+    }
+  }
+
+  async getRanking() {
+    try {
+      const query = 'SELECT * FROM users_ranking WHERE twitch_id = $1';
+      const values = [this.twitch_id];
+      const { rows } = await db.query(query, values);
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener el ranking:', error);
       throw error;
     }
   }
