@@ -71,7 +71,11 @@ export const SETTINGS_MODEL = {
   first_ranking_twitch_reward: {
     type: 'channel_point',
     value: '',
-  }
+  },
+  enable_experimental_features: {
+    type: 'boolean',
+    value: false
+  },
 }
 
 

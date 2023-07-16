@@ -19,6 +19,10 @@ DashboardRouter.get("/bot-settings", passport.authenticate('jwt', { session: fal
     const HIDDEN_CONDITIONS = {
       live_notification_message: () => !settings.enable_live_notification.value,
       first_ranking_twitch_reward: () => !settings.enable_first_ranking.value,
+      enable_conversation: () => !settings.enable_experimental_features.value,
+      conversation_prompt: () => !settings.enable_experimental_features.value,
+      enable_detoxify: () => !settings.enable_experimental_features.value,
+
     };
 
     // Agregar el campo 'hidden' a cada ajuste según las condiciones definidas
