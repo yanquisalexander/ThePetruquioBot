@@ -15,16 +15,14 @@ import {
     botJoinedChannels,
     whisperedUsers,
 } from './memory_variables.js';
-import {
-    getRandomBotResponse,
-    getRandomOnClearChat,
-} from './modules/random-responses.js';
+import { getRandomBotResponse, getRandomOnClearChat } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
 import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
 import { translate } from './modules/translate.js';
 import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
 import BotModel from './app/models/Bot.js';
+import { handleDetoxify } from './modules/detoxify.js';
 
 
 
@@ -128,6 +126,10 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (isCommand) {
         const args = message.slice(1).split(' ');
         await handleCommand({ channel, context, username, message, toUser: args[1], isModerator, settings: Settings });
+    }
+
+    if (Settings.enable_detoxify && !isModerator) {
+        await handleDetoxify(channel, context, message, Settings);
     }
 };
 

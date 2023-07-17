@@ -48,11 +48,21 @@ export const getChannelInfo = async (channelName) => {
 };
 
 export const timeoutUser = async (channelID, userID, duration, reason) => {
+    console.log(`Dando timeout a ${userID} en ${channelID} por ${duration} segundos`);
+    const moderator = await getChannelInfo('petruquiobot');
     try {
-        const response = await HelixClient.moderation.timeoutUser(channelID, userID, duration, reason);
-        return response;
-    } catch (error) {
+        HelixClient.asUser(moderator, async (client) => {
+            let response = await client.moderation.banUser(channelID, moderator, {
+               reason,
+               duration,
+               user: userID
+            });
+            return response;
+        });
+    }
+    catch (error) {
         console.error(`No se puede dar timeout: ${error}`);
+        console.error(error);
         return null;
     }
 };

@@ -44,6 +44,21 @@ export const SETTINGS_MODEL = {
     value: false,
     experimental: true,
   },
+  detoxify_threshold: {
+    type: 'number',
+    value: 0.6,
+    experimental: true,
+  },
+  detoxify_timeout_threshold: {
+    type: 'number',
+    value: 0.8,
+    experimental: true,
+  },
+  detoxify_timeout_time: {
+    type: 'number',
+    value: 300,
+    experimental: true,
+  },
   enable_greetings: {
     type: 'boolean',
     value: false,
