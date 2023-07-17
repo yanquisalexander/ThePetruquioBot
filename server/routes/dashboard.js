@@ -1,7 +1,7 @@
 import { Router } from "express";
 import passport from "../../lib/passport.js";
 import Channel from "../../app/models/Channel.js";
-import { AppClient } from "../../utils/twitch.js";
+import { AppClient, HelixClient } from "../../utils/twitch.js";
 import UserToken from "../../app/models/UserToken.js";
 import { ApiClient } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
@@ -102,7 +102,7 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
   try {
     const user = await AppClient.users.getUserByName(req.user.username);
     const token = await UserToken.findByUserId(req.user.id);
-    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.twitch_token);
+    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.accessToken);
     const TwitchClient = new ApiClient({
       authProvider
     })
@@ -188,12 +188,7 @@ DashboardRouter.get('/bot-status', passport.authenticate('jwt', { session: false
 DashboardRouter.get('/channel-point-rewards', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const channel = await Channel.getChannelByName(req.user.username);
-    const token = await UserToken.findByUserId(req.user.id);
-    const TwitchClient = new ApiClient({
-      authProvider: new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.twitch_token),
-    })
-
-    const rewardsData = await TwitchClient.channelPoints.getCustomRewards(channel.twitch_id);
+    const rewardsData = await HelixClient.channelPoints.getCustomRewards(channel.twitch_id);
     let rewards = []
     rewardsData.map(reward => {
       rewards.push({

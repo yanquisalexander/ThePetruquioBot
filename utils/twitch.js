@@ -1,6 +1,5 @@
 import { ApiClient } from '@twurple/api';
-import { getAccessToken, authProvider, appTokenProvider } from '../lib/twitch-auth.js';
-import { EventSubWsListener } from '@twurple/eventsub-ws';
+import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
 
 export const AppClient = new ApiClient({

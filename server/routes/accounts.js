@@ -4,6 +4,9 @@ import jwt from "jsonwebtoken";
 import User from "../../app/models/User.js";
 import UserToken from "../../app/models/UserToken.js";
 import passport from "../../lib/passport.js";
+import { exchangeCode } from '@twurple/auth';
+import { authProvider } from "../../lib/twitch-auth.js";
+
 
 const AccountsRouter = Router();
 
@@ -11,16 +14,11 @@ AccountsRouter.post("/get-token", async (req, res) => {
     // Aquí puedes realizar la lógica para obtener el access_token desde Twitch
     console.log(req.body);
     const code = req.body.code;
+    const clientId = process.env.TWITCH_CLIENT_ID;
+    const clientSecret = process.env.TWITCH_CLIENT_SECRET;
+    const redirectUri = process.env.NODE_ENV === 'development' ? 'http://localhost:8888/api/auth/callback/twitch' : 'https://petruquio.live/api/auth/callback/twitch';
 
-    let twitchTokens = await axios.post('https://id.twitch.tv/oauth2/token', {
-        client_id: process.env.TWITCH_CLIENT_ID,
-        client_secret: process.env.TWITCH_CLIENT_SECRET,
-        code,
-        grant_type: 'authorization_code',
-        redirect_uri: process.env.NODE_ENV === 'development' ? 'http://localhost:8888/api/auth/callback/twitch' : 'https://petruquio.live/api/auth/callback/twitch'
-    })
-
-    twitchTokens = twitchTokens.data
+    let twitchTokens = await exchangeCode(clientId, clientSecret, code, redirectUri)
 
 
 
@@ -29,7 +27,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
         // Validar el access_token con Twitch
         const tokenValid = await axios.get('https://id.twitch.tv/oauth2/validate', {
             headers: {
-                Authorization: `Bearer ${twitchTokens.access_token}`
+                Authorization: `Bearer ${twitchTokens.accessToken}`
             }
         });
 
@@ -39,7 +37,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
             // Obtener información del usuario desde Twitch
             const userInfo = await axios.get('https://api.twitch.tv/helix/users', {
                 headers: {
-                    Authorization: `Bearer ${twitchTokens.access_token}`,
+                    Authorization: `Bearer ${twitchTokens.accessToken}`,
                     'Client-Id': process.env.TWITCH_CLIENT_ID
                 }
             });
@@ -66,11 +64,14 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 profile
             }
 
+            // Guardar el access_token y refresh_token en la base de datos
+            authProvider.addUser(user.twitchId, twitchTokens)
+
             let token = await UserToken.findByUserId(user.id);
             if (token) {
-                await UserToken.update(user.id, twitchTokens.access_token, twitchTokens.refresh_token);
+                await UserToken.update(user.id, twitchTokens);
             } else {
-                await UserToken.create(user.id, twitchTokens.access_token, twitchTokens.refresh_token);
+                await UserToken.create(user.id, twitchTokens);
             }
 
             // Crear un JWT personalizado para el usuario
