@@ -30,6 +30,11 @@
   dependencies:
     node-fetch "^2.6.11"
 
+"@d-fischer/deprecate@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@d-fischer/deprecate/-/deprecate-2.0.2.tgz#d1f0d40acc881edd771cace7992a1070460608c8"
+  integrity sha512-wlw3HwEanJFJKctwLzhfOM6LKwR70FPfGZGoKOhWBKyOPXk+3a9Cc6S9zhm6tka7xKtpmfxVIReGUwPnMbIaZg==
+
 "@d-fischer/detect-node@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@d-fischer/detect-node/-/detect-node-3.0.1.tgz#7b051a86611b0396ba205aabae805b18cc642a78"
@@ -131,6 +136,15 @@
     "@twurple/api-call" "6.2.1"
     "@twurple/common" "6.2.1"
     retry "^0.13.1"
+    tslib "^2.0.3"
+
+"@twurple/auth-tmi@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@twurple/auth-tmi/-/auth-tmi-7.0.0.tgz#12acb9232841afbb88bd9ea7224e39079f828220"
+  integrity sha512-LGPeSc2NEyzImvJxP7w9iWMryZMisRU54hfJW+oA6gsElM/X13e9IkESXHhWdvu8SNjiOnakF6u5yhkuNyFJQA==
+  dependencies:
+    "@d-fischer/deprecate" "^2.0.2"
+    "@types/tmi.js" "^1.7.1"
     tslib "^2.0.3"
 
 "@twurple/auth@6.2.1", "@twurple/auth@^6.2.1":
@@ -246,6 +260,11 @@
   dependencies:
     "@types/mime" "^1"
     "@types/node" "*"
+
+"@types/tmi.js@^1.7.1":
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/@types/tmi.js/-/tmi.js-1.8.3.tgz#db81ad42f7f71dce0aa9dfa5f14bf7c49af4cad2"
+  integrity sha512-piKPU1DF+Lxnh9BV0gVpbJIMnKOQT6zT0o6NLE0DZgHNW7fGxReRRSp987+Ph1aYiyNWXXbxAeQAovTlEYC1hw==
 
 "@types/ws@^8.5.4":
   version "8.5.5"

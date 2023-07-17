@@ -165,6 +165,7 @@ const onWhisperHandler = async (from, context, message, self) => {
 };
 
 const onNoticeHandler = async (channel, msgid, message) => {
+    console.log('>>>>', 'NOTICE', channel, msgid, message);
     try {
         console.log('>>>>', 'NOTICE', channel, msgid, message);
         if (msgid === 'msg_banned') {

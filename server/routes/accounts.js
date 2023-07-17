@@ -6,6 +6,7 @@ import UserToken from "../../app/models/UserToken.js";
 import passport from "../../lib/passport.js";
 import { exchangeCode } from '@twurple/auth';
 import { authProvider } from "../../lib/twitch-auth.js";
+import BotModel from "../../app/models/Bot.js";
 
 
 const AccountsRouter = Router();
@@ -56,12 +57,18 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 profile_image_url
             });
             
+            const banned = await BotModel.isBanned(id);
+
 
             let profile = await user.getProfile();
 
             user = {
                 ...user,
                 profile
+            }
+
+            if (banned) {
+                user.banned = true;
             }
 
             // Guardar el access_token y refresh_token en la base de datos
@@ -94,5 +101,15 @@ AccountsRouter.get("/me", passport.authenticate('jwt', { session: false }), (req
 
 //AccountsRouter
   
-
+AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const banned = await BotModel.isBanned(req.user.twitchId);
+    const user = req.user;    
+    if (user) {
+        user.banned = banned ? true : false;
+        res.json({ user });
+    }
+    else {
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+});
 export default AccountsRouter;

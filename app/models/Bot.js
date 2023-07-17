@@ -14,7 +14,12 @@ class BotModel {
     await db.query(updateQuery, updateValues);
   }
 
-
+  static async isBanned(channelId) {
+    const query = 'SELECT * FROM bot_bans WHERE channel_id = $1';
+    const values = [channelId];
+    const result = await db.query(query, values);
+    return result.rows[0];
+  }
 }
 
 export default BotModel;
