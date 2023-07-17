@@ -194,6 +194,18 @@ class Channel {
   }
 
 
+  static async findByTwitchId(twitchId) {
+    const query = 'SELECT name FROM channels WHERE twitch_id = $1';
+    const values = [twitchId];
+    const { rows } = await db.query(query, values);
+    if (rows.length === 0) {
+      return null;
+    }
+    const channelData = rows[0];
+    const channel = await Channel.getChannelByName(channelData.name);
+    return channel;
+  }
+
 
   static async deleteChannelByName(channelName) {
     try {
