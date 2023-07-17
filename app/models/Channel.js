@@ -106,7 +106,7 @@ class Channel {
   // Método para obtener un array de canales a los que se debe unir automáticamente
 
   static async getAutoJoinChannels() {
-    const query = 'SELECT name FROM channels WHERE auto_connect = true';
+    const query = 'SELECT name FROM channels WHERE auto_connect = true ORDER BY name ASC';
     const { rows } = await db.query(query);
     const channels = rows.map((row) => row.name);
     return channels;

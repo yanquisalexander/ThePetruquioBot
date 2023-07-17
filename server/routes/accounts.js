@@ -67,7 +67,6 @@ AccountsRouter.post("/get-token", async (req, res) => {
             }
 
             let token = await UserToken.findByUserId(user.id);
-            UserToken.update
             if (token) {
                 await UserToken.update(user.id, twitchTokens.access_token, twitchTokens.refresh_token);
             } else {

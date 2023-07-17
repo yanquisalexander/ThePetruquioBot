@@ -102,10 +102,12 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
   try {
     const user = await AppClient.users.getUserByName(req.user.username);
     const token = await UserToken.findByUserId(req.user.id);
+    const authProvider = new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.twitch_token);
     const TwitchClient = new ApiClient({
-      authProvider: new StaticAuthProvider(process.env.TWITCH_CLIENT_ID, token.twitch_token),
+      authProvider
     })
 
+    
     const moderatedChannels = await TwitchClient.moderation.getModerators(user);
     console.log(moderatedChannels.data);
     const channels = moderatedChannels.data.map(channel => channel.userDisplayName);
