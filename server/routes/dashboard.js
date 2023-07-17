@@ -22,6 +22,10 @@ DashboardRouter.get("/bot-settings", passport.authenticate('jwt', { session: fal
       enable_conversation: () => !settings.enable_experimental_features.value,
       conversation_prompt: () => !settings.enable_experimental_features.value,
       enable_detoxify: () => !settings.enable_experimental_features.value,
+      detoxify_threshold: () => !settings.enable_detoxify.value && settings.enable_experimental_features.value,
+      detoxify_timeout_threshold: () => !settings.enable_detoxify.value && settings.enable_experimental_features.value,
+      detoxify_timeout_time: () => !settings.enable_detoxify.value && settings.enable_experimental_features.value,
+
 
     };
 
