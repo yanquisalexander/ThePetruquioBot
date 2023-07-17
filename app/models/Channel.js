@@ -25,6 +25,10 @@ export const SETTINGS_MODEL = {
     type: 'string',
     value: '',
   },
+  enable_clip_command: {
+    type: 'boolean',
+    value: false,
+  },
   enable_translation: {
     type: 'boolean',
     value: false,

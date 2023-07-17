@@ -6,7 +6,7 @@ import { replaceVariables } from "../utils/variable-replacement.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
-import { HelixClient, getChannelInfo } from "../utils/twitch.js";
+import { AppClient, HelixClient, getChannelInfo } from "../utils/twitch.js";
 import { channel } from "diagnostics_channel";
 import { pusher } from "../lib/pusher.js";
 
@@ -16,85 +16,85 @@ const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por can
 const formatSettingName = (setting) => {
     // Reemplazar guiones medios por guiones bajos
     let formattedName = setting.replace(/-/g, '_');
-  
+
     // Convertir formato camelCase a formato con guiones bajos
     formattedName = formattedName.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-  
-    return formattedName;
-  };
-  
 
-  const updateSetting = async (channel, setting, value, username) => {
+    return formattedName;
+};
+
+
+const updateSetting = async (channel, setting, value, username) => {
     // Obtener el tipo de ajuste
     const settingType = SETTINGS_MODEL[setting].type;
-  
+
     // Convertir el valor según el tipo de ajuste
     let parsedValue;
     if (settingType === 'boolean') {
-      // Convertir valores booleanos alternativos a true o false
-      if (value === 'on' || value === '1' || value === 'true') {
-        parsedValue = true;
-      } else if (value === 'off' || value === '0' || value === 'false') {
-        parsedValue = false;
-      } else {
-        Bot.say(channel, `El valor ${value} no es válido para el ajuste ${setting}`);
-        return;
-      }
+        // Convertir valores booleanos alternativos a true o false
+        if (value === 'on' || value === '1' || value === 'true') {
+            parsedValue = true;
+        } else if (value === 'off' || value === '0' || value === 'false') {
+            parsedValue = false;
+        } else {
+            Bot.say(channel, `El valor ${value} no es válido para el ajuste ${setting}`);
+            return;
+        }
     } else if (settingType === 'string') {
-      parsedValue = value; // Para ajustes de tipo string, no se requiere ninguna conversión
+        parsedValue = value; // Para ajustes de tipo string, no se requiere ninguna conversión
     }
-  
-  
+
+
     // Guardar los cambios en la base de datos
     try {
-      const currentChannel = await Channel.getChannelByName(channel);
-      if (currentChannel.settings.hasOwnProperty(setting) && typeof currentChannel.settings[setting] === 'object' && currentChannel.settings[setting].hasOwnProperty('value')) {
-        currentChannel.settings[setting].value = parsedValue;
-      }
-    await currentChannel.updateSettings();
-    await Channel.addAuditory(currentChannel.twitch_id, 'UPDATE_SETTING', {
-        user: username,
-        setting,
-        value: parsedValue
-    })
-    pusher.trigger(`settings-${channel}`, 'update', {
-        username,
-        setting,
-        value: parsedValue
-    });
-    if(setting === 'bot-muted' && value === true) return;
-    Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
+        const currentChannel = await Channel.getChannelByName(channel);
+        if (currentChannel.settings.hasOwnProperty(setting) && typeof currentChannel.settings[setting] === 'object' && currentChannel.settings[setting].hasOwnProperty('value')) {
+            currentChannel.settings[setting].value = parsedValue;
+        }
+        await currentChannel.updateSettings();
+        await Channel.addAuditory(currentChannel.twitch_id, 'UPDATE_SETTING', {
+            user: username,
+            setting,
+            value: parsedValue
+        })
+        pusher.trigger(`settings-${channel}`, 'update', {
+            username,
+            setting,
+            value: parsedValue
+        });
+        if (setting === 'bot-muted' && value === true) return;
+        Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
     } catch (error) {
-      Bot.say(channel, `Ha ocurrido un error al intentar actualizar el ajuste ${setting}`);
-      console.error(error);
+        Bot.say(channel, `Ha ocurrido un error al intentar actualizar el ajuste ${setting}`);
+        console.error(error);
     }
-  }
-  
+}
+
 
 
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
     const args = message.slice(1).split(' ');
     let command = args.shift().toLowerCase();
-    if(command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
+    if (command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
         command = 'from';
     }
-    if(command === 'mostrar') {
+    if (command === 'mostrar') {
         command = 'show';
     }
-    if(command === 'ocultar') {
+    if (command === 'ocultar') {
         command = 'hide';
     }
 
     switch (command) {
         case 'lang':
-            if(!settings.enable_translation) return;
+            if (!settings.enable_translation) return;
 
             return sendMessage(channel, langExpl[Math.floor(Math.random() * langExpl.length)]);
         case 'random':
             return sendMessage(channel, `@${username}, ${getRandomFact()}`);
         case 'autotranslate':
-            if(!isModerator) return;
-            if(!settings.enable_translation) {
+            if (!isModerator) return;
+            if (!settings.enable_translation) {
                 console.log(chalk.yellow.bold(`Translation is disabled in ${channel}`));
                 return
             }
@@ -110,7 +110,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'from':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             const location = args.join(' ');
             if (location) {
                 const spectatorLocation = new SpectatorLocation(username, location);
@@ -128,7 +128,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'msg':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             const messageContent = args.join(' ');
             if (messageContent) {
                 if (messageContent.length > 100) {
@@ -142,19 +142,19 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'show':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             return;
         case 'hide':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             const pinEmote = args[0];
             if (pinEmote) {
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
@@ -232,41 +232,55 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             return;
         case 'map':
-            if(!settings.enable_community_map) return;
+            if (!settings.enable_community_map) return;
             sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
             break;
-            case 'set':
-                // Verificar si el usuario es un moderador
-                if (!isModerator) {
-                  return;
-                }
-              
-                // Verificar si se proporcionó un ajuste y un valor
-                if (args.length < 2) {
-                  Bot.say(channel, `@${username}, Uso correcto: !set <ajuste> <valor>`);
-                  return;
-                }
-              
-                // Obtener el ajuste y el valor del mensaje
-                const setting = args[0];
-                const value = args.slice(1).join(' ');
-              
-                // Verificar si el ajuste es válido según SETTINGS_MODEL en formato camelCase
-                if (setting in SETTINGS_MODEL) {
-                  await updateSetting(channel, setting, value, username);
-                }
-                // Verificar si el ajuste es válido según SETTINGS_MODEL en formato con guiones medios
-                else {
-                  const formattedSetting = formatSettingName(setting);
-                  if (formattedSetting in SETTINGS_MODEL) {
-                   await updateSetting(channel, formattedSetting, value, username);
-                  } else {
+        case 'set':
+            // Verificar si el usuario es un moderador
+            if (!isModerator) {
+                return;
+            }
+
+            // Verificar si se proporcionó un ajuste y un valor
+            if (args.length < 2) {
+                Bot.say(channel, `@${username}, Uso correcto: !set <ajuste> <valor>`);
+                return;
+            }
+
+            // Obtener el ajuste y el valor del mensaje
+            const setting = args[0];
+            const value = args.slice(1).join(' ');
+
+            // Verificar si el ajuste es válido según SETTINGS_MODEL en formato camelCase
+            if (setting in SETTINGS_MODEL) {
+                await updateSetting(channel, setting, value, username);
+            }
+            // Verificar si el ajuste es válido según SETTINGS_MODEL en formato con guiones medios
+            else {
+                const formattedSetting = formatSettingName(setting);
+                if (formattedSetting in SETTINGS_MODEL) {
+                    await updateSetting(channel, formattedSetting, value, username);
+                } else {
                     Bot.say(channel, `@${username}, El ajuste "${setting}" no existe.`);
-                  }
                 }
-              
-                break;
-              
+            }
+
+            break;
+        case 'clip':
+            if (!settings.enable_clip_command) return;
+            const currentChannel = await Channel.getChannelByName(channel);
+            const clip = HelixClient.asUser(process.env.TWITCH_USER_ID, (client => {
+                return client.clips.createClip({
+                    channel: currentChannel.twitch_id
+                });
+            }))
+
+            clip.then((clip) => {
+                sendMessage(channel, `@${username}, ¡Se ha creado un clip! ${clip.url}`);
+            }).catch((error) => {
+                console.error(error);
+                sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar crear un clip!`);
+            });
 
         default:
             if (langList.includes(command) && settings.enable_translation) {
