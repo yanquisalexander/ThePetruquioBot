@@ -112,4 +112,5 @@ AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }),
         res.status(401).json({ message: 'Unauthorized' });
     }
 });
+
 export default AccountsRouter;

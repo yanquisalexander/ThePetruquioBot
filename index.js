@@ -62,7 +62,10 @@ await WebServer.boot();
 
 Bot.connect()
     .then(() => {
-        Bot.join(process.env.BOT_NAME);
+        if (process.env.NODE_ENV === 'production') {
+            // On production, join to self channel
+            Bot.join(process.env.BOT_NAME);
+        }
     })
     .catch(console.error);
 
@@ -83,8 +86,8 @@ const processMessage = async ({ channel, context, username, message }) => {
     Object.entries(settings).reduce((acc, [key, setting]) => {
         acc[key] = setting.value;
         return acc;
-      }, Settings);
-      
+    }, Settings);
+
     //TODO: Ban compartido 
     //console.log(await Channel.checkSharedBans(username))
 
@@ -113,7 +116,7 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
     if (Settings.enable_greetings) {
-        if(Settings.bot_muted) return; // Don't greet if bot is muted
+        if (Settings.bot_muted) return; // Don't greet if bot is muted
         if (canReceiveGreeting(channel, username, channel)) {
             activeUsers[channel][username] = Date.now();
             const isBot = knownBots.includes(username.toLowerCase());
@@ -147,7 +150,7 @@ const onChatClearedHandler = (channel) => {
 
 const onWhisperHandler = async (from, context, message, self) => {
     console.log(chalk.bgWhite.blue.bold(`Whisper received from ${from}: ${message}`));
-    if(whisperedUsers[from] && Date.now() - whisperedUsers[from] < 1000 * 60 * 60 * 24) return; // Don't answer if whispered in the last 24 hours
+    if (whisperedUsers[from] && Date.now() - whisperedUsers[from] < 1000 * 60 * 60 * 24) return; // Don't answer if whispered in the last 24 hours
     if (self) return;
     whisperedUsers[from] = Date.now();
 
