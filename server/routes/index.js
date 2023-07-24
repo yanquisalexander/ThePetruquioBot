@@ -4,6 +4,7 @@ import StatsRouter from './stats.js'
 import RankingRouter from './ranking.js'
 import DashboardRouter from './dashboard.js'
 import AccountsRouter from './accounts.js'
+import AdminRouter from './admin.js'
 
 let routes = Router()
 let RouterMap = [
@@ -26,6 +27,10 @@ let RouterMap = [
     {
         path: '/accounts',
         handler: AccountsRouter
+    },
+    {
+        path: '/admin',
+        handler: AdminRouter
     },
     {
         path: '*',

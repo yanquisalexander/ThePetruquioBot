@@ -7,6 +7,8 @@ import passport from "../../lib/passport.js";
 import { exchangeCode } from '@twurple/auth';
 import { authProvider } from "../../lib/twitch-auth.js";
 import BotModel from "../../app/models/Bot.js";
+import Session from "../../app/models/Session.js";
+import { merge } from "lodash-es";
 
 
 const AccountsRouter = Router();
@@ -62,14 +64,6 @@ AccountsRouter.post("/get-token", async (req, res) => {
 
             let profile = await user.getProfile();
 
-            user = {
-                ...user,
-                profile
-            }
-
-            if (banned) {
-                user.banned = true;
-            }
 
             // Guardar el access_token y refresh_token en la base de datos
             authProvider.addUser(user.twitchId, twitchTokens)
@@ -81,6 +75,21 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 await UserToken.create(user.id, twitchTokens);
             }
 
+            // Crear la sesión del usuario en la base de datos
+            const session = await Session.create(user.id, {}, {}, null);
+            console.log(`Created session ${session.sessionId} for user ${user.login} (${user.id})`);
+
+            user = {
+                ...user,
+                profile
+            }
+
+            merge(user, { session_id: session.sessionId });
+
+            if (banned) {
+                user.banned = true;
+            }
+            
             // Crear un JWT personalizado para el usuario
             const customToken = jwt.sign({user}, process.env.JWT_SECRET, { expiresIn: '30d' });
 
@@ -102,8 +111,20 @@ AccountsRouter.get("/me", passport.authenticate('jwt', { session: false }), (req
 //AccountsRouter
   
 AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const banned = await BotModel.isBanned(req.user.twitchId);
-    const user = req.user;    
+    let user = req.user;   
+    const banned = await BotModel.isBanned(user.twitchId); 
+    const session = await Session.findBySessionId(user.session_id);
+    if(!session) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    if(session.impersonatedUserId) {
+        const impersonatedUser = await User.findById(session.impersonatedUserId);
+        if(impersonatedUser) {
+            const impersonatedProfile = await impersonatedUser.getProfile();
+            user = merge(impersonatedUser, { profile: impersonatedProfile }, { session_id: session.sessionId }, { impersonated: true });
+        }
+    }
+
     if (user) {
         user.banned = banned ? true : false;
         res.json({ user });
@@ -112,5 +133,19 @@ AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }),
         res.status(401).json({ message: 'Unauthorized' });
     }
 });
+
+AccountsRouter.delete("/session", passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const user = req.user;
+    const session = await Session.findBySessionId(user.session_id);
+    if(!session) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    await session.revokeCurrent();
+
+    res.json({ status: 'ok' });
+});
+
+
 
 export default AccountsRouter;

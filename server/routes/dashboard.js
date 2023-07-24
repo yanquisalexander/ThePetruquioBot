@@ -9,12 +9,21 @@ import { botJoinedChannels } from "../../memory_variables.js";
 import { merge } from "lodash-es";
 import { SETTINGS_MODEL } from "../../app/models/Channel.js";
 import { subscribeToEvents } from "../boot-webserver.js";
+import Session from "../../app/models/Session.js";
 
 const DashboardRouter = Router();
 
 DashboardRouter.get("/bot-settings", passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const channel = await Channel.getChannelByName(req.user.username);
+    const session = await Session.findBySessionId(req.user.session_id);
+    let channel;
+    if (session.impersonatedUserId) {
+      console.log(`LOG: Impersonated user ${session.impersonatedUserId}`);
+      channel = await Channel.findByUserId(session.impersonatedUserId);
+    } else {
+      channel = await Channel.getChannelByName(req.user.username);
+    }
+
     let settings = channel.settings;
     const HIDDEN_CONDITIONS = {
       live_notification_message: () => !settings.enable_live_notification.value,
@@ -52,7 +61,14 @@ DashboardRouter.get("/bot-settings", passport.authenticate('jwt', { session: fal
 
 DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const channel = await Channel.getChannelByName(req.user.username);
+    const session = await Session.findBySessionId(req.user.session_id);
+    let channel;
+    if (session.impersonatedUserId) {
+      console.log(`LOG: Impersonated user ${session.impersonatedUserId}`);
+      channel = await Channel.findByUserId(session.impersonatedUserId);
+    } else {
+      channel = await Channel.getChannelByName(req.user.username);
+    }
     const updatedSettings = req.body; // Supongamos que el cuerpo de la solicitud contiene un objeto con los ajustes modificados { key: value }
 
     // Iterar sobre cada ajuste modificado y actualizar solo la clave "value" en el objeto de ajustes del canal
@@ -84,7 +100,14 @@ DashboardRouter.post("/bot-settings", passport.authenticate('jwt', { session: fa
 
 DashboardRouter.get('/auditories', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const channel = await Channel.getChannelByName(req.user.username);
+    const session = await Session.findBySessionId(req.user.session_id);
+    let channel;
+    if (session.impersonatedUserId) {
+      console.log(`LOG: Impersonated user ${session.impersonatedUserId}`);
+      channel = await Channel.findByUserId(session.impersonatedUserId);
+    } else {
+      channel = await Channel.getChannelByName(req.user.username);
+    }
     const auditories = await channel.getAuditories();
 
     res.json({
@@ -111,7 +134,7 @@ DashboardRouter.get('/mod/channels', passport.authenticate('jwt', { session: fal
       authProvider
     })
 
-    
+
     const moderatedChannels = await TwitchClient.moderation.getModerators(user);
     console.log(moderatedChannels.data);
     const channels = moderatedChannels.data.map(channel => channel.userDisplayName);
@@ -191,7 +214,14 @@ DashboardRouter.get('/bot-status', passport.authenticate('jwt', { session: false
 
 DashboardRouter.get('/channel-point-rewards', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const channel = await Channel.getChannelByName(req.user.username);
+    const session = await Session.findBySessionId(req.user.session_id);
+    let channel;
+    if (session.impersonatedUserId) {
+      console.log(`LOG: Impersonated user ${session.impersonatedUserId}`);
+      channel = await Channel.findByUserId(session.impersonatedUserId);
+    } else {
+      channel = await Channel.getChannelByName(req.user.username);
+    }
     const rewardsData = await HelixClient.channelPoints.getCustomRewards(channel.twitch_id);
     let rewards = []
     rewardsData.map(reward => {

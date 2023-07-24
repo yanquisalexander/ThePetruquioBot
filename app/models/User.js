@@ -11,6 +11,42 @@ class User {
     this.admin = admin;
   }
 
+  static async findAll() {
+    // Get User, Profile and Channel and merge them
+    const query = `
+      SELECT users.id, users.twitch_id, users.username, users.email, users.admin, profiles.display_name, profiles.broadcaster_type, profiles.description, profiles.profile_image_url, channels.name, channels.team_id, channels.twitch_id, channels.settings, channels.auto_connect
+      FROM users
+      LEFT JOIN profiles ON users.id = profiles.user_id
+      LEFT JOIN channels ON users.twitch_id = channels.twitch_id
+      ORDER BY users.username ASC
+    `;
+    
+
+    try {
+      const result = await db.query(query);
+      const users = result.rows.map(row => {
+        const user = new User(row.id, row.twitch_id, row.username, row.email, row.admin);
+        user.profile = {
+          display_name: row.display_name,
+          broadcaster_type: row.broadcaster_type,
+          description: row.description,
+          profile_image_url: row.profile_image_url
+        };
+        user.channel = {
+          name: row.name,
+          team_id: row.team_id,
+          twitch_id: row.twitch_id,
+          settings: row.settings,
+          auto_connect: row.auto_connect
+        };
+        return user;
+      });
+      return users;
+    } catch (error) {
+      throw new Error('Failed to find all users');
+    }
+  }
+
   static async findById(id) {
     const query = 'SELECT * FROM users WHERE id = $1';
     const values = [id];
@@ -117,6 +153,20 @@ class User {
       console.log(error);
       throw new Error('Failed to create user');
     }
+  }
+    async delete() {
+      const query = `DELETE FROM users WHERE id = $1`;
+
+      const values = [this.id];
+
+      try {
+        await db.query(query, values);
+      }
+      catch (error) {
+        console.log(error);
+        throw new Error('Failed to delete user');
+      }
+
   }
 }
 

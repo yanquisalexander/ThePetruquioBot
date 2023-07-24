@@ -225,6 +225,32 @@ class Channel {
     return channel;
   }
 
+  static async findByUserId(userId) {
+    // Primero, obtenemos el twitch_id del usuario usando su user_id
+    const userQuery = 'SELECT twitch_id FROM users WHERE id = $1';
+    const userValues = [userId];
+    const userResult = await db.query(userQuery, userValues);
+
+    if (userResult.rows.length === 0) {
+      return null; // Si el usuario no existe, retornamos null
+    }
+
+    const twitchId = userResult.rows[0].twitch_id;
+
+    // Luego, continuamos con la consulta normal usando el twitch_id
+    const query = 'SELECT name FROM channels WHERE twitch_id = $1';
+    const values = [twitchId];
+    const channelResult = await db.query(query, values);
+
+    if (channelResult.rows.length === 0) {
+      return null; // Si el canal no existe, retornamos null
+    }
+
+    const channelData = channelResult.rows[0];
+    const channel = await Channel.getChannelByName(channelData.name);
+    return channel;
+  }
+
 
   static async deleteChannelByName(channelName) {
     try {
