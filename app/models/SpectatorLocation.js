@@ -81,6 +81,21 @@ class SpectatorLocation {
             throw error;
         }
     }
+
+    static async find(username) {
+        const query = {
+            text: 'SELECT * FROM spectator_locations WHERE username = $1',
+            values: [username],
+        };
+
+        try {
+            const result = await db.query(query);
+            return result.rows[0];
+        } catch (error) {
+            console.error('Error al obtener la ubicación del espectador:', error);
+            throw error;
+        }
+    }
 }
 
 export default SpectatorLocation;

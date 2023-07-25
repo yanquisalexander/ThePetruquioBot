@@ -9,6 +9,18 @@ class WorldMap {
     this.pinMessage = pinMessage;
   }
 
+  static async forgive(username, channelName) {
+    const query = `DELETE FROM WorldMap WHERE username = $1 AND channel_name = $2`;
+
+    try {
+      await db.query(query, [username, channelName]);
+    } catch (error) {
+      console.error('Error al eliminar al usuario en el WorldMap:', error);
+      throw error;
+    }
+  }
+
+
   async save() {
     const query = {
       text: `

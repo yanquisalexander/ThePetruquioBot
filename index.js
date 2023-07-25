@@ -14,6 +14,7 @@ import {
     autoTranslateUsers,
     botJoinedChannels,
     whisperedUsers,
+    CountryLangs,
 } from './memory_variables.js';
 import { getRandomBotResponse, getRandomOnClearChat } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
@@ -23,6 +24,7 @@ import { railwayConnected } from './utils/environment.js';
 import { WebServer } from './server/boot-webserver.js';
 import BotModel from './app/models/Bot.js';
 import { handleDetoxify } from './modules/detoxify.js';
+import SpectatorLocation from './app/models/SpectatorLocation.js';
 
 
 
@@ -76,6 +78,8 @@ const onConnectedHandler = (address, port) => {
 const processMessage = async ({ channel, context, username, message }) => {
     const isModerator = context.mod || Boolean(context.badges?.broadcaster) || context.username === 'alexitoo_uy' // Bot owner;
     const isBroadcaster = isModerator && context.badges.broadcaster;
+    const isBot = knownBots.includes(username.toLowerCase());
+    const userOnMap = await SpectatorLocation.find(username);
     channel = channel.replace('#', '');
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
@@ -117,10 +121,14 @@ const processMessage = async ({ channel, context, username, message }) => {
 
     if (Settings.enable_greetings) {
         if (Settings.bot_muted) return; // Don't greet if bot is muted
-        if (canReceiveGreeting(channel, username, channel)) {
+        if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
             activeUsers[channel][username] = Date.now();
-            const isBot = knownBots.includes(username.toLowerCase());
-            const greetingMessage = getRandomGreeting(username, isBot);
+            console.log(userOnMap)
+            let lang = 'en'
+            if (userOnMap.country_code && CountryLangs[userOnMap.country_code]) {
+                lang = CountryLangs[userOnMap.country_code];
+            }
+            const greetingMessage = getRandomGreeting(username, isBot, lang);
             addGreetingToStack(channel, greetingMessage);
         }
 

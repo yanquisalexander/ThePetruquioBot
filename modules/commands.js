@@ -75,7 +75,7 @@ const updateSetting = async (channel, setting, value, username) => {
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
     const args = message.slice(1).split(' ');
     let command = args.shift().toLowerCase();
-    const isUserOnMap = await WorldMap.get(username, channel.replace('#', ''));
+    const isUserOnMap = await SpectatorLocation.find(username);
     if (command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
         command = 'from';
     }

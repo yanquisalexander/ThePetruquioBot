@@ -1,3 +1,4 @@
+import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import { Bot } from "../bot.js";
 import { activeUsers, greetingsStack } from "../memory_variables.js";
 import { isFollower, knownBots } from "../utils/twitch.js";
@@ -33,7 +34,7 @@ export const addGreetingToStack = (channel, message, options) => {
     greetingsStack.push({ channel, message, ...options });
 };
 
-const canReceiveGreeting = (channel, username, channelOwner) => {
+const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) => {
     if (username.toLowerCase() === 'alexitoo_uy' && channelOwner.toLowerCase() !== 'alexitoo_uy') {
         // Verificar si el usuario es el creador del bot
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
@@ -54,16 +55,6 @@ const canReceiveGreeting = (channel, username, channelOwner) => {
         return false;
     }
 
-
-    // Comprobar si el usuario es seguidor del canal
-    if (isFollower(username, channel.slice(1))) {
-        // Comprobar si el usuario ha pasado al menos 6 horas desde su último mensaje
-        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
-            return false;
-        }
-        return true;
-    }
-
     // Comprobar si es un bot conocido
     if (knownBots.includes(username.toLowerCase())) {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
@@ -72,10 +63,21 @@ const canReceiveGreeting = (channel, username, channelOwner) => {
         return true;
     }
 
+    // Comprobar si el usuario está en el mapa de la comunidad
+    if (isUserOnMap) {
+        // Comprobar si el usuario ha pasado al menos 6 horas desde su último mensaje
+        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
+            return false;
+        }
+        return true;
+    }
+
+    
+
     return false;
 };
 
-const getRandomGreeting = (username, isBot = false) => {
+const getRandomGreeting = (username, isBot = false, lang) => {
     const greetingList = isBot ? botGreetings : greetings;
     const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
     const randomEmote = emotes[Math.floor(Math.random() * emotes.length)];
