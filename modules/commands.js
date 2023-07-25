@@ -75,6 +75,7 @@ const updateSetting = async (channel, setting, value, username) => {
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
     const args = message.slice(1).split(' ');
     let command = args.shift().toLowerCase();
+    const isUserOnMap = await WorldMap.get(username, channel.replace('#', ''));
     if (command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
         command = 'from';
     }
@@ -129,6 +130,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'msg':
             if (!settings.enable_community_map) return;
+            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const messageContent = args.join(' ');
             if (messageContent) {
                 if (messageContent.length > 100) {
@@ -143,18 +145,24 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'show':
             if (!settings.enable_community_map) return;
+            if (isUserOnMap) {
             const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
+            } else {
+                sendMessage(channel, `${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            }
             return;
         case 'hide':
             if (!settings.enable_community_map) return;
+            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
             if (!settings.enable_community_map) return;
+            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const pinEmote = args[0];
             if (pinEmote) {
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`

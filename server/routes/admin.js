@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../../app/models/User.js';
 import { Bot } from '../../bot.js';
 import Session from '../../app/models/Session.js';
+import psList from 'ps-list';
 
 const AdminRouter = Router();
 
@@ -88,6 +89,29 @@ AdminRouter.post("/users/:userId/impersonate", passport.authenticate('jwt', { se
         return res.status(403).json({ message: 'Unauthorized to impersonate' });
     }
 });
+
+AdminRouter.get("/processes", passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const currentUser = req.user;
+
+    // Verifica si el usuario actual tiene el privilegio de administrador
+    if (currentUser.admin) {
+        try {
+            let processes = [];
+            processes = await psList()
+            res.json({
+                data: {
+                    processes
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: 'Failed to get processes' });
+        }
+    } else {
+        return res.status(403).json({ message: 'Unauthorized to get processes' });
+    }
+});
+
 
 
 export default AdminRouter;
