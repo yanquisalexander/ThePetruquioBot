@@ -11,7 +11,7 @@ DynamicSitemapRouter.get('/', async (req, res) => {
     channels.map(channel => {
         if (channel.settings && channel.settings.enable_community_map) {
             sitemapData.push({
-                url: `https://petruquio.live/map/${channel.name}`,
+                url: `https://petruquio.live/c/${channel.name}/map`,
                 changefreq: 'daily',
                 priority: 0.8
             });

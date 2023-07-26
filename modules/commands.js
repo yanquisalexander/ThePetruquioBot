@@ -241,7 +241,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'map':
             if (!settings.enable_community_map) return;
-            sendMessage(channel, `You can access our EarthDay map here: petruquio.live/map/${channel.replace('#', '')}`);
+            sendMessage(channel, `You can access our EarthDay map here: petruquio.live/c/${channel}/map`);
             break;
         case 'set':
             // Verificar si el usuario es un moderador
