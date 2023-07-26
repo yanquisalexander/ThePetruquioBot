@@ -5,6 +5,7 @@ import RankingRouter from './ranking.js'
 import DashboardRouter from './dashboard.js'
 import AccountsRouter from './accounts.js'
 import AdminRouter from './admin.js'
+import DynamicSitemapRouter from './dynamic-sitemap.js'
 
 let routes = Router()
 let RouterMap = [
@@ -31,6 +32,10 @@ let RouterMap = [
     {
         path: '/admin',
         handler: AdminRouter
+    },
+    {
+        path: '/dynamic-sitemap',
+        handler: DynamicSitemapRouter
     },
     {
         path: '*',
