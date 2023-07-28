@@ -247,43 +247,6 @@ setInterval(() => {
     }
 }, 10 * 1000);
 
-// Cada 30 segundos, verificar si hay canales suspendidos que se puedan reconectar
-setInterval(async () => {
-    try {
-        if (suspendedChannels.length > 0) {
-            const channel = suspendedChannels[0];
-            const { attempts, suspendedAt } = channel;
-            console.log(`Channel ${channel.channel} : ${attempts} attempts, suspended at ${suspendedAt}`);
-            if (attempts < 3 && Date.now() - suspendedAt > 1 * 60 * 1000) {
-                console.log(`Retrying to join ${channel.channel}...`);
-                try {
-                    Bot.join(channel.channel)
-                } catch (e) {
-                    console.error(e);
-                }
-
-                // Incrementar intentos y actualizar tiempo de suspensión
-                channel.attempts++;
-                channel.suspendedAt = Date.now();
-
-                // Mover el canal al final de la lista para dar paso a los siguientes canales
-                suspendedChannels.splice(0, 1);
-                suspendedChannels.push(channel);
-            } else if (attempts >= 3) {
-                console.log(`Retried to join ${channel.channel} 3 times without success, removing from autojoin...`);
-                let channelData = await Channel.getChannelByName(channel.channel);
-                await channelData.disableAutoConnect();
-
-                // Eliminar el canal de la lista de canales suspendidos
-                suspendedChannels.splice(0, 1);
-            }
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}, 30 * 1000);
-
-
 
 
 
