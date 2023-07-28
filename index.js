@@ -197,8 +197,6 @@ const onNoticeHandler = async (channel, msgid, message) => {
                     suspendedAt: Date.now(),
                     attempts: 0
                 }
-            } else {
-                suspendedChannels[channel].attempts++;
             }
         }
 
