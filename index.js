@@ -256,7 +256,11 @@ setInterval(async () => {
             console.log(`Channel ${channel.channel} : ${attempts} attempts, suspended at ${suspendedAt}`);
             if (attempts < 3 && Date.now() - suspendedAt > 2 * 60 * 1000) {
                 console.log(`Retrying to join ${channel.channel}...`);
-                Bot.join(channel.channel);
+                try {
+                    Bot.join(channel.channel)
+                } catch (e) {
+                    console.error(e);
+                }
 
                 // Incrementar intentos y actualizar tiempo de suspensión
                 channel.attempts++;
