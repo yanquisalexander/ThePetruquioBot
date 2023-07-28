@@ -192,11 +192,12 @@ const onNoticeHandler = async (channel, msgid, message) => {
             // Si el canal sigue suspendido, se volverá a intentar en 2 minutos
             // Si tras 3 intentos el canal sigue suspendido, se eliminará de autojoin
             console.log(`Channel ${channel} has been suspended :(`);
-            if (!suspendedChannels[channel]) {
-                suspendedChannels[channel] = {
+            if (!suspendedChannels.find(c => c.channel === channel)) {
+                suspendedChannels.push({
+                    channel: channel.replace('#', ''),
                     suspendedAt: Date.now(),
                     attempts: 0
-                }
+                })
             }
         }
 
@@ -252,10 +253,10 @@ setInterval(async () => {
         if (suspendedChannels.length > 0) {
             const channel = suspendedChannels[0];
             const { attempts, suspendedAt } = channel;
-            console.log(`Channel ${channel} : ${attempts} attempts, suspended at ${suspendedAt}`);
+            console.log(`Channel ${channel.channel} : ${attempts} attempts, suspended at ${suspendedAt}`);
             if (attempts < 3 && Date.now() - suspendedAt > 2 * 60 * 1000) {
-                console.log(`Retrying to join ${channel}...`);
-                Bot.join(channel);
+                console.log(`Retrying to join ${channel.channel}...`);
+                Bot.join(channel.channel);
 
                 // Incrementar intentos y actualizar tiempo de suspensión
                 channel.attempts++;
@@ -265,8 +266,8 @@ setInterval(async () => {
                 suspendedChannels.splice(0, 1);
                 suspendedChannels.push(channel);
             } else if (attempts >= 3) {
-                console.log(`Retried to join ${channel} 3 times without success, removing from autojoin...`);
-                let channelData = await Channel.getChannelByName(channel.replace('#', ''));
+                console.log(`Retried to join ${channel.channel} 3 times without success, removing from autojoin...`);
+                let channelData = await Channel.getChannelByName(channel.channel);
                 await channelData.disableAutoConnect();
 
                 // Eliminar el canal de la lista de canales suspendidos
@@ -277,7 +278,6 @@ setInterval(async () => {
         console.error(e);
     }
 }, 30 * 1000);
-
 
 
 
