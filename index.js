@@ -19,6 +19,7 @@ import { handleDetoxify } from './modules/detoxify.js';
 import {
     addGreetingToStack,
     canReceiveGreeting,
+    getRandomBroadcasterGreeting,
     getRandomGreeting,
 } from './modules/greetings.js';
 import { getRandomBotResponse } from './modules/random-responses.js';
@@ -145,7 +146,10 @@ const processMessage = async ({ channel, context, username, message }) => {
             if (userOnMap && userOnMap.country_code && CountryLangs[userOnMap.country_code]) {
                 lang = CountryLangs[userOnMap.country_code];
             }
-            const greetingMessage = getRandomGreeting(username, isBot, lang);
+            let greetingMessage = getRandomGreeting(username, isBot, lang);
+            if(isBroadcaster) {
+                greetingMessage = getRandomBroadcasterGreeting(username);
+            }
             addGreetingToStack(channel, greetingMessage);
         }
 
