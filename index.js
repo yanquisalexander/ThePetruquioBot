@@ -188,7 +188,7 @@ const onNoticeHandler = async (channel, msgid, message) => {
             Bot.part(channel);
             console.log(`Bot has left ${chan} channel`);
         }
-        if (msgid === 'msg_channel_suspended ') {
+        if (msgid === 'msg_channel_suspended') {
             // Se añade el canal a la lista de canales suspendidos, y se intentará reconectar en 5 minutos
             // Si el canal sigue suspendido, se volverá a intentar en 5 minutos
             // Si tras 3 intentos el canal sigue suspendido, se eliminará de autojoin
