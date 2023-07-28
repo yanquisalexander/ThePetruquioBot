@@ -58,7 +58,7 @@ AccountsRouter.post("/get-token", async (req, res) => {
                 description,
                 profile_image_url
             });
-            
+
             const banned = await BotModel.isBanned(id);
 
 
@@ -89,9 +89,9 @@ AccountsRouter.post("/get-token", async (req, res) => {
             if (banned) {
                 user.banned = true;
             }
-            
+
             // Crear un JWT personalizado para el usuario
-            const customToken = jwt.sign({user}, process.env.JWT_SECRET, { expiresIn: '30d' });
+            const customToken = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
             // Enviar el JWT personalizado al cliente
             res.json({ token: customToken });
@@ -104,22 +104,22 @@ AccountsRouter.post("/get-token", async (req, res) => {
 
 AccountsRouter.get("/me", passport.authenticate('jwt', { session: false }), (req, res) => {
     const user = req.user;
-  
+
     res.json({ user });
-  });
+});
 
 //AccountsRouter
-  
+
 AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }), async (req, res) => {
-    let user = req.user;   
-    const banned = await BotModel.isBanned(user.twitchId); 
+    let user = req.user;
+    const banned = await BotModel.isBanned(user.twitchId);
     const session = await Session.findBySessionId(user.session_id);
-    if(!session) {
+    if (!session) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-    if(session.impersonatedUserId) {
+    if (session.impersonatedUserId) {
         const impersonatedUser = await User.findById(session.impersonatedUserId);
-        if(impersonatedUser) {
+        if (impersonatedUser) {
             const impersonatedProfile = await impersonatedUser.getProfile();
             user = merge(impersonatedUser, { profile: impersonatedProfile }, { session_id: session.sessionId }, { impersonated: true });
         }
@@ -137,14 +137,65 @@ AccountsRouter.get("/session", passport.authenticate('jwt', { session: false }),
 AccountsRouter.delete("/session", passport.authenticate('jwt', { session: false }), async (req, res) => {
     const user = req.user;
     const session = await Session.findBySessionId(user.session_id);
-    if(!session) {
+    if (!session) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
-    
+
     await session.revokeCurrent();
 
     res.json({ status: 'ok' });
 });
+
+AccountsRouter.get("/:provider/connect", passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const user = req.user;
+    const provider = req.params.provider;
+    const session = await Session.findBySessionId(user.session_id);
+    console.log(session);
+    if (!session.sessionId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    switch (provider) {
+        case 'discord':
+            const discordScopes = ["identify", "email", "connections", "guilds", "guilds.join"];
+            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&redirect_uri=${process.env.NODE_ENV === 'production' ? 'https://petruquio.live/auth/discord/callback' : 'http://localhost:8888/auth/discord/callback'}&response_type=code&scope=${discordScopes.join('%20')}&prompt=consent`;
+            return res.send(discordAuthUrl);
+        default:
+            return res.status(404).json({ message: 'Provider not found' });
+    }
+});
+
+AccountsRouter.get("/discord/callback", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+    passport.authorize('discord', { session: false }, async (err, profile, info) => {
+        let user = req.user;
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Failed to connect Discord account' });
+        }
+
+        if (!user) {
+            return res.status(500).json({ message: 'Failed to connect Discord account' });
+        }
+
+
+
+
+        const currentUser = await User.findById(user.id);
+        console.log(currentUser);
+        console.log(profile);
+
+        let connect = await currentUser.connectExternalProvider('discord', profile.id, profile.accessToken, null, profile);
+        if (!connect) {
+            return res.status(500).json({ message: 'Failed to connect Discord account' });
+        }
+
+        return res.json({ status: 'ok' });
+    }
+    )(req, res, next);
+});
+
+
+
 
 
 

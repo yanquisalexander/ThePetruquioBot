@@ -20,7 +20,7 @@ class User {
       LEFT JOIN channels ON users.twitch_id = channels.twitch_id
       ORDER BY users.username ASC
     `;
-    
+
 
     try {
       const result = await db.query(query);
@@ -44,6 +44,24 @@ class User {
       return users;
     } catch (error) {
       throw new Error('Failed to find all users');
+    }
+  }
+
+  static async findByUsername(username) {
+    const query = 'SELECT * FROM users WHERE username = $1';
+    const values = [username];
+
+    try {
+      const result = await db.query(query, values);
+
+      const userData = result.rows[0];
+      if (!userData) {
+        return null;
+      }
+      return new User(userData.id, userData.twitch_id, userData.username, userData.email);
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to find user by username');
     }
   }
 
@@ -154,20 +172,107 @@ class User {
       throw new Error('Failed to create user');
     }
   }
-    async delete() {
-      const query = `DELETE FROM users WHERE id = $1`;
+  async delete() {
+    const query = `DELETE FROM users WHERE id = $1`;
 
-      const values = [this.id];
+    const values = [this.id];
 
-      try {
-        await db.query(query, values);
-      }
-      catch (error) {
-        console.log(error);
-        throw new Error('Failed to delete user');
-      }
+    try {
+      await db.query(query, values);
+    }
+    catch (error) {
+      console.log(error);
+      throw new Error('Failed to delete user');
+    }
 
   }
+
+  // Método para conectar una cuenta externa con la cuenta de usuario
+  async connectExternalProvider(providerName, providerUserId, access_token, refresh_token, userInfo) {
+    try {
+      // Verificar si el proveedor ya existe en la tabla "providers"
+      const provider = await db.query('SELECT * FROM providers WHERE provider_name = $1', [providerName]);
+
+      if (provider.rows.length === 0) {
+        // Si el proveedor no existe, agregarlo a la tabla "providers"
+        await db.query('INSERT INTO providers (provider_name) VALUES ($1)', [providerName]);
+      }
+
+      // Verificar si ya existe una conexión para este usuario con el proveedor dado
+      const connection = await db.query(
+        'SELECT * FROM connected_accounts WHERE user_id = $1 AND provider_id = (SELECT provider_id FROM providers WHERE provider_name = $2)',
+        [this.id, providerName]
+      );
+
+      if (connection.rows.length === 0) {
+        // Si no existe una conexión, agregarla a la tabla "connected_accounts"
+        await db.query(
+          'INSERT INTO connected_accounts (user_id, provider_id, provider_user_id, access_token, refresh_token, userinfo) VALUES ($1, (SELECT provider_id FROM providers WHERE provider_name = $2), $3, $4, $5, $6)',
+          [this.id, providerName, providerUserId, access_token, refresh_token, userInfo]
+        );
+      }
+      else {
+        // Si ya existe una conexión, actualizarla
+        await db.query(
+          'UPDATE connected_accounts SET access_token = $1, refresh_token = $2, userinfo = $3 WHERE user_id = $4 AND provider_id = (SELECT provider_id FROM providers WHERE provider_name = $5)',
+          [access_token, refresh_token, userInfo, this.id, providerName]
+        );
+      }
+
+      // Retorna true para indicar que se ha conectado exitosamente
+      return true;
+    } catch (error) {
+      console.error('Error connecting external provider:', error);
+      return false;
+    }
+  }
+
+  async getConnectedAccounts() {
+    try {
+      const result = await db.query(
+        'SELECT * FROM connected_accounts WHERE user_id = $1',
+        [this.id]
+      );
+      return result.rows;
+    } catch (error) {
+      console.error('Error getting connected accounts:', error);
+      return [];
+    }
+  }
+
+  async getConnectedAccountInfo(providerName) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM connected_accounts WHERE user_id = $1 AND provider_id = (SELECT provider_id FROM providers WHERE provider_name = $2)',
+        [this.id, providerName]
+      );
+
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        // If no connected account found, you can handle it accordingly.
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting connected account info:', error);
+      throw error; // Re-throw the error to be handled by the caller of this method.
+    }
+  }
+
+
+  async disconnectExternalProvider(providerName) {
+    try {
+      await db.query(
+        'DELETE FROM connected_accounts WHERE user_id = $1 AND provider_id = (SELECT provider_id FROM providers WHERE provider_name = $2)',
+        [this.id, providerName]
+      );
+      return true;
+    } catch (error) {
+      console.error('Error disconnecting external provider:', error);
+      return false;
+    }
+  }
+
 }
 
 export default User;

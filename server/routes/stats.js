@@ -11,11 +11,5 @@ StatsRouter.get("/", (req, res, next) => {
     })
 })
 
-StatsRouter.get("/route", (req, res, next) => {
-    const allRoutes = [];
-    
-
-    console.log(WebServer._router);
-})
 
 export default StatsRouter;

@@ -9,6 +9,7 @@ import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
 import { AppClient, HelixClient, getChannelInfo } from "../utils/twitch.js";
 import { channel } from "diagnostics_channel";
 import { pusher } from "../lib/pusher.js";
+import { WorldMapCache } from "../server/routes/world-map.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -123,6 +124,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     latitude: spectatorLocation.latitude,
                     longitude: spectatorLocation.longitude
                 });
+                WorldMapCache.clear(channel);
                 sendMessage(channel, `Tu ubicación ha sido registrada correctamente.`);
             } else {
                 sendMessage(channel, `Debes especificar una ubicación después del comando !from.`);
@@ -138,6 +140,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
                 await worldMap.save();
+                WorldMapCache.clear(channel);
                 sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
             } else {
                 sendMessage(channel, `Debes especificar un mensaje después del comando !msg.`);
@@ -148,6 +151,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (isUserOnMap) {
             const showMap = new WorldMap(username, channel.replace('#', ''), true);
             await showMap.save();
+            WorldMapCache.clear(channel);
             sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             } else {
                 sendMessage(channel, `${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
@@ -172,6 +176,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     username,
                     emote: emoteUrl
                 });
+                WorldMapCache.clear(channel);
                 sendMessage(channel, `@${username}, tu Pin se ha sido guardado correctamente.`);
             } else {
                 sendMessage(channel, `@${username}, Debes especificar un emote después del comando !emote.`);
