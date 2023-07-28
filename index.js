@@ -114,7 +114,8 @@ const processMessage = async ({ channel, context, username, message }) => {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {
-                //addGreetingToStack(channel, shoutout.message);
+                activeUsers[channel][username] = Date.now();
+                addGreetingToStack(channel, shoutout.message);
             }
         } catch (error) {
 
