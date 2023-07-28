@@ -341,7 +341,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 sendMessage(channel, translated)
             }
             if (customCommand) {
-                if (customCommand.command_options.enabled) {
+                if (customCommand?.command_options?.enabled) {
                     const parsedReply = await replaceVariables({
                         commandResponse: customCommand.response,
                         channel,
