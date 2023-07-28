@@ -26,6 +26,7 @@ import { translate } from './modules/translate.js';
 import { WebServer } from './server/boot-webserver.js';
 import { railwayConnected } from './utils/environment.js';
 import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
+import Shoutout from './app/models/Shoutout.js';
 
 
 
@@ -107,6 +108,17 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (Settings.bot_muted && !isModerator) {
         console.log(chalk.yellow.bold(`Bot is muted in ${channel} :(`));
         return;
+    }
+
+    if (Settings.enable_auto_shoutout) {
+        try {
+            let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
+            if (shoutout) {
+                addGreetingToStack(channel, shoutout.message);
+            }
+        } catch (error) {
+            console.log('');
+        }
     }
 
     if (autoTranslateUsers[channel][username]) {
