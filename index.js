@@ -179,7 +179,6 @@ const onWhisperHandler = async (from, context, message, self) => {
 const onNoticeHandler = async (channel, msgid, message) => {
     console.log('>>>>', 'NOTICE', channel, msgid, message);
     try {
-        console.log('>>>>', 'NOTICE', channel, msgid, message);
         if (msgid === 'msg_banned') {
             const chan = channel.toLowerCase().substring(1);
             let channelData = await getChannelInfo(chan);
@@ -253,21 +252,34 @@ setInterval(() => {
 setInterval(async () => {
     try {
         if (suspendedChannels.length > 0) {
-            const channel = suspendedChannels.shift();
-            if (channel.attempts < 3 && Date.now() - channel.suspendedAt < 1000 * 60 * 5) {
+            const channel = suspendedChannels[0];
+            const { attempts, suspendedAt } = channel;
+
+            if (attempts < 3 && Date.now() - suspendedAt > 5 * 60 * 1000) {
                 console.log(`Retrying to join ${channel}...`);
                 Bot.join(channel);
-            } else {
+
+                // Incrementar intentos y actualizar tiempo de suspensión
+                channel.attempts++;
+                channel.suspendedAt = Date.now();
+
+                // Mover el canal al final de la lista para dar paso a los siguientes canales
+                suspendedChannels.splice(0, 1);
+                suspendedChannels.push(channel);
+            } else if (attempts >= 3) {
                 console.log(`Retried to join ${channel} 3 times without success, removing from autojoin...`);
                 let channelData = await Channel.getChannelByName(channel.replace('#', ''));
                 await channelData.disableAutoConnect();
-                delete suspendedChannels[channel];
+
+                // Eliminar el canal de la lista de canales suspendidos
+                suspendedChannels.splice(0, 1);
             }
         }
     } catch (e) {
         console.error(e.stack);
     }
 }, 30 * 1000);
+
 
 
 
