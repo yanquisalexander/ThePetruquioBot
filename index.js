@@ -192,6 +192,7 @@ const onNoticeHandler = async (channel, msgid, message) => {
             // Se añade el canal a la lista de canales suspendidos, y se intentará reconectar en 5 minutos
             // Si el canal sigue suspendido, se volverá a intentar en 5 minutos
             // Si tras 3 intentos el canal sigue suspendido, se eliminará de autojoin
+            console.log(`Channel ${channel} has been suspended :(`);
             if (!suspendedChannels[channel]) {
                 suspendedChannels[channel] = {
                     suspendedAt: Date.now(),
@@ -200,7 +201,6 @@ const onNoticeHandler = async (channel, msgid, message) => {
             } else {
                 suspendedChannels[channel].attempts++;
             }
-            console.log(`Channel ${channel} has been suspended :(`);
         }
 
 
@@ -255,6 +255,7 @@ setInterval(async () => {
         if (suspendedChannels.length > 0) {
             const channel = suspendedChannels.shift();
             if (channel.attempts < 3 && Date.now() - channel.suspendedAt < 1000 * 60 * 5) {
+                console.log(`Retrying to join ${channel}...`);
                 Bot.join(channel);
             } else {
                 console.log(`Retried to join ${channel} 3 times without success, removing from autojoin...`);
