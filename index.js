@@ -252,7 +252,7 @@ setInterval(async () => {
         if (suspendedChannels.length > 0) {
             const channel = suspendedChannels[0];
             const { attempts, suspendedAt } = channel;
-
+            console.log(`Channel ${channel} : ${attempts} attempts, suspended at ${suspendedAt}`);
             if (attempts < 3 && Date.now() - suspendedAt > 2 * 60 * 1000) {
                 console.log(`Retrying to join ${channel}...`);
                 Bot.join(channel);
@@ -274,7 +274,7 @@ setInterval(async () => {
             }
         }
     } catch (e) {
-        console.error(e.stack);
+        console.error(e);
     }
 }, 30 * 1000);
 
