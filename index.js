@@ -141,7 +141,6 @@ const processMessage = async ({ channel, context, username, message }) => {
         if (Settings.bot_muted) return; // Don't greet if bot is muted
         if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
             activeUsers[channel][username] = Date.now();
-            console.log(userOnMap)
             let lang = 'en'
             if (userOnMap && userOnMap.country_code && CountryLangs[userOnMap.country_code]) {
                 lang = CountryLangs[userOnMap.country_code];
