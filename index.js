@@ -120,6 +120,7 @@ const processMessage = async ({ channel, context, username, message }) => {
             console.log('');
         }
     }
+    
 
     if (autoTranslateUsers[channel][username]) {
         const translatedMessage = await translate(message, 'en', username);
