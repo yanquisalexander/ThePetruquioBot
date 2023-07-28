@@ -29,7 +29,7 @@ class Shoutout {
                 newShoutout.message,
                 newShoutout.enabled
             );
-            SHOUTOUT_CACHE.set(target_streamer, shoutout);
+            SHOUTOUT_CACHE.set(`${channel_id}-${target_streamer}`, shoutout);
             return shoutout;
         } catch (error) {
             throw new Error('Error creating shoutout: ' + error.message);
@@ -37,8 +37,8 @@ class Shoutout {
     }
 
     static async findByTargetStreamer(channel_id, target_streamer) {
-        if (SHOUTOUT_CACHE.get(target_streamer)) {
-            return SHOUTOUT_CACHE.get(target_streamer);
+        if (SHOUTOUT_CACHE.get(`${channel_id}-${target_streamer}`)) {
+            return SHOUTOUT_CACHE.get(`${channel_id}-${target_streamer}`);
         }
         try {
             const query = 'SELECT * FROM shoutouts WHERE channel_id = $1 AND target_streamer = $2';
@@ -48,13 +48,15 @@ class Shoutout {
             if (!shoutout) {
                 throw new Error('Shoutout not found');
             }
-            return new Shoutout(
+            let so = new Shoutout(
                 shoutout.id,
                 shoutout.channel_id,
                 shoutout.target_streamer,
                 shoutout.message,
                 shoutout.enabled
             );
+            SHOUTOUT_CACHE.set(`${channel_id}-${target_streamer}`, so);
+            return so;
         } catch (error) {
             throw new Error('Error finding shoutout: ' + error.message);
         }
@@ -107,7 +109,7 @@ class Shoutout {
             const updatedShoutout = result.rows[0];
             this.message = updatedShoutout.message;
             this.enabled = updatedShoutout.enabled;
-            SHOUTOUT_CACHE.set(this.target_streamer, this);
+            SHOUTOUT_CACHE.set(`${channel_id}-${this.target_streamer}`, this);
             return this;
         } catch (error) {
             throw new Error('Error updating shoutout: ' + error.message);
@@ -119,7 +121,7 @@ class Shoutout {
             const query = 'DELETE FROM shoutouts WHERE id = $1';
             const values = [this.id];
             await db.query(query, values);
-            SHOUTOUT_CACHE.remove(this.target_streamer);
+            SHOUTOUT_CACHE.remove(`${this.channel_id}-${this.target_streamer}`);
             return true;
         } catch (error) {
             throw new Error('Error deleting shoutout: ' + error.message);

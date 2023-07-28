@@ -113,14 +113,14 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (Settings.enable_auto_shoutout) {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
-            if (shoutout) {
+            if (shoutout && shoutout.enabled) {
                 addGreetingToStack(channel, shoutout.message);
             }
         } catch (error) {
             console.log('');
         }
     }
-    
+
 
     if (autoTranslateUsers[channel][username]) {
         const translatedMessage = await translate(message, 'en', username);

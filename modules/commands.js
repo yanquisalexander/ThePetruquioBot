@@ -11,6 +11,7 @@ import { channel } from "diagnostics_channel";
 import { pusher } from "../lib/pusher.js";
 import { WorldMapCache } from "../server/routes/world-map.js";
 import Command from "../app/models/Command.js";
+import Shoutout from "../app/models/Shoutout.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -83,7 +84,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
     try {
         customCommand = await Command.findByChannelAndName(channelData.id, command.toLowerCase());
     } catch (error) {
-        console.error(error.message);
+        //console.error(error.message);
     }
 
 
@@ -142,7 +143,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'msg':
             if (!settings.enable_community_map) return;
-            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const messageContent = args.join(' ');
             if (messageContent) {
                 if (messageContent.length > 100) {
@@ -159,24 +160,24 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'show':
             if (!settings.enable_community_map) return;
             if (isUserOnMap) {
-            const showMap = new WorldMap(username, channel.replace('#', ''), true);
-            await showMap.save();
-            WorldMapCache.clear(channel);
-            sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
+                const showMap = new WorldMap(username, channel.replace('#', ''), true);
+                await showMap.save();
+                WorldMapCache.clear(channel);
+                sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             } else {
                 sendMessage(channel, `${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             }
             return;
         case 'hide':
             if (!settings.enable_community_map) return;
-            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
             if (!settings.enable_community_map) return;
-            if(!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const pinEmote = args[0];
             if (pinEmote) {
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
@@ -257,7 +258,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'map':
             if (!settings.enable_community_map) return;
             // Si el comando es !map, y tiene una respuesta personalizada, enviar la respuesta personalizada
-            if(customCommand && customCommand.response) {
+            if (customCommand && customCommand.response) {
                 const parsedReply = await replaceVariables({
                     commandResponse: customCommand.response,
                     channel,
@@ -299,6 +300,25 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
 
             break;
+        case 'so':
+            if (!isModerator) return;
+            const targetStreamer = args[0];
+            if (targetStreamer) {
+                try {
+                    const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
+                    if (shoutout && shoutout.enabled) {
+                        sendMessage(channel, shoutout.message);
+                    } else if (!shoutout) {
+                        sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                }
+            } else {
+                return
+                
+            }
+            break;
         case 'clip':
             if (!settings.enable_clip_command) return;
             const currentChannel = await Channel.getChannelByName(channel);
@@ -328,7 +348,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         username,
                         toUser
                     });
-                    Bot.say(channel,  parsedReply);
+                    Bot.say(channel, parsedReply);
                 }
             }
             return;
