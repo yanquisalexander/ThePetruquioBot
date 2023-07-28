@@ -117,7 +117,7 @@ const processMessage = async ({ channel, context, username, message }) => {
                 addGreetingToStack(channel, shoutout.message);
             }
         } catch (error) {
-            console.log('');
+            
         }
     }
 
