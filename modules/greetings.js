@@ -67,7 +67,6 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
         return true;
     }
 
-    
 
     return false;
 };
