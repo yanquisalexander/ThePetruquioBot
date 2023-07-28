@@ -12,6 +12,8 @@ export const whisperedUsers = [];
 
 export const eventSubListeners = [];
 
+export const suspendedChannels = [];
+
 export const CountryLangs = {
     ar: 'es', // Argentina
     at: 'de', // Austria

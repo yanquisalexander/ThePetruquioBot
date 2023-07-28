@@ -251,6 +251,14 @@ class Channel {
     return channel;
   }
 
+  async disableAutoConnect() {
+    const query = 'UPDATE channels SET auto_connect = false WHERE id = $1';
+    const values = [this.id];
+    const result = await db.query(query, values);
+    return result;
+  }
+
+
 
   static async deleteChannelByName(channelName) {
     try {

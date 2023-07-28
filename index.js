@@ -1,30 +1,31 @@
-import dotenv from 'dotenv';
-import './lib/twitch-auth.js';
 import chalk from 'chalk';
-import { Bot, sendMessage } from './bot.js';
+import dotenv from 'dotenv';
+import BotModel from './app/models/Bot.js';
 import Channel from './app/models/Channel.js';
+import SpectatorLocation from './app/models/SpectatorLocation.js';
+import { Bot, sendMessage } from './bot.js';
+import './lib/twitch-auth.js';
 import {
-    getRandomGreeting,
-    canReceiveGreeting,
-    addGreetingToStack,
-} from './modules/greetings.js';
-import {
+    CountryLangs,
     activeUsers,
-    greetingsStack,
     autoTranslateUsers,
     botJoinedChannels,
+    greetingsStack,
+    suspendedChannels,
     whisperedUsers,
-    CountryLangs,
 } from './memory_variables.js';
-import { getRandomBotResponse, getRandomOnClearChat } from './modules/random-responses.js';
 import { handleCommand } from './modules/commands.js';
-import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
-import { translate } from './modules/translate.js';
-import { railwayConnected } from './utils/environment.js';
-import { WebServer } from './server/boot-webserver.js';
-import BotModel from './app/models/Bot.js';
 import { handleDetoxify } from './modules/detoxify.js';
-import SpectatorLocation from './app/models/SpectatorLocation.js';
+import {
+    addGreetingToStack,
+    canReceiveGreeting,
+    getRandomGreeting,
+} from './modules/greetings.js';
+import { getRandomBotResponse } from './modules/random-responses.js';
+import { translate } from './modules/translate.js';
+import { WebServer } from './server/boot-webserver.js';
+import { railwayConnected } from './utils/environment.js';
+import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
 
 
 
@@ -187,6 +188,21 @@ const onNoticeHandler = async (channel, msgid, message) => {
             Bot.part(channel);
             console.log(`Bot has left ${chan} channel`);
         }
+        if (msgid === 'msg_channel_suspended ') {
+            // Se añade el canal a la lista de canales suspendidos, y se intentará reconectar en 5 minutos
+            // Si el canal sigue suspendido, se volverá a intentar en 5 minutos
+            // Si tras 3 intentos el canal sigue suspendido, se eliminará de autojoin
+            if (!suspendedChannels[channel]) {
+                suspendedChannels[channel] = {
+                    suspendedAt: Date.now(),
+                    attempts: 0
+                }
+            } else {
+                suspendedChannels[channel].attempts++;
+            }
+            console.log(`Channel ${channel} has been suspended :(`);
+        }
+
 
     } catch (e) {
         console.error(e);
@@ -232,6 +248,29 @@ setInterval(() => {
         console.error(e.stack);
     }
 }, 10 * 1000);
+
+// Cada 30 segundos, verificar si hay canales suspendidos que se puedan reconectar
+setInterval(async () => {
+    try {
+        if (suspendedChannels.length > 0) {
+            const channel = suspendedChannels.shift();
+            if (channel.attempts < 3) {
+                Bot.join(channel);
+            } else {
+                console.log(`Retried to join ${channel} 3 times without success, removing from autojoin...`);
+                let channelData = await Channel.getChannelByName(channel.replace('#', ''));
+                await channelData.disableAutoConnect();
+                delete suspendedChannels[channel];
+            }
+        }
+    } catch (e) {
+        console.error(e.stack);
+    }
+}, 30 * 1000);
+
+
+
+
 
 Bot.on('connected', onConnectedHandler);
 Bot.on('chat', onMessageHandler);
