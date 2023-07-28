@@ -40,19 +40,14 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
             return false;
         }
-        addGreetingToStack(channel, 'Meet Alexitoo, my creator 😸. They are a talented individual who has brought me to life! Make sure to check out their channel and show them some love. twitch.tv/alexitoo_uy');
     }
 
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
-        // Verificar si ha pasado el cooldown para el propietario del canal
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
             return false;
         }
-        // Realizar acciones especiales para el propietario del canal, como enviar un mensaje personalizado
-        addGreetingToStack(channel, getRandomBroadcasterGreeting(username));
-        activeUsers[channel][username] = Date.now(); // Actualizar el tiempo del último mensaje del propietario del canal
-        return false;
+        return true;
     }
 
     // Comprobar si es un bot conocido
@@ -84,7 +79,7 @@ const getRandomGreeting = (username, isBot = false, lang) => {
     return greeting.replace("#username", username).replace("#emote", randomEmote);
 };
 
-const getRandomBroadcasterGreeting = (username) => {
+export const getRandomBroadcasterGreeting = (username) => {
     const greeting = broadcasterGreetings[Math.floor(Math.random() * broadcasterGreetings.length)];
     return greeting.replace("#username", username);
 };
