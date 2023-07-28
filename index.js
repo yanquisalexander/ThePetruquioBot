@@ -254,7 +254,7 @@ setInterval(async () => {
     try {
         if (suspendedChannels.length > 0) {
             const channel = suspendedChannels.shift();
-            if (channel.attempts < 3) {
+            if (channel.attempts < 3 && Date.now() - channel.suspendedAt < 1000 * 60 * 5) {
                 Bot.join(channel);
             } else {
                 console.log(`Retried to join ${channel} 3 times without success, removing from autojoin...`);
