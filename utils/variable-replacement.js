@@ -1,13 +1,19 @@
 export const replaceVariables = async ({ commandResponse, channel, username, toUser }) => {
 
     if (!toUser) {
-        toUser = username;
+        toUser = 'username';
     }
     // Reemplazar ${sender} con el nombre de usuario
     commandResponse = commandResponse.replace(/\${sender}/g, `@${username}`);
 
     // Reemplazar ${touser} con el nombre de usuario del destinatario
     commandResponse = commandResponse.replace(/\${touser}/g, `${toUser}`);
+
+    // Reemplazar ${channel} con el nombre del canal
+    commandResponse = commandResponse.replace(/\${channel}/g, `${channel}`);
+
+    // Reemplazar ${mapUrl} con la URL del Community Map
+    commandResponse = commandResponse.replace(/\${mapUrl}/g, `https://petruquio.live/c/${channel}/map`);
 
     // Reemplazar ${randomNum VALOR_MIN-VALOR_MAX} con un número aleatorio dentro del rango especificado
     const randomNumRegex = /\${randomNum(?:\s+(\d+)\s*-\s*(\d+))?}/g;

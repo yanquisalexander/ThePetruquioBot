@@ -10,6 +10,7 @@ import { AppClient, HelixClient, getChannelInfo } from "../utils/twitch.js";
 import { channel } from "diagnostics_channel";
 import { pusher } from "../lib/pusher.js";
 import { WorldMapCache } from "../server/routes/world-map.js";
+import Command from "../app/models/Command.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -73,10 +74,19 @@ const updateSetting = async (channel, setting, value, username) => {
 
 
 
-export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings }) => {
+export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings, channelData }) => {
     const args = message.slice(1).split(' ');
     let command = args.shift().toLowerCase();
     const isUserOnMap = await SpectatorLocation.find(username);
+
+    let customCommand;
+    try {
+        customCommand = await Command.findByChannelAndName(channelData.id, command.toLowerCase());
+    } catch (error) {
+        console.error(error.message);
+    }
+
+
     if (command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
         command = 'from';
     }
@@ -246,6 +256,16 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'map':
             if (!settings.enable_community_map) return;
+            // Si el comando es !map, y tiene una respuesta personalizada, enviar la respuesta personalizada
+            if(customCommand && customCommand.response) {
+                const parsedReply = await replaceVariables({
+                    commandResponse: customCommand.response,
+                    channel,
+                    username,
+                    toUser
+                });
+                return sendMessage(channel, parsedReply);
+            }
             sendMessage(channel, `You can access our EarthDay map here: petruquio.live/c/${channel}/map`);
             break;
         case 'set':
@@ -299,6 +319,17 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (langList.includes(command) && settings.enable_translation) {
                 let translated = await translate(message, command, username)
                 sendMessage(channel, translated)
+            }
+            if (customCommand) {
+                if (customCommand.command_options.enabled) {
+                    const parsedReply = await replaceVariables({
+                        commandResponse: customCommand.response,
+                        channel,
+                        username,
+                        toUser
+                    });
+                    Bot.say(channel,  parsedReply);
+                }
             }
             return;
     }

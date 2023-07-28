@@ -137,7 +137,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isCommand = message.startsWith('!');
     if (isCommand) {
         const args = message.slice(1).split(' ');
-        await handleCommand({ channel, context, username, message, toUser: args[1], isModerator, settings: Settings });
+        await handleCommand({ channel, context, username, message, toUser: args[1], isModerator, settings: Settings, channelData });
     }
 
     if (Settings.enable_detoxify && !isModerator) {
