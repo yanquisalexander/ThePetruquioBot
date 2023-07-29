@@ -35,13 +35,6 @@ export const addGreetingToStack = (channel, message, options) => {
 };
 
 const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) => {
-    if (username.toLowerCase() === 'alexitoo_uy' && channelOwner.toLowerCase() !== 'alexitoo_uy') {
-        // Verificar si el usuario es el creador del bot
-        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
-            return false;
-        }
-    }
-
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
