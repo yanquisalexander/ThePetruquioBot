@@ -316,7 +316,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             } else {
                 return
-                
+
             }
             break;
         case 'clip':
@@ -337,8 +337,13 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
         default:
             if (langList.includes(command) && settings.enable_translation) {
-                let translated = await translate(message, command, username)
-                sendMessage(channel, translated)
+                if (!message) return;
+                try {
+                    let translated = await translate(message, command, username)
+                    sendMessage(channel, translated)
+                } catch (error) {
+                    return
+                }
             }
             if (customCommand) {
                 if (customCommand?.command_options?.enabled) {
