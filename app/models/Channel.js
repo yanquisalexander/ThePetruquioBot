@@ -11,6 +11,11 @@ export const SETTINGS_MODEL = {
     type: 'boolean',
     value: false,
   },
+  enable_community_features: {
+    type: 'boolean',
+    value: false,
+    experimental: true,
+  },
   channel_language: {
     type: 'list',
     value: 'es',
