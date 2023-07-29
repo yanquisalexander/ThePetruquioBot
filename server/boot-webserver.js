@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import routes from "./routes/index.js";
 import passport from '../lib/passport.js'
-import status from 'express-status-monitor'
 import { EventSubMiddleware } from '@twurple/eventsub-http';
 import { AppClient } from "../utils/twitch.js";
 import Channel from "../app/models/Channel.js";
@@ -31,7 +30,6 @@ export const TwitchEventSub = new EventSubMiddleware({
 // Middlewares
 WebServer.use(cors('*'));
 WebServer.use(passport.initialize());
-WebServer.use(status());
 WebServer.use('/api/', bodyParser.json(), routes);
 
 // Error handling
