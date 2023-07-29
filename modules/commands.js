@@ -302,7 +302,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             break;
         case 'so':
             if (!isModerator) return;
-            const targetStreamer = args[0];
+            let targetStreamer = args[0];
 
 
             if (targetStreamer) {
