@@ -355,10 +355,12 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             });
         case 'shoutout':
             if (!isModerator) return;
-            // Command to add, remove or edit a shoutout
             const action = args[0];
             const target = args[1];
             const message = args.slice(2).join(' ');
+            if(target && target.startsWith('@')) {
+                target = target.slice(1);
+            }
             if (action === 'add') {
                 if (!target || !message) return;
                 try {
