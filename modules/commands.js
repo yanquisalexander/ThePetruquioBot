@@ -311,6 +311,16 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     targetStreamer = targetStreamer.slice(1);
                 }
                 try {
+                    try {
+                        const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
+                            let targetChannel = await client.users.getUserByName(targetStreamer);
+                            let shoutout = await client.chat.shoutoutUser(channelData.twitch_id, targetChannel.id, process.env.TWITCH_USER_ID);
+                            return shoutout;
+                        }))
+                    } catch (error) {
+                        // Do nothing, continue with the bot shoutout
+                    }
+                    
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
                     if (shoutout && shoutout.enabled) {
                         sendMessage(channel, shoutout.message);
