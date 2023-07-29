@@ -358,7 +358,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             const action = args[0];
             const target = args[1];
             const message = args.slice(2).join(' ');
-            if(target && target.startsWith('@')) {
+            // Replace the @ symbol if it exists
+            if (target.startsWith('@')) {
                 target = target.slice(1);
             }
             if (action === 'add') {
