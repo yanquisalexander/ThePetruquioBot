@@ -42,6 +42,7 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
         }
         return true;
     }
+    
 
     // Comprobar si es un bot conocido
     if (knownBots.includes(username.toLowerCase())) {
