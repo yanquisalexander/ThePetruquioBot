@@ -320,7 +320,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     } catch (error) {
                         // Do nothing, continue with the bot shoutout
                     }
-                    
+
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
                     if (shoutout && shoutout.enabled) {
                         sendMessage(channel, shoutout.message);
@@ -353,6 +353,56 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 console.error(error);
                 sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar crear un clip!`);
             });
+        case 'shoutout':
+            if (!isModerator) return;
+            // Command to add, remove or edit a shoutout
+            const action = args[0];
+            const target = args[1];
+            const message = args.slice(2).join(' ');
+            if (action === 'add') {
+                if (!target || !message) return;
+                try {
+                    const shoutout = await Shoutout.create(channelData.id, target, message);
+                    sendMessage(channel, `@${username}, ¡Shoutout creado correctamente!`);
+                } catch (error) {
+                    console.error(error.message);
+                    sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar crear el shoutout!`);
+                }
+            } else if (action === 'remove') {
+                if (!target) return;
+                try {
+                    const shoutout = await Shoutout.findByTargetStreamer(channelData.id, target);
+                    if (shoutout) {
+                        await shoutout.delete();
+                        sendMessage(channel, `@${username}, ¡Shoutout eliminado correctamente!`);
+                    } else {
+                        sendMessage(channel, `@${username}, ¡No se ha encontrado el shoutout!`);
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                    sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar eliminar el shoutout!`);
+                }
+            } else if (action === 'edit') {
+                if (!target || !message) return;
+                try {
+                    const shoutout = await Shoutout.findByTargetStreamer(channelData.id, target);
+                    if (shoutout) {
+                        shoutout.message = message;
+                        await shoutout.update();
+                        sendMessage(channel, `@${username}, ¡Shoutout editado correctamente!`);
+                    } else {
+                        sendMessage(channel, `@${username}, ¡No se ha encontrado el shoutout!`);
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                    sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar editar el shoutout!`);
+                }
+            } else {
+                return;
+            }
+            break;
+
+
 
         default:
             if (langList.includes(command) && settings.enable_translation) {
