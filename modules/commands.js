@@ -303,16 +303,25 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'so':
             if (!isModerator) return;
             const targetStreamer = args[0];
+
+
             if (targetStreamer) {
+                // Replace the @ symbol if it exists
+                if (targetStreamer.startsWith('@')) {
+                    targetStreamer = targetStreamer.slice(1);
+                }
                 try {
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
                     if (shoutout && shoutout.enabled) {
                         sendMessage(channel, shoutout.message);
-                    } else if (!shoutout) {
+                    } else if (shoutout && !shoutout.enabled) {
+                        sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
+                    } else {
                         sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
                     }
                 } catch (error) {
                     console.error(error.message);
+                    sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
                 }
             } else {
                 return
@@ -353,7 +362,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         username,
                         toUser
                     });
-                    Bot.say(channel, parsedReply);
+                    sendMessage(channel, parsedReply);
                 }
             }
             return;
