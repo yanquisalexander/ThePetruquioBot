@@ -404,9 +404,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 return;
             }
             break;
-
-
-
+            
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 if (!message) return;

@@ -1,4 +1,5 @@
 import { db } from "../../lib/database.js";
+import WorldMap from "./WorldMap.js";
 
 class BotModel {
 
@@ -20,6 +21,12 @@ class BotModel {
     const result = await db.query(query, values);
     return result.rows[0];
   }
+
+  static async renameUser(id, username, channelName) {
+    // TODO: Anexar el id del usuario a las tablas de la base de datos
+  }
+
+
 }
 
 export default BotModel;

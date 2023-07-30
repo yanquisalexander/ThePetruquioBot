@@ -109,7 +109,7 @@ class Shoutout {
             const updatedShoutout = result.rows[0];
             this.message = updatedShoutout.message;
             this.enabled = updatedShoutout.enabled;
-            SHOUTOUT_CACHE.set(`${channel_id}-${this.target_streamer}`, this);
+            SHOUTOUT_CACHE.set(`${this.channel_id}-${this.target_streamer}`, this);
             return this;
         } catch (error) {
             throw new Error('Error updating shoutout: ' + error.message);
