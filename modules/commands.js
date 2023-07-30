@@ -357,15 +357,15 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isModerator) return;
             const action = args[0];
             const target = args[1];
-            const message = args.slice(2).join(' ');
+            let shoutoutMessage = args.slice(2).join(' ');
             // Replace the @ symbol if it exists
             if (target.startsWith('@')) {
                 target = target.slice(1);
             }
             if (action === 'add') {
-                if (!target || !message) return;
+                if (!target || !shoutoutMessage) return;
                 try {
-                    const shoutout = await Shoutout.create(channelData.id, target, message);
+                    const shoutout = await Shoutout.create(channelData.id, target, shoutoutMessage);
                     sendMessage(channel, `@${username}, ¡Shoutout creado correctamente!`);
                 } catch (error) {
                     console.error(error.message);
@@ -386,11 +386,11 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar eliminar el shoutout!`);
                 }
             } else if (action === 'edit') {
-                if (!target || !message) return;
+                if (!target || !shoutoutMessage) return;
                 try {
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, target);
                     if (shoutout) {
-                        shoutout.message = message;
+                        shoutout.message = shoutoutMessage;
                         await shoutout.update();
                         sendMessage(channel, `@${username}, ¡Shoutout editado correctamente!`);
                     } else {
@@ -408,7 +408,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
-                    let translated = await translate(messageContent , command, username)
+                    let translated = await translate(message , command, username)
                     sendMessage(channel, translated)
                 } catch (error) {
                     return
