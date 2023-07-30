@@ -406,9 +406,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             break;
 
         default:
-            if (langList.includes(command) && settings.enable_translation && message?.length > 0) {
+            if (langList.includes(command) && settings.enable_translation) {
+                if(args.length === 0) return;
                 try {
-                    let translated = await translate(message, command, username)
+                    let translated = await translate(args.join(' ') , command, username)
                     sendMessage(channel, translated)
                 } catch (error) {
                     return
