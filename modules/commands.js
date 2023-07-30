@@ -408,7 +408,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
-                    let translated = await translate(args.join(' ') , command, username)
+                    let translated = await translate(messageContent , command, username)
                     sendMessage(channel, translated)
                 } catch (error) {
                     return
