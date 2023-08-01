@@ -2,6 +2,7 @@ import { ApiClient } from '@twurple/api';
 import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
 import { liveChannels } from '../memory_variables.js';
+import { Bot } from '../bot.js';
 
 const TwitchCache = new Cache();
 
