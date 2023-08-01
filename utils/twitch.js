@@ -131,6 +131,8 @@ export const getLiveChannels = async (channelList) => {
 
     for (const channels of channelGroups) {
         try {
+            // Wait 10 seconds between each request to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 10000));
             const streams = await HelixClient.streams.getStreams({ userName: channels });
             for (const stream of streams.data) {
                 liveChannels.push(stream);
