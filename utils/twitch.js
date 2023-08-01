@@ -1,6 +1,7 @@
 import { ApiClient } from '@twurple/api';
 import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
+import { liveChannels } from '../memory_variables.js';
 
 const TwitchCache = new Cache();
 
@@ -144,3 +145,39 @@ export const getLiveChannels = async (channelList) => {
 
     return liveChannels;
 };
+
+export const checkLiveChannels = async () => {
+    try {
+        const channels = Bot.getChannels();
+        const channelList = channels.map(channel => channel.replace('#', ''));
+        const currentLive = await getLiveChannels(channelList);
+        console.log(chalk.bgWhite.magenta.bold(`Checking if channels are live...`));
+        const currentLiveChannels = currentLive.map(channel => channel.userName);
+        const newLiveChannels = currentLiveChannels.filter(channel => !liveChannels.includes(channel));
+        
+        // If there are new live channels, set liveChannels to the new list
+
+        if (newLiveChannels.length > 0) {
+            liveChannels.length = 0;
+            liveChannels.push(...currentLiveChannels);
+        }
+
+        // If there are channels that are no longer live, remove them from liveChannels
+
+        const noLongerLiveChannels = liveChannels.filter(channel => !currentLiveChannels.includes(channel));
+
+        if (noLongerLiveChannels.length > 0) {
+            noLongerLiveChannels.forEach(channel => {
+                const index = liveChannels.indexOf(channel);
+                liveChannels.splice(index, 1);
+            });
+        }
+
+        console.log(chalk.bgWhite.magenta.bold(`Live channels: ${liveChannels.join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold(`New live channels: ${newLiveChannels.join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold(`No longer live channels: ${noLongerLiveChannels.join(', ')}`));
+
+    } catch (e) {
+        console.error(e.stack);
+    }
+}

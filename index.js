@@ -28,7 +28,7 @@ import { getRandomBotResponse } from './modules/random-responses.js';
 import { translate } from './modules/translate.js';
 import { WebServer } from './server/boot-webserver.js';
 import { railwayConnected } from './utils/environment.js';
-import { HelixClient, getChannelInfo, getLiveChannels, isChannelLive, knownBots } from './utils/twitch.js';
+import { HelixClient, checkLiveChannels, getChannelInfo, getLiveChannels, isChannelLive, knownBots } from './utils/twitch.js';
 import Shoutout from './app/models/Shoutout.js';
 
 
@@ -281,39 +281,15 @@ setInterval(() => {
 
 // Cada 2 minutos, verificamos si los canales están en vivo
 setInterval(async () => {
-    try {
-        const channels = Bot.getChannels();
-        const channelList = channels.map(channel => channel.replace('#', ''));
-        const currentLive = await getLiveChannels(channelList);
-        const currentLiveChannels = currentLive.map(channel => channel.userName);
-        const newLiveChannels = currentLiveChannels.filter(channel => !liveChannels.includes(channel));
-        
-        // If there are new live channels, set liveChannels to the new list
-
-        if (newLiveChannels.length > 0) {
-            liveChannels.length = 0;
-            liveChannels.push(...currentLiveChannels);
-        }
-
-        // If there are channels that are no longer live, remove them from liveChannels
-
-        const noLongerLiveChannels = liveChannels.filter(channel => !currentLiveChannels.includes(channel));
-
-        if (noLongerLiveChannels.length > 0) {
-            noLongerLiveChannels.forEach(channel => {
-                const index = liveChannels.indexOf(channel);
-                liveChannels.splice(index, 1);
-            });
-        }
-
-        console.log(chalk.bgWhite.magenta.bold(`Live channels: ${liveChannels.join(', ')}`));
-        console.log(chalk.bgWhite.magenta.bold(`New live channels: ${newLiveChannels.join(', ')}`));
-        console.log(chalk.bgWhite.magenta.bold(`No longer live channels: ${noLongerLiveChannels.join(', ')}`));
-
-    } catch (e) {
-        console.error(e.stack);
-    }
+    await checkLiveChannels();
 }, 2 * 60 * 1000);
+
+
+// Pasados 15 segundos de que el bot se conecte, obtener los canales en vivo, luego, utilizará el intervalo
+
+setTimeout(async () => {
+    await checkLiveChannels();
+}, 15 * 1000);
 
 
 
