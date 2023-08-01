@@ -109,3 +109,36 @@ export const isChannelLive = async (channel) => {
         return false;
     }
 }
+
+export const getLiveChannels = async (channelList) => {
+    // Si la lista de canales está vacía, no hay canales en vivo
+    // Si la lista es muy grande, se divide en grupos de 100 canales (límite de la API de Twitch)
+    
+    if (channelList.length === 0) {
+        return [];
+    }
+
+    const channelGroups = [];
+    const groupSize = 100;
+    const groupCount = Math.ceil(channelList.length / groupSize);
+
+    for (let i = 0; i < groupCount; i++) {
+        const channels = channelList.slice(i * groupSize, (i + 1) * groupSize);
+        channelGroups.push(channels);
+    }
+
+    const liveChannels = [];
+
+    for (const channels of channelGroups) {
+        try {
+            const streams = await HelixClient.streams.getStreams({ userName: channels });
+            for (const stream of streams.data) {
+                liveChannels.push(stream);
+            }
+        } catch (error) {
+            console.error(`Error al obtener los streams: ${error}`);
+        }
+    }
+
+    return liveChannels;
+};

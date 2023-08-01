@@ -28,7 +28,7 @@ import { getRandomBotResponse } from './modules/random-responses.js';
 import { translate } from './modules/translate.js';
 import { WebServer } from './server/boot-webserver.js';
 import { railwayConnected } from './utils/environment.js';
-import { HelixClient, getChannelInfo, isChannelLive, knownBots } from './utils/twitch.js';
+import { HelixClient, getChannelInfo, getLiveChannels, isChannelLive, knownBots } from './utils/twitch.js';
 import Shoutout from './app/models/Shoutout.js';
 
 
@@ -279,28 +279,43 @@ setInterval(() => {
 }, 10 * 1000);
 
 
-// Cada 2 minutos, verificamos cada canal individualmente para ver si están en vivo
+// Cada 2 minutos, verificamos si los canales están en vivo
 setInterval(async () => {
     try {
         const channels = Bot.getChannels();
-        for (const channel of channels) {
-            const channelName = channel.replace('#', '');
-            await new Promise(resolve => setTimeout(resolve, 30000));
-            isLive = await isChannelLive(channelName);
-            if (isLive) {
-                if (!liveChannels.includes(channelName)) {
-                    liveChannels.push(channelName);
-                }
-            } else {
-                if (liveChannels.includes(channelName)) {
-                    liveChannels.splice(liveChannels.indexOf(channelName), 1);
-                }
-            }
+        const channelList = channels.map(channel => channel.replace('#', ''));
+        const currentLive = await getLiveChannels(channelList);
+        const currentLiveChannels = currentLive.map(channel => channel.userName);
+        const newLiveChannels = currentLiveChannels.filter(channel => !liveChannels.includes(channel));
+        
+        // If there are new live channels, set liveChannels to the new list
+
+        if (newLiveChannels.length > 0) {
+            liveChannels.length = 0;
+            liveChannels.push(...currentLiveChannels);
         }
+
+        // If there are channels that are no longer live, remove them from liveChannels
+
+        const noLongerLiveChannels = liveChannels.filter(channel => !currentLiveChannels.includes(channel));
+
+        if (noLongerLiveChannels.length > 0) {
+            noLongerLiveChannels.forEach(channel => {
+                const index = liveChannels.indexOf(channel);
+                liveChannels.splice(index, 1);
+            });
+        }
+
+        console.log(chalk.bgWhite.magenta.bold(`Live channels: ${liveChannels.join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold(`New live channels: ${newLiveChannels.join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold(`No longer live channels: ${noLongerLiveChannels.join(', ')}`));
+
     } catch (e) {
         console.error(e.stack);
     }
-}, 5 * 60 * 1000);
+}, 2 * 60 * 1000);
+
+
 
 
 
