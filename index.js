@@ -115,10 +115,20 @@ const processMessage = async ({ channel, context, username, message }) => {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {
-                if(await canReceiveGreeting(channel, username, channel, true)) {
+                if (await canReceiveGreeting(channel, username, channel, true)) {
                     activeUsers[channel][username] = Date.now();
                     addGreetingToStack(channel, shoutout.message);
                 }
+                try {
+                    const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
+                        let targetChannel = await client.users.getUserByName(targetStreamer);
+                        let shoutout = await client.chat.shoutoutUser(channelData.twitch_id, targetChannel.id, process.env.TWITCH_USER_ID);
+                        return shoutout;
+                    }))
+                } catch (error) {
+                    // Do nothing if native shoutout fails, it's not important
+                }
+
             }
         } catch (error) {
 
@@ -146,7 +156,7 @@ const processMessage = async ({ channel, context, username, message }) => {
                 lang = CountryLangs[userOnMap.country_code];
             }
             let greetingMessage = getRandomGreeting(username, isBot, lang);
-            if(isBroadcaster) {
+            if (isBroadcaster) {
                 greetingMessage = getRandomBroadcasterGreeting(username);
             }
             addGreetingToStack(channel, greetingMessage);

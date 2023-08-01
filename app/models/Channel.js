@@ -275,6 +275,7 @@ class Channel {
       console.log(`Canal ${channelName} eliminado de la base de datos`);
     } catch (error) {
       console.log(`Error al eliminar el canal ${channelName} de la base de datos: ${error}`);
+      console.log(error);
       throw error.message;
     }
   }

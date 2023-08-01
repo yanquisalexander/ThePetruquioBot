@@ -319,6 +319,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         }))
                     } catch (error) {
                         // Do nothing, continue with the bot shoutout
+                        //console.error(error);
                     }
 
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
