@@ -138,7 +138,7 @@ export const getLiveChannels = async (channelList) => {
             await new Promise(resolve => setTimeout(resolve, 10000));
             const streams = await HelixClient.streams.getStreams({ userName: channels });
             for (const stream of streams.data) {
-                liveChannels[stream.userName] = stream;
+                liveChannels.push(stream);
             }
         } catch (error) {
             console.error(`Error al obtener los streams: ${error}`);
