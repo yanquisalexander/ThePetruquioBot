@@ -3,6 +3,7 @@ import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
 import { liveChannels } from '../memory_variables.js';
 import { Bot } from '../bot.js';
+import chalk from 'chalk';
 
 const TwitchCache = new Cache();
 
