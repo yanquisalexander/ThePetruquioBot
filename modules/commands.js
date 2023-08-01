@@ -436,10 +436,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     if (team) {
                         const teamChannels = await team.getMembers();
                         const liveChannels = await getLiveChannels(teamChannels.map(channel => channel.name));
-                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el equipo ${team.displayName || team.name}`)
+                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
                         const liveChannelsNames = liveChannels.map(channel => channel.userName);
 
-                        sendMessage(channel, `@${username}, los canales en vivo de ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
+                        sendMessage(channel, `@${username}, los canales en vivo del team ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
                     } else {
                         return 
                     }
