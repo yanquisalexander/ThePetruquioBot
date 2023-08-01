@@ -44,3 +44,8 @@ export const CountryLangs = {
     ve: 'es', // Venezuela
   };
   
+export const latencyInfo = {
+    lastLatency: 0,
+};
+
+export const liveChannels = [];

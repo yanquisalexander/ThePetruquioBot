@@ -2,6 +2,9 @@ import { ApiClient } from '@twurple/api';
 import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
 
+const TwitchCache = new Cache();
+
+
 export const AppClient = new ApiClient({
     authProvider: appTokenProvider
 });
@@ -25,8 +28,6 @@ export const isFollower = async (username, channel) => {
 };
 
 export const knownBots = ["streamelements", "streamlabs", "nightbot"];
-
-const TwitchCache = new Cache();
 
 
 
@@ -53,9 +54,9 @@ export const timeoutUser = async (channelID, userID, duration, reason) => {
     try {
         HelixClient.asUser(moderator, async (client) => {
             let response = await client.moderation.banUser(channelID, moderator, {
-               reason,
-               duration,
-               user: userID
+                reason,
+                duration,
+                user: userID
             });
             return response;
         });
@@ -98,3 +99,13 @@ export const getStreamInfo = async (channelID) => {
         return null;
     }
 };
+
+export const isChannelLive = async (channel) => {
+    try {
+        const stream = await HelixClient.streams.getStreamByUserName(channel);
+        return !!stream;
+    } catch (error) {
+        console.error(`Error al verificar si el canal está en vivo: ${error}`);
+        return false;
+    }
+}

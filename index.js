@@ -13,6 +13,8 @@ import {
     greetingsStack,
     suspendedChannels,
     whisperedUsers,
+    latencyInfo,
+    liveChannels
 } from './memory_variables.js';
 import { handleCommand } from './modules/commands.js';
 import { handleDetoxify } from './modules/detoxify.js';
@@ -26,7 +28,7 @@ import { getRandomBotResponse } from './modules/random-responses.js';
 import { translate } from './modules/translate.js';
 import { WebServer } from './server/boot-webserver.js';
 import { railwayConnected } from './utils/environment.js';
-import { HelixClient, getChannelInfo, knownBots } from './utils/twitch.js';
+import { HelixClient, getChannelInfo, isChannelLive, knownBots } from './utils/twitch.js';
 import Shoutout from './app/models/Shoutout.js';
 
 
@@ -277,6 +279,33 @@ setInterval(() => {
 }, 10 * 1000);
 
 
+// Cada 2 minutos, verificamos cada canal individualmente para ver si están en vivo
+setInterval(async () => {
+    try {
+        const channels = Bot.getChannels();
+        for (const channel of channels) {
+            const channelName = channel.replace('#', '');
+            await new Promise(resolve => setTimeout(resolve, 30000));
+            isLive = await isChannelLive(channelName);
+            if (isLive) {
+                if (!liveChannels.includes(channelName)) {
+                    liveChannels.push(channelName);
+                }
+            } else {
+                if (liveChannels.includes(channelName)) {
+                    liveChannels.splice(liveChannels.indexOf(channelName), 1);
+                }
+            }
+        }
+    } catch (e) {
+        console.error(e.stack);
+    }
+}, 5 * 60 * 1000);
+
+
+
+
+
 
 
 Bot.on('connected', onConnectedHandler);
@@ -295,5 +324,8 @@ Bot.on('join', (channel, username, self) => {
         console.log(chalk.green.bold(`Joined ${channel}`));
     }
 });
+Bot.on('pong', (latency) => {
+    latencyInfo.lastLatency = latency;
+})
 
 //Bot.on('raided', onRaidedHandler)
