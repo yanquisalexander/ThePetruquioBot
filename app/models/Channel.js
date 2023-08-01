@@ -286,7 +286,7 @@ class Channel {
           SELECT COUNT(*) AS ban_count
           FROM bans b
           INNER JOIN channels c ON c.id = b.channel_id
-          INNER JOIN teams t ON t.team_id = c.team_id
+          INNER JOIN teams t ON t.id = c.team_id
           WHERE t.team_id = $1
           AND b.banned_user = $2
         `;
