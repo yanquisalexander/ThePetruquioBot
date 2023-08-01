@@ -113,7 +113,7 @@ const processMessage = async ({ channel, context, username, message }) => {
         return;
     }
 
-    if (Settings.enable_auto_shoutout) {
+    if (Settings.enable_community_features && Settings.enable_auto_shoutout) {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {

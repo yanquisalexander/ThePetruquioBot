@@ -6,12 +6,13 @@ import { replaceVariables } from "../utils/variable-replacement.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
-import { AppClient, HelixClient, getChannelInfo } from "../utils/twitch.js";
+import { AppClient, HelixClient, getChannelInfo, getLiveChannels } from "../utils/twitch.js";
 import { channel } from "diagnostics_channel";
 import { pusher } from "../lib/pusher.js";
 import { WorldMapCache } from "../server/routes/world-map.js";
 import Command from "../app/models/Command.js";
 import Shoutout from "../app/models/Shoutout.js";
+import Team from "../app/models/Team.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -303,8 +304,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'so':
             if (!isModerator) return;
             let targetStreamer = args[0];
-
-
+            if (!settings.enable_community_features) return; // Don't shoutout if community features are disabled
             if (targetStreamer) {
                 // Replace the @ symbol if it exists
                 if (targetStreamer.startsWith('@')) {
@@ -356,6 +356,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             });
         case 'shoutout':
             if (!isModerator) return;
+            if (!settings.enable_community_features) return; // Shoutout module are part of community features, so if they are disabled, don't execute the command
             const action = args[0];
             const target = args[1];
             let shoutoutMessage = args.slice(2).join(' ');
@@ -409,7 +410,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
-                    let translated = await translate(message , command, username)
+                    let translated = await translate(message, command, username)
                     sendMessage(channel, translated)
                 } catch (error) {
                     return
@@ -426,6 +427,28 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     sendMessage(channel, parsedReply);
                 }
             }
+
+            // Team commands, like !live-${teamName} to check live channels in a team
+            if (command.startsWith('live-')) {
+                const teamName = command.slice(5);
+                try {
+                    let team = await Team.getByName(teamName);
+                    if (team) {
+                        const teamChannels = await team.getMembers();
+                        const liveChannels = await getLiveChannels(teamChannels.map(channel => channel.name));
+                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el equipo ${team.displayName || team.name}`)
+                        const liveChannelsNames = liveChannels.map(channel => channel.userName);
+
+                        sendMessage(channel, `@${username}, los canales en vivo de ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
+                    } else {
+                        return 
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                }
+
+            }
+
             return;
     }
 };
