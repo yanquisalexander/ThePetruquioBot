@@ -418,8 +418,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             }
         case 'petru':
-            if(!settings.enable_conversation) return;
-            if(isAssistantOnCooldown(channel, username)) return;
+            if (!settings.enable_conversation) return;
+            if (isAssistantOnCooldown(channel, username)) return;
             try {
                 let twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
                 addToAssistantHistory(channel, message, username);
@@ -438,6 +438,28 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             } catch (error) {
                 console.error(error);
+            }
+            break;
+        case 'team':
+            if (!settings.enable_community_features) return;
+            const option = args[0];
+            const teamName = args[1];
+            if (!option) return;
+            if (option === 'live') {
+                // Get channel team and then get live channels from that team
+                try {
+                    let channelData = await Channel.getChannelByName(channel);
+                    let team = await Team.getById(channelData.team_id);
+                    if (team) {
+                        const teamChannels = await team.getMembers();
+                        const liveChannels = await getLiveChannels(teamChannels.map(channel => channel.name));
+                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
+                    } else {
+                        return
+                    }
+                } catch (error) {
+                    console.error(error.message);
+                }
             }
             break;
         default:
@@ -461,9 +483,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             }
 
-            // Team commands, like !live-${teamName} to check live channels in a team
-            if (command.startsWith('live-')) {
-                const teamName = command.slice(5);
+            // Team commands, like !${teamName}-live to check live channels in a team
+            if (command.endsWith('-live')) {
+                const teamName = command.slice(0, -5);
                 try {
                     let team = await Team.getByName(teamName);
                     if (team) {

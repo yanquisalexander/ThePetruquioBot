@@ -48,6 +48,29 @@ class Team {
             throw error;
         }
     }
+
+    static async getById(id) {
+        const query = {
+            text: 'SELECT * FROM teams WHERE id = $1',
+            values: [id],
+        };
+
+        try {
+            const result = await db.query(query);
+            if(result.rows.length === 0) {
+                return null;
+            }
+            const team = result.rows[0];
+            
+            if (team) {
+                return new Team(team.id, team.name, team.display_name);
+            }
+            
+        } catch (error) {
+            console.error('Error al obtener el equipo por id:', error);
+            throw error;
+        }
+    }
 }
 
 export default Team;
