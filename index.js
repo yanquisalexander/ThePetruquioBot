@@ -69,6 +69,7 @@ await WebServer.boot();
 
 Bot.connect()
     .then(() => {
+        Bot.join(process.env.BOT_NAME);
         if (process.env.NODE_ENV === 'production') {
             // On production, join to self channel
             Bot.join(process.env.BOT_NAME);

@@ -406,7 +406,15 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 return;
             }
             break;
-
+        case 'debug':
+            if(username !== 'alexitoo_uy') return;
+            let debugCommand = args[0];
+            switch(debugCommand) {
+                case 'channelId': 
+                    sendMessage(channel, `Channel ID: ${channelData.id} (${channelData.twitch_id})`);
+                    break;
+                
+            }
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
