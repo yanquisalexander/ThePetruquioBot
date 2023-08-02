@@ -199,9 +199,11 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'join':
             if (channel === Bot.getUsername()) {
                 let joinChannel = username; // Por defecto, unirse al canal actual
+                let autoJoin = true // Por defecto, unirse automáticamente al canal si el usuario es quien envió el comando, y si es "alexitoo_uy", tiene que especificar el parámetro "true" para unirse automáticamente
                 if (username === 'alexitoo_uy') {
                     if (args.length > 0) {
                         joinChannel = args[0].toLowerCase(); // Si el usuario es "alexitoo_uy", se acepta el parámetro como nombre de canal
+                        autoJoin = args[1] === 'true' ? true : false;
                     } else {
                         return sendMessage(channel, `¡Debes especificar un canal después del comando !join!`);
                     }
@@ -214,7 +216,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         team_id: null,
                         twitch_id: channelInfo.id,
                         settings: { ...SETTINGS_MODEL },
-                        auto_connect: true
+                        auto_connect: autoJoin // Por defecto, unirse automáticamente al canal si el usuario es quien envió el comando, y si es "alexitoo_uy", tiene que especificar el parámetro "true" para unirse automáticamente
                     })
                     if (process.env.NODE_ENV === 'production') {
                         Bot.join(joinChannel)
