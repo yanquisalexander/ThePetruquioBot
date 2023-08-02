@@ -119,7 +119,8 @@ const subscribeToLiveNotificationEvents = async (channel) => {
     const title = stream?.title ? stream.title : '';
     const message = cachedChannel.settings.live_notification_message.value
       .replace('#channel', channel.name)
-      .replace('#title', title);
+      .replace('#title', title)
+      .replace('#game', stream?.gameName ? stream.gameName : '');
     sendMessage(channel.name, message);
   });
   eventSubListeners[`${channel.name}-live`] = liveListener;
