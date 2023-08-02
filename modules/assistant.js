@@ -2,7 +2,7 @@ import { Configuration, OpenAIApi } from "openai";
 import googleIt from 'google-it'
 
 export const googleSearch = async (query, limit = 3) => {
-    return googleIt({query, limit: limit})
+    return googleIt({query, limit: limit, disableConsole: true})
 }
 
 const configuration = new Configuration({

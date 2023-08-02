@@ -418,7 +418,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             }
         case 'petru':
-            if(!settings.enable_assistant) return;
+            if(!settings.enable_conversation) return;
             if(isAssistantOnCooldown(channel, username)) return;
             try {
                 let twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
