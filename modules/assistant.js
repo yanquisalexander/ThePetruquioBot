@@ -1,6 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import googleIt from 'google-it'
-import { getAssistantHistory } from "../lib/assistant-tools";
+import { getAssistantHistory } from "../lib/assistant-tools.js";
 
 export const googleSearch = async (query, limit = 3) => {
     return googleIt({query, limit: limit, disableConsole: true})
