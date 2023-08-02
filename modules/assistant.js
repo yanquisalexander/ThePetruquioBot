@@ -3,7 +3,7 @@ import googleIt from 'google-it'
 import { getAssistantHistory } from "../lib/assistant-tools.js";
 
 export const googleSearch = async (query, limit = 3) => {
-    return googleIt({query, limit: limit, disableConsole: true})
+    return googleIt({ query, limit: limit, disableConsole: true })
 }
 
 const configuration = new Configuration({
@@ -24,10 +24,16 @@ const openai = new OpenAIApi(configuration);
 
 
 export const createAssistantResponse = async (channelInfo, streamInfo, username, message, channelSettings, channel) => {
+    let streamerGoogleInfo;
+    let googleData;
     try {
         const channelHistory = getAssistantHistory(channel);
-        const streamerGoogleInfo = await googleSearch(channelInfo.displayName + 'twitch', 3)
-        const googleData = await googleSearch(message, 2)
+        try {
+            streamerGoogleInfo = await googleSearch(channelInfo.displayName + 'twitch', 3)
+            googleData = await googleSearch(message, 2)
+        } catch (error) {
+
+        }
         let tagsMessage = streamInfo && streamInfo.tags.length > 0 ? `Stream tags: ${streamInfo.tags.join(', ')}` : '';
 
 
@@ -44,10 +50,20 @@ export const createAssistantResponse = async (channelInfo, streamInfo, username,
             You should summarize your answers.
             Streamer bio: ${channelInfo.description}.
             ${tagsMessage}
-            Streamer data according to Google: ${JSON.stringify(streamerGoogleInfo)}.
-            Google search: ${JSON.stringify(googleData)}.
+            
             You are responding to ${username}.
         `
+
+            if(streamerGoogleInfo){
+                PROMPT_EXTERNAL_DATA += `
+                Streamer data according to Google: ${JSON.stringify(streamerGoogleInfo)}.
+                `
+            }
+            if(googleData){
+                PROMPT_EXTERNAL_DATA += `
+                Google data: ${JSON.stringify(googleData)}.
+                `
+            }
 
 
         PROMPT += PROMPT_EXTERNAL_DATA
