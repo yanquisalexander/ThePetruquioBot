@@ -154,32 +154,39 @@ export const checkLiveChannels = async () => {
         const channelList = channels.map(channel => channel.replace('#', ''));
         const currentLive = await getLiveChannels(channelList);
         console.log(chalk.bgWhite.magenta.bold(`Checking if channels are live...`));
-        const currentLiveChannels = currentLive.map(channel => channel.userName);
-        const newLiveChannels = currentLiveChannels.filter(channel => !liveChannels.includes(channel));
         
-        // If there are new live channels, set liveChannels to the new list
+        const currentLiveChannels = currentLive.reduce((result, channel) => {
+            const channelName = channel.userName;
+            result.push(channel);
+            return result;
+        }, []);
+
+        const newLiveChannels = currentLiveChannels.filter(channel => !liveChannels.some(item => item.userName === channel.userName));
+        
+        // If there are new live channels, add them to liveChannels
 
         if (newLiveChannels.length > 0) {
-            liveChannels.length = 0;
-            liveChannels.push(...currentLiveChannels);
+            liveChannels.push(...newLiveChannels);
         }
 
         // If there are channels that are no longer live, remove them from liveChannels
 
-        const noLongerLiveChannels = liveChannels.filter(channel => !currentLiveChannels.includes(channel));
+        const noLongerLiveChannels = liveChannels.filter(channel => !currentLiveChannels.some(item => item.userName === channel.userName));
 
         if (noLongerLiveChannels.length > 0) {
             noLongerLiveChannels.forEach(channel => {
-                const index = liveChannels.indexOf(channel);
+                const index = liveChannels.findIndex(item => item.userName === channel.userName);
                 liveChannels.splice(index, 1);
             });
         }
 
-        console.log(chalk.bgWhite.magenta.bold(`Live channels: ${liveChannels.join(', ')}`));
-        console.log(chalk.bgWhite.magenta.bold(`New live channels: ${newLiveChannels.join(', ')}`));
-        console.log(chalk.bgWhite.magenta.bold(`No longer live channels: ${noLongerLiveChannels.join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold('Live channels:'));
+        console.log(liveChannels.map(channel => channel.userName).join(', '));
+        console.log(chalk.bgWhite.magenta.bold(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
+        console.log(chalk.bgWhite.magenta.bold(`No longer live channels: ${noLongerLiveChannels.map(channel => channel.userName).join(', ')}`));
 
     } catch (e) {
         console.error(e.stack);
     }
 }
+
