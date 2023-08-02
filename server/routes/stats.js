@@ -17,7 +17,7 @@ StatsRouter.get("/", (req, res, next) => {
 
 StatsRouter.get("/live-now", async (req, res, next) => {
     try {
-        const live = liveChannels.filter(channel => channel.userName !== 'petruquiobot');
+        const live = liveChannels
         const liveData = live.map(channel => {
             const { userName, title, viewers, startDate } = channel;
             return {
