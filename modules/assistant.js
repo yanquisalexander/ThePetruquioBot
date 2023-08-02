@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import googleIt from 'google-it'
+import { getAssistantHistory } from "../lib/assistant-tools";
 
 export const googleSearch = async (query, limit = 3) => {
     return googleIt({query, limit: limit, disableConsole: true})
@@ -24,7 +25,7 @@ const openai = new OpenAIApi(configuration);
 
 export const createAssistantResponse = async (channelInfo, streamInfo, username, message, channelSettings) => {
     try {
-
+        const channelHistory = getAssistantHistory(channelInfo.userName);
         const streamerGoogleInfo = await googleSearch(channelInfo.displayName + 'twitch', 3)
         const googleData = await googleSearch(message, 2)
         let tagsMessage = streamInfo && streamInfo.tags.length > 0 ? `Stream tags: ${streamInfo.tags.join(', ')}` : '';
@@ -51,7 +52,12 @@ export const createAssistantResponse = async (channelInfo, streamInfo, username,
 
         PROMPT += PROMPT_EXTERNAL_DATA
 
-
+        if (channelHistory) {
+            PROMPT += "\n\nChat history:\n\n";
+            channelHistory.forEach(({ username, message }) => {
+                PROMPT += `${username}: ${message}\n`;
+            });
+        }
 
         let messages = [
             {
