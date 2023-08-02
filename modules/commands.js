@@ -423,7 +423,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             try {
                 let twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
                 addToAssistantHistory(channel, message, username);
-                let AssistantResponse = await createAssistantResponse(twitchChannelInfo, null, username, message, settings);
+                let AssistantResponse = await createAssistantResponse(twitchChannelInfo, null, username, message, settings, channel);
                 if (AssistantResponse) {
                     // Si ya mencionó al usuario en el mensaje (con @), no volver a mencionarlo
                     if (message.includes(`@${username}`)) {

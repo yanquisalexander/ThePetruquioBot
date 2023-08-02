@@ -23,9 +23,9 @@ Responderás de forma breve y al punto.
 const openai = new OpenAIApi(configuration);
 
 
-export const createAssistantResponse = async (channelInfo, streamInfo, username, message, channelSettings) => {
+export const createAssistantResponse = async (channelInfo, streamInfo, username, message, channelSettings, channel) => {
     try {
-        const channelHistory = getAssistantHistory(channelInfo.userName);
+        const channelHistory = getAssistantHistory(channel);
         const streamerGoogleInfo = await googleSearch(channelInfo.displayName + 'twitch', 3)
         const googleData = await googleSearch(message, 2)
         let tagsMessage = streamInfo && streamInfo.tags.length > 0 ? `Stream tags: ${streamInfo.tags.join(', ')}` : '';
