@@ -13,6 +13,8 @@ import { WorldMapCache } from "../server/routes/world-map.js";
 import Command from "../app/models/Command.js";
 import Shoutout from "../app/models/Shoutout.js";
 import Team from "../app/models/Team.js";
+import { createAssistantResponse } from "./assistant.js";
+import { isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -407,14 +409,35 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             break;
         case 'debug':
-            if(username !== 'alexitoo_uy') return;
+            if (username !== 'alexitoo_uy') return;
             let debugCommand = args[0];
-            switch(debugCommand) {
-                case 'channelId': 
+            switch (debugCommand) {
+                case 'channelId':
                     sendMessage(channel, `Channel ID: ${channelData.id} (${channelData.twitch_id})`);
                     break;
-                
+
             }
+        case 'petru':
+            if(!settings.enable_assistant) return;
+            if(isAssistantOnCooldown(channel, username)) return;
+            try {
+                let twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
+                let AssistantResponse = await createAssistantResponse(twitchChannelInfo, null, username, message, settings);
+                if (AssistantResponse) {
+                    // Si ya mencionó al usuario en el mensaje (con @), no volver a mencionarlo
+                    if (message.includes(`@${username}`)) {
+                        sendMessage(channel, AssistantResponse);
+                    }
+                    // Si no, mencionarlo al inicio del mensaje
+                    else {
+                        sendMessage(channel, `@${username}, ${AssistantResponse}`);
+                    }
+                    setAssistantCooldown(channel, 30);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+            break;
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
@@ -449,7 +472,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
                         sendMessage(channel, `@${username}, los canales en vivo del team ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
                     } else {
-                        return 
+                        return
                     }
                 } catch (error) {
                     console.error(error.message);
