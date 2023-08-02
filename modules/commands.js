@@ -14,7 +14,7 @@ import Command from "../app/models/Command.js";
 import Shoutout from "../app/models/Shoutout.js";
 import Team from "../app/models/Team.js";
 import { createAssistantResponse } from "./assistant.js";
-import { isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
+import { addToAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -422,6 +422,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if(isAssistantOnCooldown(channel, username)) return;
             try {
                 let twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
+                addToAssistantHistory(channel, message, username);
                 let AssistantResponse = await createAssistantResponse(twitchChannelInfo, null, username, message, settings);
                 if (AssistantResponse) {
                     // Si ya mencionó al usuario en el mensaje (con @), no volver a mencionarlo
@@ -432,6 +433,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     else {
                         sendMessage(channel, `@${username}, ${AssistantResponse}`);
                     }
+                    addToAssistantHistory(channel, AssistantResponse, 'PetruquioBot');
                     setAssistantCooldown(channel, 30);
                 }
             } catch (error) {
