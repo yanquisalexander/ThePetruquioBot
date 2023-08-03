@@ -377,7 +377,7 @@ registerInstance();
 async function sendHeartbeat() {
     try {
         // Utiliza el comando hmset para agregar el campo con la marca de tiempo actual
-        await redis.zadd('active_instances', instanceId, Date.now());
+        await redis.zadd('active_instances', Date.now(), instanceId);
     } catch (error) {
         console.error('Error enviando el heartbeat:', error);
     }
@@ -400,7 +400,7 @@ async function checkAndRemoveDisconnectedInstances() {
 
         // Eliminar las instancias desconectadas de la lista de activas
         if (disconnectedInstances.length > 0) {
-            await redis.hdel('active_instances', ...disconnectedInstances);
+            await redis.zrem('active_instances', ...disconnectedInstances);
             // También eliminar las claves directamente de Redis
             await redis.del(...disconnectedInstances);
         }
