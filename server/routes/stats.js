@@ -3,6 +3,7 @@ import { Bot, bootedAt } from "../../bot.js";
 import { WebServer } from "../boot-webserver.js";
 import { latencyInfo, liveChannels } from "../../memory_variables.js";
 import { getLiveChannels } from "../../utils/twitch.js";
+import { instanceId } from "../../index.js";
 
 const StatsRouter = Router();
 
@@ -11,7 +12,8 @@ StatsRouter.get("/", (req, res, next) => {
         bootedAt,
         channels: Bot.getChannels().map(channel => channel.slice(1)),
         latency: latencyInfo,
-        liveChannels: liveChannels.map(channel => channel.userName)
+        liveChannels: liveChannels.map(channel => channel.userName),
+        instanceId
     })
 })
 

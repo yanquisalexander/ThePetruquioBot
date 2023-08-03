@@ -43,7 +43,7 @@ console.log = (...args) => {
 console.clear();
 
 // Para instanceId, se utiliza el nombre del bot, más un número aleatorio entre 1 y 1000 (aunque cambie cada vez que se reinicie el bot)
-const instanceId = `petruquiobot-${Math.floor(Math.random() * 1000) + 1}`;
+export const instanceId = `petruquiobot-${Math.floor(Math.random() * 1000) + 1}`;
 
 try {
     dotenv.config();
