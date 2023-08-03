@@ -30,9 +30,7 @@ import { WebServer } from './server/boot-webserver.js';
 import { railwayConnected } from './utils/environment.js';
 import { HelixClient, checkLiveChannels, getChannelInfo, getLiveChannels, isChannelLive, knownBots } from './utils/twitch.js';
 import Shoutout from './app/models/Shoutout.js';
-
-
-
+import { redis } from './lib/redis.js';
 
 
 // Monkey patching console.log to add timestamp to logs
@@ -44,9 +42,14 @@ console.log = (...args) => {
 // Clear console on start to avoid clutter from previous sessions (in production mode) 
 console.clear();
 
+// Para instanceId, se utiliza el nombre del bot, más un número aleatorio entre 1 y 1000 (aunque cambie cada vez que se reinicie el bot)
+const instanceId = `petruquiobot-${Math.floor(Math.random() * 1000) + 1}`;
+
 try {
     dotenv.config();
     console.log(chalk.blue('Environment variables loaded'));
+    console.log(chalk.blue('NODE_ENV:', process.env.NODE_ENV));
+    console.log(chalk.blue('Instance ID:', instanceId));
 } catch (error) {
     console.error(chalk.bgBlack.red('Missing .env file'));
     process.exit(-1);
@@ -179,9 +182,13 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
 
-const onMessageHandler = (channel, context, message, self) => {
-    if (context.username === Bot.getUsername() || self) return;
-    processMessage({ channel, context, username: context.username, message });
+const onMessageHandler = async (channel, context, message, self) => {
+    const nextInstance = await getNextInstance();
+
+    if (context.username === Bot.getUsername() || self || instanceId !== nextInstance) {
+        // Ignorar mensajes si no es la instancia que debe procesarlos
+        return;
+    } processMessage({ channel, context, username: context.username, message });
 };
 
 const onChatClearedHandler = (channel) => {
@@ -321,3 +328,82 @@ Bot.on('pong', (latency) => {
 })
 
 //Bot.on('raided', onRaidedHandler)
+
+
+
+// Registro de la instancia en Redis al iniciarse
+async function registerInstance() {
+    try {
+        const timestamp = Date.now();
+        await redis.hset('active_instances', instanceId, timestamp);
+        console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} registered in Redis with timestamp ${timestamp}`));
+    } catch (error) {
+        console.error('Error registering instance:', error);
+    }
+}
+
+
+// Obtener la siguiente instancia en orden de round-robin
+async function getNextInstance() {
+    try {
+        const allInstances = await redis.hgetall('active_instances');
+        console.log(chalk.bgWhite.magenta.bold(`All instances:`, allInstances));
+
+        const instanceIds = Object.keys(allInstances);
+        const instanceIndex = instanceIds.indexOf(instanceId);
+        console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} is at index ${instanceIndex}`));
+
+        const nextInstanceIndex = (instanceIndex + 1) % instanceIds.length;
+        const nextInstanceId = instanceIds[nextInstanceIndex];
+        console.log(chalk.bgWhite.magenta.bold(`Next instance is ${nextInstanceId}`));
+
+        return nextInstanceId;
+    } catch (error) {
+        console.error('Error getting next instance:', error);
+        return null;
+    }
+}
+
+
+
+// Registrar la instancia en Redis al iniciarse
+
+registerInstance();
+
+// Enviar un heartbeat a Redis
+
+async function sendHeartbeat() {
+    try {
+        // Agrega un campo con la marca de tiempo actual a la clave de la instancia
+        await redis.hset('active_instances', instanceId, Date.now());
+    } catch (error) {
+        console.error('Error sending heartbeat:', error);
+    }
+}
+
+// Temporizador para enviar señales "heartbeat" cada 30 segundos
+setInterval(sendHeartbeat, 30 * 1000);
+
+// Función para verificar y eliminar instancias desconectadas de la lista de activas
+async function checkAndRemoveDisconnectedInstances() {
+    try {
+        // Obtén todas las instancias activas y sus marcas de tiempo de "heartbeat"
+        const activeInstances = await redis.hgetall('active_instances');
+        const currentTime = Date.now();
+
+        // Filtrar las instancias con marcas de tiempo más antiguas que un umbral (por ejemplo, 1 minuto)
+        const disconnectedInstances = Object.keys(activeInstances).filter(
+            (instance) => currentTime - parseInt(activeInstances[instance]) > 60 * 1000
+        );
+
+        // Eliminar las instancias desconectadas de la lista de activas
+        if (disconnectedInstances.length > 0) {
+            await redis.hdel('active_instances', disconnectedInstances);
+        }
+    } catch (error) {
+        console.error('Error checking and removing disconnected instances:', error);
+    }
+}
+
+// Temporizador para verificar y eliminar instancias desconectadas cada 2 minutos, esto dará un margen de 1 minuto para que las instancias se reconecten
+setInterval(checkAndRemoveDisconnectedInstances, 2 * 60 * 1000);
