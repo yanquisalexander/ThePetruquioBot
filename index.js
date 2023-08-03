@@ -77,8 +77,7 @@ Bot.connect()
             // On production, join to self channel
             Bot.join(process.env.BOT_NAME);
         }
-    })
-    .catch(console.error);
+    }).catch(console.error);
 
 const onConnectedHandler = (address, port) => {
     console.log(chalk.bgWhite.magenta.bold(`Connected to Twitch as ${Bot.getUsername()} (${address}:${port})`));
@@ -368,6 +367,7 @@ async function getNextInstance() {
 
 
 
+
 // Registrar la instancia en Redis al iniciarse
 
 registerInstance();
@@ -376,10 +376,10 @@ registerInstance();
 
 async function sendHeartbeat() {
     try {
-        // Agrega un campo con la marca de tiempo actual a la clave de la instancia
-        await redis.hset('active_instances', instanceId, Date.now());
+        // Utiliza el comando hmset para agregar el campo con la marca de tiempo actual
+        await redis.hmset('active_instances', instanceId, Date.now());
     } catch (error) {
-        console.error('Error sending heartbeat:', error);
+        console.error('Error enviando el heartbeat:', error);
     }
 }
 
