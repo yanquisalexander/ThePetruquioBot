@@ -377,7 +377,7 @@ registerInstance();
 async function sendHeartbeat() {
     try {
         // Utiliza el comando hmset para agregar el campo con la marca de tiempo actual
-        await redis.hmset('active_instances', instanceId, Date.now());
+        await redis.zadd('active_instances', instanceId, Date.now());
     } catch (error) {
         console.error('Error enviando el heartbeat:', error);
     }
