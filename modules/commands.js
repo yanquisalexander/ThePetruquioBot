@@ -14,7 +14,7 @@ import Command from "../app/models/Command.js";
 import Shoutout from "../app/models/Shoutout.js";
 import Team from "../app/models/Team.js";
 import { createAssistantResponse } from "./assistant.js";
-import { addToAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
+import { addToAssistantHistory, clearAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
 
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
@@ -417,7 +417,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 case 'channelId':
                     sendMessage(channel, `Channel ID: ${channelData.id} (${channelData.twitch_id})`);
                     break;
-
+                case 'assistant_clear':
+                    clearAssistantHistory(channel);
+                    sendMessage(channel, `@${username}, Historial de conversación limpiado correctamente.`);
+                    break;
             }
         case 'petru':
             if (!settings.enable_conversation) return;
