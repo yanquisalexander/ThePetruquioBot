@@ -335,7 +335,7 @@ Bot.on('pong', (latency) => {
 async function registerInstance() {
     try {
         const timestamp = Date.now();
-        await redis.hset('active_instances', instanceId, timestamp);
+        await redis.zadd('active_instances', timestamp, instanceId);
         console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} registered in Redis with timestamp ${timestamp}`));
     } catch (error) {
         console.error('Error registering instance:', error);
@@ -349,12 +349,8 @@ async function getNextInstance() {
         const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
         console.log(chalk.bgWhite.magenta.bold(`All instances:`, allInstances));
 
-        // 'allInstances' es un array donde los elementos se alternan entre el nombre de la instancia y el puntaje
-        // Por ejemplo, ['petruquiobot-72', '1', 'petruquiobot-482', '2']
-        
-        const instanceIds = allInstances.filter((_, index) => index % 2 === 0); // Filtrar solo los nombres de las instancias
-        const scores = allInstances.filter((_, index) => index % 2 !== 0); // Filtrar solo los puntajes
-
+        const instanceIds = allInstances.filter((_, index) => index % 2 === 0);
+        const instanceScores = allInstances.filter((_, index) => index % 2 !== 0).map(Number);
         const instanceIndex = instanceIds.indexOf(instanceId);
         console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} is at index ${instanceIndex}`));
 
@@ -404,12 +400,15 @@ async function checkAndRemoveDisconnectedInstances() {
 
         // Eliminar las instancias desconectadas de la lista de activas
         if (disconnectedInstances.length > 0) {
-            await redis.hdel('active_instances', disconnectedInstances);
+            await redis.hdel('active_instances', ...disconnectedInstances);
+            // También eliminar las claves directamente de Redis
+            await redis.del(...disconnectedInstances);
         }
     } catch (error) {
         console.error('Error checking and removing disconnected instances:', error);
     }
 }
+
 
 // Temporizador para verificar y eliminar instancias desconectadas cada 2 minutos, esto dará un margen de 1 minuto para que las instancias se reconecten
 setInterval(checkAndRemoveDisconnectedInstances, 2 * 60 * 1000);
