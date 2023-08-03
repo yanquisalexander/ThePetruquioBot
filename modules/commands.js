@@ -69,7 +69,7 @@ const updateSetting = async (channel, setting, value, username) => {
             value: parsedValue
         });
         if (setting === 'bot-muted' && value === true) return;
-        Bot.say(channel, `El ajuste ${setting} ha sido actualizado a ${parsedValue}`);
+        Bot.say(channel, `El ajuste ${setting} ha sido actualizado ${settingType === 'boolean' ? 'a ' + parsedValue : '.'}`);
     } catch (error) {
         Bot.say(channel, `Ha ocurrido un error al intentar actualizar el ajuste ${setting}`);
         console.error(error);
