@@ -386,29 +386,28 @@ async function sendHeartbeat() {
 // Temporizador para enviar señales "heartbeat" cada 30 segundos
 setInterval(sendHeartbeat, 30 * 1000);
 
-// Función para verificar y eliminar instancias desconectadas de la lista de activas
+// Verificar y eliminar instancias desconectadas
 async function checkAndRemoveDisconnectedInstances() {
     try {
-        // Obtén todas las instancias activas y sus marcas de tiempo de "heartbeat"
-        const activeInstances = await redis.hgetall('active_instances');
+        // Obtén todas las instancias activas y sus marcas de tiempo de "heartbeat" del conjunto ordenado
+        const activeInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
         const currentTime = Date.now();
 
         // Filtrar las instancias con marcas de tiempo más antiguas que un umbral (por ejemplo, 1 minuto)
-        const disconnectedInstances = Object.keys(activeInstances).filter(
-            (instance) => currentTime - parseInt(activeInstances[instance]) > 60 * 1000
-        );
+        const disconnectedInstances = activeInstances.filter((_, index) => index % 2 === 0)
+            .filter((instanceId, index) => currentTime - parseInt(activeInstances[index * 2 + 1]) > 60 * 1000);
 
-        // Eliminar las instancias desconectadas de la lista de activas
+        // Eliminar las instancias desconectadas del conjunto ordenado
         if (disconnectedInstances.length > 0) {
             await redis.zrem('active_instances', ...disconnectedInstances);
-            // También eliminar las claves directamente de Redis
-            await redis.del(...disconnectedInstances);
+            console.log(chalk.bgWhite.magenta.bold(`Instancias desconectadas:`, disconnectedInstances));
+            // No es necesario eliminar las claves directamente de Redis, ya que ya lo hicimos con zrem
         }
     } catch (error) {
-        console.error('Error checking and removing disconnected instances:', error);
+        console.error('Error verificando y eliminando instancias desconectadas:', error);
     }
 }
 
 
 // Temporizador para verificar y eliminar instancias desconectadas cada 2 minutos, esto dará un margen de 1 minuto para que las instancias se reconecten
-setInterval(checkAndRemoveDisconnectedInstances, 2 * 60 * 1000);
+setInterval(checkAndRemoveDisconnectedInstances, 0.15 * 60 * 1000);
