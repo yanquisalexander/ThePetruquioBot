@@ -426,5 +426,5 @@ async function checkAndRemoveDisconnectedInstances() {
 }
 
 
-// Temporizador para verificar y eliminar instancias desconectadas cada 2 minutos, esto dará un margen de 1 minuto para que las instancias se reconecten
-setInterval(checkAndRemoveDisconnectedInstances, 0.15 * 60 * 1000);
+// Temporizador para verificar y eliminar instancias desconectadas cada 6 segundos, esto dará un margen de 1 minuto para que las instancias se reconecten
+setInterval(checkAndRemoveDisconnectedInstances, 0.20 * 60 * 1000);

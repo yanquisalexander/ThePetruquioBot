@@ -422,6 +422,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     sendMessage(channel, `@${username}, Historial de conversación limpiado correctamente.`);
                     break;
             }
+            break;
         case 'petru':
             if (!settings.enable_conversation) return;
             if (isAssistantOnCooldown(channel, username)) return;
