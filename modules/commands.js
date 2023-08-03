@@ -436,7 +436,12 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         sendMessage(channel, `@${username}, ${AssistantResponse}`);
                     }
                     addToAssistantHistory(channel, AssistantResponse, 'PetruquioBot');
-                    setAssistantCooldown(channel, 15);
+                    if (username && username.toLowerCase() === 'alexitoo_uy') {
+                        return;
+                    } else {
+                        setAssistantCooldown(channel, 15);
+                    }
+
                 }
             } catch (error) {
                 console.error(error);
