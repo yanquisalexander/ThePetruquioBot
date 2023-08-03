@@ -1,5 +1,5 @@
 import { Bot, sendMessage } from "../bot.js";
-import { autoTranslateUsers } from "../memory_variables.js";
+import { autoTranslateUsers, liveChannels } from "../memory_variables.js";
 import { getRandomFact } from "./random-responses.js";
 import { langExpl, langList, translate } from "./translate.js";
 import { replaceVariables } from "../utils/variable-replacement.js";
@@ -453,9 +453,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     let channelData = await Channel.getChannelByName(channel);
                     let team = await Team.getById(channelData.team_id);
                     if (team) {
-                        const teamChannels = await team.getMembers();
-                        const liveChannels = await getLiveChannels(teamChannels.map(channel => channel.name));
-                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
+                        let teamChannels = await team.getMembers();
+                        let nowLive = liveChannels.filter(channel => teamChannels.includes(channel.name)); // Use liveChannels variable to save API calls, because it's updated every 2 minutes
+                        if (nowLive.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
                     } else {
                         return
                     }
@@ -491,9 +491,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 try {
                     let team = await Team.getByName(teamName);
                     if (team) {
-                        const teamChannels = await team.getMembers();
-                        const liveChannels = await getLiveChannels(teamChannels.map(channel => channel.name));
-                        if (liveChannels.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
+                        let teamChannels = await team.getMembers();
+                        let nowLive = liveChannels.filter(channel => teamChannels.includes(channel.name)); // Use liveChannels variable to save API calls, because it's updated every 2 minutes
+                        if (nowLive.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
                         const liveChannelsNames = liveChannels.map(channel => channel.userName);
 
                         sendMessage(channel, `@${username}, los canales en vivo del team ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
