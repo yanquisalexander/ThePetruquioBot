@@ -182,12 +182,18 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
 const onMessageHandler = async (channel, context, message, self) => {
-    const nextInstance = await getNextInstance();
+    var nextInstance = await getNextInstance();
+    if (process.env.NODE_ENV !== 'production') {
+        nextInstance = instanceId; // For development, always process messages on the same instance
+        //console.log(chalk.bgWhite.green.bold(`Development mode: Processing all messages on instance ${nextInstance}`));
+    }
 
     if (context.username === Bot.getUsername() || self || instanceId !== nextInstance) {
         // Ignorar mensajes si no es la instancia que debe procesarlos
         return;
-    } processMessage({ channel, context, username: context.username, message });
+    } 
+    
+    processMessage({ channel, context, username: context.username, message });
 };
 
 const onChatClearedHandler = (channel) => {
@@ -376,9 +382,10 @@ async function getNextInstance() {
 
 
 
-// Registrar la instancia en Redis al iniciarse
-
-registerInstance();
+// Registrar la instancia en Redis al iniciarse (solo en producción)
+if (process.env.NODE_ENV === 'production') {
+    registerInstance();
+}
 
 // Enviar un heartbeat a Redis
 
@@ -391,8 +398,10 @@ async function sendHeartbeat() {
     }
 }
 
-// Temporizador para enviar señales "heartbeat" cada 30 segundos
-setInterval(sendHeartbeat, 30 * 1000);
+if (process.env.NODE_ENV === 'production') {
+    // Temporizador para enviar señales "heartbeat" cada 30 segundos
+    setInterval(sendHeartbeat, 30 * 1000);
+}
 
 // Verificar y eliminar instancias desconectadas
 async function checkAndRemoveDisconnectedInstances() {

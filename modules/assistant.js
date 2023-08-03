@@ -7,8 +7,8 @@ export const googleSearch = async (query, limit = 3) => {
 }
 
 const configuration = new Configuration({
-    apiKey: process.env.OPENAI_TOKEN,
-    basePath: "https://free.churchless.tech/v1",
+    apiKey: 'sk-DhKAvG6XLq4ONQO07b50Df3d013047AfB82f707c145e13B4',
+    basePath: "https://chattyapi.tech/v1",
 
 });
 
@@ -94,7 +94,6 @@ export const createAssistantResponse = async (channelInfo, streamInfo, username,
             temperature: 1.2,
             stream: false,
         });
-
         console.log(AssistantResponse.data.choices[0].message.content)
         return AssistantResponse.data.choices[0].message.content;
 
