@@ -346,10 +346,15 @@ async function registerInstance() {
 // Obtener la siguiente instancia en orden de round-robin
 async function getNextInstance() {
     try {
-        const allInstances = await redis.hgetall('active_instances');
+        const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
         console.log(chalk.bgWhite.magenta.bold(`All instances:`, allInstances));
 
-        const instanceIds = Object.keys(allInstances);
+        // 'allInstances' es un array donde los elementos se alternan entre el nombre de la instancia y el puntaje
+        // Por ejemplo, ['petruquiobot-72', '1', 'petruquiobot-482', '2']
+        
+        const instanceIds = allInstances.filter((_, index) => index % 2 === 0); // Filtrar solo los nombres de las instancias
+        const scores = allInstances.filter((_, index) => index % 2 !== 0); // Filtrar solo los puntajes
+
         const instanceIndex = instanceIds.indexOf(instanceId);
         console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} is at index ${instanceIndex}`));
 
@@ -363,6 +368,7 @@ async function getNextInstance() {
         return null;
     }
 }
+
 
 
 
