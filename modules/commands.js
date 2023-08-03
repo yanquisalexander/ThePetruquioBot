@@ -436,7 +436,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         sendMessage(channel, `@${username}, ${AssistantResponse}`);
                     }
                     addToAssistantHistory(channel, AssistantResponse, 'PetruquioBot');
-                    setAssistantCooldown(channel, 30);
+                    setAssistantCooldown(channel, 15);
                 }
             } catch (error) {
                 console.error(error);
