@@ -342,20 +342,27 @@ async function registerInstance() {
 }
 
 
-// Obtener la siguiente instancia en orden de round-robin
+// Obtener la siguiente instancia con el timestamp más bajo
 async function getNextInstance() {
     try {
         const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
         console.log(chalk.bgWhite.magenta.bold(`All instances:`, allInstances));
 
+        if (allInstances.length === 0) {
+            console.log('No active instances found.');
+            return null;
+        }
+
+        // Filtrar las instancias y puntuaciones (timestamps) del conjunto ordenado
         const instanceIds = allInstances.filter((_, index) => index % 2 === 0);
         const instanceScores = allInstances.filter((_, index) => index % 2 !== 0).map(Number);
-        const instanceIndex = instanceIds.indexOf(instanceId);
-        console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} is at index ${instanceIndex}`));
 
-        const nextInstanceIndex = (instanceIndex + 1) % instanceIds.length;
-        const nextInstanceId = instanceIds[nextInstanceIndex];
-        console.log(chalk.bgWhite.magenta.bold(`Next instance is ${nextInstanceId}`));
+        // Encontrar la instancia con el timestamp más bajo
+        const minTimestamp = Math.min(...instanceScores);
+        const minTimestampIndex = instanceScores.indexOf(minTimestamp);
+        const nextInstanceId = instanceIds[minTimestampIndex];
+
+        console.log(chalk.bgWhite.magenta.bold(`Next instance with lowest timestamp is ${nextInstanceId}`));
 
         return nextInstanceId;
     } catch (error) {
@@ -363,6 +370,7 @@ async function getNextInstance() {
         return null;
     }
 }
+
 
 
 
