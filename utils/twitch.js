@@ -130,6 +130,7 @@ export const getLiveChannels = async (channelList) => {
         channelGroups.push(channels);
     }
 
+    const liveChannels = [];
 
     for (const channels of channelGroups) {
         try {
