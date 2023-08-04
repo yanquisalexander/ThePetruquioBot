@@ -346,18 +346,21 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'clip':
             if (!settings.enable_clip_command) return;
             const currentChannel = await Channel.getChannelByName(channel);
-            const clip = HelixClient.asUser(process.env.TWITCH_USER_ID, (client => {
-                return client.clips.createClip({
+            let clipData;
+            HelixClient.asUser(process.env.TWITCH_USER_ID, (client => {
+                client.clips.createClip({
                     channel: currentChannel.twitch_id
-                });
+                }).then((clip) => {
+                    console.log(clip);
+                    clipData = clip;
+                    sendMessage(channel, `@${username}, ¡Se ha creado un clip! https://clips.twitch.tv/${clip}`);
+                }).catch((error) => {
+                    console.error(error);
+                    sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar crear un clip!`);
+                })
             }))
 
-            clip.then((clip) => {
-                sendMessage(channel, `@${username}, ¡Se ha creado un clip! ${clip.url}`);
-            }).catch((error) => {
-                console.error(error);
-                sendMessage(channel, `@${username}, ¡Ha ocurrido un error al intentar crear un clip!`);
-            });
+            break;
         case 'shoutout':
             if (!isModerator) return;
             if (!settings.enable_community_features) return; // Shoutout module are part of community features, so if they are disabled, don't execute the command
