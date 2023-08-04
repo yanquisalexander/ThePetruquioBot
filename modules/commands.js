@@ -504,7 +504,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     let team = await Team.getByName(teamName);
                     if (team) {
                         let teamChannels = await team.getMembers();
-                        let nowLive = liveChannels.filter(channel => teamChannels.includes(channel.name)); // Use liveChannels variable to save API calls, because it's updated every 2 minutes
+                        let nowLive = liveChannels.filter(channel => teamChannels.includes(channel.userName)); // Use liveChannels variable to save API calls, because it's updated every 2 minutes
+                        console.log(nowLive);
+                        console.log(liveChannels);
                         if (nowLive.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
                         const liveChannelsNames = liveChannels.map(channel => channel.userName);
 
