@@ -183,6 +183,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const pinEmote = args[0];
             if (pinEmote) {
+                if(!context?.emotes) return; // If the user didn't send an emote, return
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
                 const emoteMap = new WorldMap(username, channel.replace('#', ''), true, emoteUrl);
                 await emoteMap.save();
