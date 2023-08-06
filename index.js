@@ -87,7 +87,12 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isModerator = context.mod || Boolean(context.badges?.broadcaster) || context.username === 'alexitoo_uy' // Bot owner;
     const isBroadcaster = isModerator && context.badges.broadcaster;
     const isBot = knownBots.includes(username.toLowerCase());
-    const userOnMap = await SpectatorLocation.find(username);
+    let userOnMap = null;
+    try {
+      userOnMap = await SpectatorLocation.find(username);  
+    } catch (error) {
+        console.error(error);
+    }
     channel = channel.replace('#', '');
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
@@ -131,7 +136,7 @@ const processMessage = async ({ channel, context, username, message }) => {
                         return shoutout;
                     }))
                 } catch (error) {
-                    // Do nothing if native shoutout fails, it's not important
+                    console.error(error)
                 }
 
             }
