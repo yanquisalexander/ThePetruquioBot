@@ -38,17 +38,20 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
+            activeUsers[channel][username] = Date.now();
             return false;
         }
+        activeUsers[channel][username] = Date.now();
         return true;
     }
-    
 
     // Comprobar si es un bot conocido
     if (knownBots.includes(username.toLowerCase())) {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
+            activeUsers[channel][username] = Date.now();
             return false;
         }
+        activeUsers[channel][username] = Date.now();
         return true;
     }
 
@@ -56,14 +59,16 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
     if (isUserOnMap) {
         // Comprobar si el usuario ha pasado al menos 6 horas desde su último mensaje
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
+            activeUsers[channel][username] = Date.now();
             return false;
         }
+        activeUsers[channel][username] = Date.now();
         return true;
     }
 
-
     return false;
 };
+
 
 const getRandomGreeting = (username, isBot = false, lang) => {
     const greetingList = isBot ? botGreetings : greetings;
