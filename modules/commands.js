@@ -210,8 +210,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     await spectatorLocation.save();
                     updatedCount++;
 
-                    // Esperar 10 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
-                    await new Promise((resolve) => setTimeout(resolve, 10000));
+                    // Esperar 5 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
+                    await new Promise((resolve) => setTimeout(resolve, 5000));
                 }
                 sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
                 WorldMapCache.clear(channel);
