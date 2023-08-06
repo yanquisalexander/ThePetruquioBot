@@ -131,7 +131,7 @@ const processMessage = async ({ channel, context, username, message }) => {
                 }
                 try {
                     const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
-                        let targetChannel = await client.users.getUserByName(targetStreamer);
+                        let targetChannel = await client.users.getUserByName(username);
                         let shoutout = await client.chat.shoutoutUser(channelData.twitch_id, targetChannel.id, process.env.TWITCH_USER_ID);
                         return shoutout;
                     }))
