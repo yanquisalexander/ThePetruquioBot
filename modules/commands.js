@@ -255,7 +255,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 return sendMessage(channel, `¡El bot se ha unido al canal de @${joinChannel} correctamente!`);
             }
             return;
-
+            
         case 'part':
             if (channel === Bot.getUsername()) {
                 let partChannel = username; // Por defecto, salir del canal del usuario que envió el comando

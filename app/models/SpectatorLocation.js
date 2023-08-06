@@ -7,12 +7,12 @@ const geocoder = NodeGeocoder({
 });
 
 class SpectatorLocation {
-    constructor(username, location) {
+    constructor(username, location, latitude = null, longitude = null, countryCode = null) {
         this.username = username;
         this.location = location;
-        this.latitude = null;
-        this.longitude = null;
-        this.countryCode = null;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.countryCode = countryCode;
     }
 
     async getGeocode() {
@@ -94,7 +94,7 @@ class SpectatorLocation {
         try {
             const result = await db.query(query);
             if(result.rows.length === 0) return null; // Si no se encuentra la ubicación del espectador, devuelve null
-            return new SpectatorLocation(result.rows[0].username, result.rows[0].location);
+            return new SpectatorLocation(result.rows[0].username, result.rows[0].location, result.rows[0].latitude, result.rows[0].longitude, result.rows[0].country_code);
         } catch (error) {
             console.error('Error al obtener la ubicación del espectador:', error);
             throw error;

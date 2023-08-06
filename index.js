@@ -89,7 +89,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     const isBot = knownBots.includes(username.toLowerCase());
     let userOnMap = null;
     try {
-      userOnMap = await SpectatorLocation.find(username);  
+        userOnMap = await SpectatorLocation.find(username);
     } catch (error) {
         console.error(error);
     }
@@ -153,18 +153,20 @@ const processMessage = async ({ channel, context, username, message }) => {
     }
 
     if (message.toLowerCase().includes(`@${Bot.getUsername().toLowerCase()}`)) {
-        if(username === 'tangerinebot_') return // TangerineBot can cause infinite loop
+        if (username === 'tangerinebot_') return // TangerineBot can cause infinite loop
         return sendMessage(channel, `@${username}, ${getRandomBotResponse()}`);
     }
 
 
     if (Settings.enable_greetings) {
         if (Settings.bot_muted) return; // Don't greet if bot is muted
+
         if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
             activeUsers[channel][username] = Date.now();
             let lang = 'en'
-            if (userOnMap && userOnMap.country_code && CountryLangs[userOnMap.country_code]) {
-            lang = CountryLangs[userOnMap.country_code.toLowerCase()]
+            if (userOnMap && userOnMap.countryCode && CountryLangs[userOnMap.countryCode]) {
+                lang = CountryLangs[userOnMap.countryCode]
+
             }
             let greetingMessage = getRandomGreeting(username, isBot, lang);
             if (isBroadcaster) {
@@ -197,8 +199,8 @@ const onMessageHandler = async (channel, context, message, self) => {
     if (context.username === Bot.getUsername() || self || instanceId !== nextInstance) {
         // Ignorar mensajes si no es la instancia que debe procesarlos
         return;
-    } 
-    
+    }
+
     processMessage({ channel, context, username: context.username, message });
 };
 
