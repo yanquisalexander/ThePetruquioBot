@@ -352,7 +352,6 @@ async function registerInstance() {
 async function getNextInstance() {
     try {
         const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
-        console.log(chalk.bgWhite.magenta.bold(`All instances:`, allInstances));
 
         if (allInstances.length === 0) {
             console.log('No active instances found.');
@@ -367,8 +366,6 @@ async function getNextInstance() {
         const minTimestamp = Math.min(...instanceScores);
         const minTimestampIndex = instanceScores.indexOf(minTimestamp);
         const nextInstanceId = instanceIds[minTimestampIndex];
-
-        console.log(chalk.bgWhite.magenta.bold(`Next instance with lowest timestamp is ${nextInstanceId}`));
 
         return nextInstanceId;
     } catch (error) {
@@ -428,3 +425,5 @@ async function checkAndRemoveDisconnectedInstances() {
 
 // Temporizador para verificar y eliminar instancias desconectadas cada 6 segundos, esto dará un margen de 1 minuto para que las instancias se reconecten
 setInterval(checkAndRemoveDisconnectedInstances, 0.20 * 60 * 1000);
+
+await checkAndRemoveDisconnectedInstances(); // Ejecutar inmediatamente al iniciar el bot, para eliminar instancias desconectadas de sesiones anteriores

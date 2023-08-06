@@ -10,7 +10,7 @@ class Team {
 
     async getMembers() {
         const query = {
-            text: 'SELECT * FROM channels WHERE team_id = $1',
+            text: 'SELECT name, id, twitch_id, team_id FROM channels WHERE team_id = $1',
             values: [this.id],
         };
 
