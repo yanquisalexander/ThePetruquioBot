@@ -497,19 +497,17 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             }
 
-            // Team commands, like !${teamName}-live to check live channels in a team
-            if (command.endsWith('-live')) {
-                const teamName = command.slice(0, -5);
+            // Team commands, like !${teamName}-live to check live channels in a team, but also should work with !${teamName}live
+            if (command.endsWith('-live') || command.endsWith('live')) {
+                let teamName = command.replace('-').replace('live', '');
                 try {
                     let team = await Team.getByName(teamName);
                     if (team) {
                         let teamChannels = await team.getMembers();
                         let live = liveChannels
-                        console.log(teamChannels);
                         // TeamChannels is an array of objects, so we need to map it to an array of strings
                         teamChannels = teamChannels.map(channel => channel.name);
                         live = live.filter(channel => teamChannels.includes(channel.userName));
-                        console.log(live);
                         if (live.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
                         let liveChannelsNames = live.map(channel => channel.userName);
                         sendMessage(channel, `@${username}, los canales en vivo del team ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
