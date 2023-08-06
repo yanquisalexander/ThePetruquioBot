@@ -16,7 +16,17 @@ const botGreetings = [
     "Hey pal @#username, good to see you around, feel safe now :)",
     "Welcome back, @#username! It's always a pleasure to have you here! :D",
     "Hello @#username, I hope you're having a fantastic day!",
+    "Hey @#username, thanks for being an awesome bot! :D",
 ];
+
+const tangerinebotRandomGreetings = [
+    "Hey #username, i'm your admirer, i love you! :D",
+    "Sikorama really was creative when he created you, #username! :D",
+    "TangerineBot, you're the best bot ever! :D",
+    "I consider you a friend, #username! :D",
+];
+
+
 
 const broadcasterGreetings = [
     "Hey boss @#username, welcome back! TakeNRG",
@@ -27,7 +37,12 @@ const broadcasterGreetings = [
 const emotes = [
     "TakeNRG",
     "VoHiYo",
-    ":D"
+    ":D",
+    "HeyGuys",
+    "GivePLZ",
+    "TPFufun",
+    "CoolCat",
+    "B)",
 ];
 
 export const addGreetingToStack = (channel, message, options) => {
@@ -71,7 +86,17 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
 
 
 const getRandomGreeting = (username, isBot = false, lang) => {
-    const greetingList = isBot ? botGreetings : greetings;
+    let greetingList;
+    if (isBot) {
+        if (username.toLowerCase() === 'tangerinebot_') {
+            greetingList = tangerinebotRandomGreetings; // PetruquioBot was inspired by TangerineBot, so he loves him and he's his admirer
+        } else {
+            greetingList = botGreetings;
+        }
+    }
+    else {
+        greetingList = greetings;
+    }
     const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
     const randomEmote = emotes[Math.floor(Math.random() * emotes.length)];
     return greeting.replace("#username", username).replace("#emote", randomEmote);

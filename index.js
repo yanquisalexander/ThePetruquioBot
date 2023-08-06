@@ -148,6 +148,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     }
 
     if (message.toLowerCase().includes(`@${Bot.getUsername().toLowerCase()}`)) {
+        if(username === 'tangerinebot_') return // TangerineBot can cause infinite loop
         return sendMessage(channel, `@${username}, ${getRandomBotResponse()}`);
     }
 
