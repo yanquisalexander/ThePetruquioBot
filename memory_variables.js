@@ -15,37 +15,37 @@ export const eventSubListeners = [];
 export const suspendedChannels = [];
 
 export const CountryLangs = {
-    ar: 'es', // Argentina
-    at: 'de', // Austria
-    au: 'en', // Australia
-    be: 'fr', // Belgium
-    bo: 'es', // Bolivia
-    br: 'pt', // Brazil
-    ch: 'en', // Switzerland
-    cl: 'es', // Chile
-    co: 'es', // Colombia
-    cr: 'es', // Costa Rica
-    de: 'de', // Germany
-    ec: 'es', // Ecuador
-    es: 'es', // Spain
-    fr: 'fr', // France
-    gb: 'en', // United Kingdom
-    it: 'it', // Italy
-    ja: 'ja', // Japan
-    jp: 'ja', // Japan
-    lu: 'fr', // Luxembourg
-    mx: 'es', // Mexico
-    nl: 'nl', // Netherlands
-    pl: 'pl', // Poland
-    pt: 'pt', // Portugal
-    ru: 'ru', // Russia
-    tr: 'tr', // Turkey
-    uy: 'es', // Uruguay
-    ve: 'es', // Venezuela
-  };
-  
+  AR: 'es',
+  BO: 'es',
+  CL: 'es',
+  CO: 'es',
+  CR: 'es',
+  CU: 'es',
+  DO: 'es',
+  EC: 'es',
+  ES: 'es',
+  GQ: 'es',
+  GT: 'es',
+  HN: 'es',
+  MX: 'es',
+  NI: 'es',
+  PA: 'es',
+  PE: 'es',
+  PR: 'es',
+  PY: 'es',
+  SV: 'es',
+  US: 'en',
+  UY: 'es',
+  VE: 'es',
+  AD: 'ca',
+  AE: 'ar',
+  AF: 'fa',
+  AG: 'en',
+  BR: 'pt'
+};
+
 export const latencyInfo = {
-    lastLatency: 0,
+  lastLatency: 0,
 };
 
 export const liveChannels = [];

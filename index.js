@@ -164,7 +164,7 @@ const processMessage = async ({ channel, context, username, message }) => {
             activeUsers[channel][username] = Date.now();
             let lang = 'en'
             if (userOnMap && userOnMap.country_code && CountryLangs[userOnMap.country_code]) {
-                lang = CountryLangs[userOnMap.country_code];
+            lang = CountryLangs[userOnMap.country_code.toLowerCase()]
             }
             let greetingMessage = getRandomGreeting(username, isBot, lang);
             if (isBroadcaster) {
