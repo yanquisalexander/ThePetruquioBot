@@ -12,6 +12,7 @@ class SpectatorLocation {
         this.location = location;
         this.latitude = null;
         this.longitude = null;
+        this.countryCode = null;
     }
 
     async getGeocode() {
@@ -21,21 +22,23 @@ class SpectatorLocation {
                 this.location = response[0].formattedAddress;
                 this.latitude = response[0].latitude;
                 this.longitude = response[0].longitude;
+                this.countryCode = response[0].countryCode;
             }
         } catch (error) {
             console.error('Error al obtener las coordenadas geográficas:', error);
+            throw error;
         }
     }
 
     async save() {
-        if (!this.latitude || !this.longitude) {
+        if (!this.latitude || !this.longitude || !this.countryCode) {
             await this.getGeocode();
         }
 
         const insertQuery = {
-            text: 'INSERT INTO spectator_locations (username, location, latitude, longitude) VALUES ($1, $2, $3, $4) ON CONFLICT (username) DO UPDATE SET location = EXCLUDED.location, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude RETURNING *',
-            values: [this.username, this.location, this.latitude, this.longitude],
-        };
+            text: 'INSERT INTO spectator_locations (username, location, latitude, longitude, country_code) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (username) DO UPDATE SET location = EXCLUDED.location, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, country_code = EXCLUDED.country_code RETURNING *',
+            values: [this.username, this.location, this.latitude, this.longitude, this.countryCode], // Asegúrate de incluir this.countryCode
+        };        
 
         try {
             const result = await db.query(insertQuery);
