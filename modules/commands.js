@@ -201,17 +201,26 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isModerator) return;
             // Buscar todos los usuarios en el mapa de la comunidad del canal, y actualizar los metadatos de cada usuario
             const usersOnMap = await WorldMap.getChannelMap(channel);
-            console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Actualizando metadatos...`);
+            console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Intentando actualizar sus metadatos...`);
             let updatedCount = 0;
-            for (const user of usersOnMap) {
-                const spectatorLocation = new SpectatorLocation(user.username, user.location);
-                await spectatorLocation.getGeocode();
-                await spectatorLocation.save();
-                updatedCount++;
+            try {
+                usersOnMap.map(async (user) => {
+                    let userLocation = await SpectatorLocation.find(user.username)
+                    await userLocation.getGeocode();
+                    await userLocation.save();
+                    updatedCount++;
+                    // Esperar 10 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
+                    await new Promise((resolve) => setTimeout(resolve, 10000));
+                });
+                sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
+                WorldMapCache.clear(channel);
+
+            } catch (error) {
+                console.error(error);
+                sendMessage(channel, `Ha ocurrido un error al intentar actualizar los metadatos de los usuarios en el mapa de la comunidad.`);
             }
-            sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
-            WorldMapCache.clear(channel);
-        break;
+
+            break;
 
         case 'join':
             if (channel === Bot.getUsername()) {
@@ -516,7 +525,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             // Team commands, like !${teamName}-live to check live channels in a team, but also should work with !${teamName}live
             if (command.endsWith('-live') || command.endsWith('live')) {
-                if(!settings.enable_community_features) return; // Team commands are part of community features, so if they are disabled, don't execute the command
+                if (!settings.enable_community_features) return; // Team commands are part of community features, so if they are disabled, don't execute the command
                 let teamName = command.replace(/-live|live/g, '');
                 try {
                     let team = await Team.getByName(teamName);
@@ -538,7 +547,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             }
 
-            
+
 
             return;
     }

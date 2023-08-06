@@ -93,7 +93,7 @@ class SpectatorLocation {
 
         try {
             const result = await db.query(query);
-            return result.rows[0];
+            return new SpectatorLocation(result.rows[0].username, result.rows[0].location);
         } catch (error) {
             console.error('Error al obtener la ubicación del espectador:', error);
             throw error;
