@@ -1,16 +1,15 @@
+import { greetings } from "../app/constants/greeting-list.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import { Bot } from "../bot.js";
 import { activeUsers, greetingsStack } from "../memory_variables.js";
 import { isFollower, knownBots } from "../utils/twitch.js";
 
+
 const cooldown = 21600000; // 6 hours
 
-const greetings = [
-    "Hola que tal, @#username? #emote",
-    "¡Bienvenido/a, @#username! #emote",
-    "Saludos, @#username. ¿Cómo estás? #emote",
-    "Hola @#username, ¡qué bueno verte por aquí! #emote",
-];
+
+
+
 
 const botGreetings = [
     "Hey pal @#username, good to see you around, feel safe now :)",
@@ -86,6 +85,7 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
 
 
 const getRandomGreeting = (username, isBot = false, lang) => {
+    // default language is english (en)
     let greetingList;
     if (isBot) {
         if (username.toLowerCase() === 'tangerinebot_') {
@@ -95,7 +95,7 @@ const getRandomGreeting = (username, isBot = false, lang) => {
         }
     }
     else {
-        greetingList = greetings;
+        greetingList = greetings[lang];
     }
     const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
     const randomEmote = emotes[Math.floor(Math.random() * emotes.length)];
