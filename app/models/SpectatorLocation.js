@@ -93,6 +93,7 @@ class SpectatorLocation {
 
         try {
             const result = await db.query(query);
+            if(result.rows.length === 0) return null; // Si no se encuentra la ubicación del espectador, devuelve null
             return new SpectatorLocation(result.rows[0].username, result.rows[0].location);
         } catch (error) {
             console.error('Error al obtener la ubicación del espectador:', error);
