@@ -196,6 +196,23 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 sendMessage(channel, `@${username}, Debes especificar un emote después del comando !emote.`);
             }
             return;
+        case 'refreshmap':
+            if (!settings.enable_community_map) return;
+            if (!isModerator) return;
+            // Buscar todos los usuarios en el mapa de la comunidad del canal, y actualizar los metadatos de cada usuario
+            const usersOnMap = await WorldMap.getChannelMap(channel);
+            console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Actualizando metadatos...`);
+            let updatedCount = 0;
+            for (const user of usersOnMap) {
+                const spectatorLocation = new SpectatorLocation(user.username, user.location);
+                await spectatorLocation.getGeocode();
+                await spectatorLocation.save();
+                updatedCount++;
+            }
+            sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
+            WorldMapCache.clear(channel);
+        break;
+
         case 'join':
             if (channel === Bot.getUsername()) {
                 let joinChannel = username; // Por defecto, unirse al canal actual
@@ -520,6 +537,8 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
 
             }
+
+            
 
             return;
     }
