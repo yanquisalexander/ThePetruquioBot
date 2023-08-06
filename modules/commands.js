@@ -493,13 +493,14 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         username,
                         toUser
                     });
-                    sendMessage(channel, parsedReply);
+                    return sendMessage(channel, parsedReply);
                 }
             }
 
             // Team commands, like !${teamName}-live to check live channels in a team, but also should work with !${teamName}live
             if (command.endsWith('-live') || command.endsWith('live')) {
-                let teamName = command.replace('-').replace('live', '');
+                if(!settings.enable_community_features) return; // Team commands are part of community features, so if they are disabled, don't execute the command
+                let teamName = command.replace(/-live|live/g, '');
                 try {
                     let team = await Team.getByName(teamName);
                     if (team) {
