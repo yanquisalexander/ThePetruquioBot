@@ -204,14 +204,15 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Intentando actualizar sus metadatos...`);
             let updatedCount = 0;
             try {
-                usersOnMap.map(async (user) => {
-                    let userLocation = await SpectatorLocation.find(user.username)
-                    await userLocation.getGeocode();
-                    await userLocation.save();
+                for (const user of usersOnMap) {
+                    const spectatorLocation = await SpectatorLocation.find(user.username);
+                    await spectatorLocation.getGeocode();
+                    await spectatorLocation.save();
                     updatedCount++;
+
                     // Esperar 10 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
                     await new Promise((resolve) => setTimeout(resolve, 10000));
-                });
+                }
                 sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
                 WorldMapCache.clear(channel);
 
@@ -221,7 +222,6 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
 
             break;
-
         case 'join':
             if (channel === Bot.getUsername()) {
                 let joinChannel = username; // Por defecto, unirse al canal actual
