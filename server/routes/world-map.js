@@ -3,6 +3,7 @@ import WorldMap from "../../app/models/WorldMap.js";
 import Channel from "../../app/models/Channel.js";
 import User from "../../app/models/User.js";
 import Cache from "../../app/Cache.js";
+import { Bot, sendMessage } from "../../bot.js";
 
 export const WorldMapCache = new Cache();
 
@@ -54,5 +55,59 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
         });
     }
 })
+
+WorldMapRouter.post("/:channel_name/viewer-found", async (req, res, next) => {
+    let channelName = req.params.channel_name || null;
+    const { username, score, finished, currentUser } = req.body;
+
+    if (!username) {
+        return res.status(400).json({
+            errors: [
+                "Username is required"
+            ],
+            error_type: "username_required"
+        });
+    }
+
+    if (!score) {
+        return res.status(400).json({
+            errors: [
+                "Score is required"
+            ],
+            error_type: "score_required"
+        });
+    }
+
+    let Channels = Bot.getChannels().map(channel => channel.replace("#", ""));
+    if (!Channels.includes(channelName)) {
+        return res.status(404).json({
+            errors: [
+                "Bot is not in this channel"
+            ],
+            error_type: "bot_not_in_channel"
+        });
+    }
+
+    if (channelName !== currentUser) {
+        return res.status(400).json({
+            errors: [
+                "Username and channel name must be the same to post a viewer found message"
+            ],
+            error_type: "username_and_channel_name_must_be_the_same"
+        });
+    }
+
+    if (!finished) {
+        sendMessage(channelName, `@${channelName} has found @${username}! Their score is ${score}!`);
+    } else {
+        sendMessage(channelName, `@${channelName} has found @${username}! Their score is ${score}! They have finished the game!`);
+    }
+
+    return res.json({
+        success: true
+    });
+});
+
+
 
 export default WorldMapRouter;
