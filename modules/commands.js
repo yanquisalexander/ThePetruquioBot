@@ -176,6 +176,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
+            pusher.trigger(`map-${channel}`, 'user-hide', {
+                username
+            });
+            WorldMapCache.clear(channel);
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
             return;
         case 'emote':
@@ -533,21 +537,24 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     if (team) {
                         let teamChannels = await team.getMembers();
                         let live = liveChannels;
-                        // TeamChannels is an array of objects, so we need to map it to an array of strings
-                        teamChannels = teamChannels.map(channel => channel.name);
-                        live = live.filter(channel => teamChannels.includes(channel.userName));
 
-                        // Check if the current channel is in the live channels list
-                        const currentChannelName = channel.name.toLowerCase();
-                        const index = live.findIndex(channel => channel.userName.toLowerCase() === currentChannelName);
-                        if (index !== -1) {
-                            // If the current channel is in the list, remove it from the list
-                            live.splice(index, 1);
+                        // Check if the current channel is a member of the team
+                        const currentChannelName = channel.name;
+                        const isCurrentChannelInTeam = teamChannels.some(channel => channel.userName === currentChannelName);
 
-                            // Check if the list is empty after removing the current channel
-                            if (live.length === 0) {
-                                return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name} (Excepto ${channel.name}, claro)`);
-                            }
+                        live = live.filter(channel => teamChannels.includes(channel.name));
+
+                        // Filter live channels and exclude the current channel if it's a member of the team and not in live
+                        live = live.filter(channel => !isCurrentChannelInTeam || (channel.userName !== currentChannelName || channel.isLive));
+
+                        const isCurrentChannelLive = live.some(channel => channel.userName === currentChannelName && channel.isLive);
+
+                        if (live.length === 0 && isCurrentChannelLive) {
+                            // No other live channels in the team (excluding the current channel if it's a member)
+                            return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name} (Excepto ${currentChannelName}, claro)`);
+                        } else if (live.length === 0 && !isCurrentChannelLive) {
+                            // No live channels in the team (excluding the current channel if it's a member)
+                            return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`);
                         }
 
                         let liveChannelsNames = live.map(channel => channel.userName);
@@ -559,6 +566,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     console.error(error.message);
                 }
             }
+
+
+
 
             return;
     }
