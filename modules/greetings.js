@@ -29,8 +29,8 @@ const tangerinebotRandomGreetings = [
 
 const broadcasterGreetings = [
     "Hey boss @#username, welcome back! TakeNRG",
-    "Hey @#username, thanks for being an awesome broadcaster!",
-    "Hello @#username, hope you're having a great stream!",
+    "Hey @#username, thanks for being an awesome broadcaster! #emote",
+    "Hello @#username, hope you're having a great stream! ;)",
 ];
 
 const emotes = [
@@ -42,6 +42,7 @@ const emotes = [
     "TPFufun",
     "CoolCat",
     "B)",
+    ";)"
 ];
 
 export const addGreetingToStack = (channel, message, options) => {
