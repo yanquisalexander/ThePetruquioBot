@@ -1,8 +1,9 @@
-import { greetings } from "../app/constants/greeting-list.js";
+import { greetings, sunlightGreetings } from "../app/constants/greeting-list.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import { Bot } from "../bot.js";
 import { activeUsers, greetingsStack } from "../memory_variables.js";
 import { isFollower, knownBots } from "../utils/twitch.js";
+import SunCalc from "suncalc";
 
 
 const cooldown = 21600000; // 6 hours
@@ -84,8 +85,18 @@ const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) 
     return false;
 };
 
+const shouldGreetSunlight = () => {
+    // El 80% de las veces no debe saludar basado en la hora del día
+    const random = Math.random();
+    if (random < 0.8) {
+        return false;
+    }
+    return true;
+};
 
-const getRandomGreeting = (username, isBot = false, lang) => {
+
+
+const getRandomGreeting = async (username, isBot = false, lang) => {
     // default language is english (en)
     let greetingList;
     if (isBot) {
@@ -94,14 +105,36 @@ const getRandomGreeting = (username, isBot = false, lang) => {
         } else {
             greetingList = botGreetings;
         }
+    } else {
+        if (shouldGreetSunlight()) {
+            const location = await SpectatorLocation.find(username);
+            if (!location) {
+                greetingList = greetings[lang];
+            } else {
+                const date = new Date();
+                const times = SunCalc.getTimes(date, location.latitude, location.longitude);
+                const hour = date.getHours();
+                // Devolver morning, afternoon, evening o night
+                if (hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
+                    greetingList = sunlightGreetings[lang].morning;
+                } else if (hour >= times.sunriseEnd.getHours() && hour < times.sunset.getHours()) {
+                    greetingList = sunlightGreetings[lang].afternoon;
+                } else if (hour >= times.sunset.getHours() && hour < times.sunset.getHours()) {
+                    greetingList = sunlightGreetings[lang].evening;
+                } else {
+                    greetingList = sunlightGreetings[lang].night;
+                }
+            }
+        } else {
+            greetingList = greetings[lang];
+        }
     }
-    else {
-        greetingList = greetings[lang];
-    }
+
     const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
     const randomEmote = emotes[Math.floor(Math.random() * emotes.length)];
     return greeting.replace("#username", username).replace("#emote", randomEmote);
 };
+
 
 export const getRandomBroadcasterGreeting = (username) => {
     const greeting = broadcasterGreetings[Math.floor(Math.random() * broadcasterGreetings.length)];
