@@ -540,14 +540,19 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
                         // Check if the current channel is a member of the team
                         const currentChannelName = channel.name;
-                        const isCurrentChannelInTeam = teamChannels.some(channel => channel.userName === currentChannelName);
+                        const isCurrentChannelInTeam = teamChannels.some(channel => channel.name === currentChannelName);
 
-                        live = live.filter(channel => teamChannels.includes(channel.userName));
+                        // Get only live channels that are members of the team
+                        live = live.filter(channel => teamChannels.includes(channel.name));
 
-                        // Filter live channels and exclude the current channel if it's a member of the team and not in live
-                        live = live.filter(channel => !isCurrentChannelInTeam || (channel.userName !== currentChannelName || channel.isLive));
+                        // Filter team live channels and remove the current channel if it's a member
+                        if (isCurrentChannelInTeam) {
+                            live = live.filter(channel => channel.name !== currentChannelName);
+                        }
 
-                        const isCurrentChannelLive = live.some(channel => channel.userName === currentChannelName && channel.isLive);
+                        // Check if the current channel is live
+
+                        const isCurrentChannelLive = liveChannels.some(channel => channel.userName === currentChannelName); // liveChannels only contains live channels, so if the current channel is not in the array, it's not live
 
                         if (live.length === 0 && isCurrentChannelLive) {
                             // No other live channels in the team (excluding the current channel if it's a member)
