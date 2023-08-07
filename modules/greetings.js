@@ -1,7 +1,7 @@
 import { greetings, sunlightGreetings } from "../app/constants/greeting-list.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import { Bot } from "../bot.js";
-import { activeUsers, greetingsStack } from "../memory_variables.js";
+import { activeUsers, greetingsStack, shoutoutedUsers } from "../memory_variables.js";
 import { isFollower, knownBots } from "../utils/twitch.js";
 import SunCalc from "suncalc";
 
@@ -50,7 +50,18 @@ export const addGreetingToStack = (channel, message, options) => {
     greetingsStack.push({ channel, message, ...options });
 };
 
-const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) => {
+const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap, isShoutoutGreeting = false) => {
+
+    // Es un shoutout?
+    if(isShoutoutGreeting) {
+        if (shoutoutedUsers[channel][username] && (Date.now() - shoutoutedUsers[channel][username]) < cooldown) {
+            shoutoutedUsers[channel][username] = Date.now();
+            return false;
+        }
+        shoutoutedUsers[channel][username] = Date.now();
+        return true;
+    }
+
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
         if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {

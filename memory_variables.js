@@ -1,5 +1,7 @@
 export const activeUsers = [];
 
+export const shoutoutedUsers = [];
+
 export const greetingsStack = [];
 
 export const CHAT_HISTORY = [];

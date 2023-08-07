@@ -14,7 +14,8 @@ import {
     suspendedChannels,
     whisperedUsers,
     latencyInfo,
-    liveChannels
+    liveChannels,
+    shoutoutedUsers
 } from './memory_variables.js';
 import { handleCommand } from './modules/commands.js';
 import { handleDetoxify } from './modules/detoxify.js';
@@ -125,19 +126,20 @@ const processMessage = async ({ channel, context, username, message }) => {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {
-                if (await canReceiveGreeting(channel, username, channel, true)) {
-                    activeUsers[channel][username] = Date.now();
+                if (await canReceiveGreeting(channel, username, channel, true, true)) {
+                    shoutoutedUsers[channel][username] = Date.now();
                     addGreetingToStack(channel, shoutout.message);
+                    try {
+                        const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
+                            let targetChannel = await client.users.getUserByName(username);
+                            let shoutout = await client.chat.shoutoutUser(channelData.twitch_id, targetChannel.id, process.env.TWITCH_USER_ID);
+                            return shoutout;
+                        }))
+                    } catch (error) {
+                        console.error(error)
+                    }
                 }
-                try {
-                    const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
-                        let targetChannel = await client.users.getUserByName(username);
-                        let shoutout = await client.chat.shoutoutUser(channelData.twitch_id, targetChannel.id, process.env.TWITCH_USER_ID);
-                        return shoutout;
-                    }))
-                } catch (error) {
-                    console.error(error)
-                }
+
 
             }
         } catch (error) {
