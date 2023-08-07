@@ -168,7 +168,7 @@ const processMessage = async ({ channel, context, username, message }) => {
                 lang = CountryLangs[userOnMap.countryCode]
 
             }
-            let greetingMessage = getRandomGreeting(username, isBot, lang);
+            let greetingMessage = await getRandomGreeting(username, isBot, lang);
             if (isBroadcaster) {
                 greetingMessage = getRandomBroadcasterGreeting(username);
             }
