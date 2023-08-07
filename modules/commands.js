@@ -542,7 +542,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         const currentChannelName = channel.name;
                         const isCurrentChannelInTeam = teamChannels.some(channel => channel.userName === currentChannelName);
 
-                        live = live.filter(channel => teamChannels.includes(channel.name));
+                        live = live.filter(channel => teamChannels.includes(channel.userName));
 
                         // Filter live channels and exclude the current channel if it's a member of the team and not in live
                         live = live.filter(channel => !isCurrentChannelInTeam || (channel.userName !== currentChannelName || channel.isLive));
