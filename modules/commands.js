@@ -183,7 +183,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const pinEmote = args[0];
             if (pinEmote) {
-                if(!context?.emotes) return; // If the user didn't send an emote, return
+                if (!context?.emotes) return; // If the user didn't send an emote, return
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
                 const emoteMap = new WorldMap(username, channel.replace('#', ''), true, emoteUrl);
                 await emoteMap.save();
@@ -256,7 +256,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 return sendMessage(channel, `¡El bot se ha unido al canal de @${joinChannel} correctamente!`);
             }
             return;
-            
+
         case 'part':
             if (channel === Bot.getUsername()) {
                 let partChannel = username; // Por defecto, salir del canal del usuario que envió el comando
@@ -532,23 +532,33 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     let team = await Team.getByName(teamName);
                     if (team) {
                         let teamChannels = await team.getMembers();
-                        let live = liveChannels
+                        let live = liveChannels;
                         // TeamChannels is an array of objects, so we need to map it to an array of strings
                         teamChannels = teamChannels.map(channel => channel.name);
                         live = live.filter(channel => teamChannels.includes(channel.userName));
-                        if (live.length === 0) return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name}`)
+
+                        // Check if the current channel is in the live channels list
+                        const currentChannelName = channel.name.toLowerCase();
+                        const index = live.findIndex(channel => channel.userName.toLowerCase() === currentChannelName);
+                        if (index !== -1) {
+                            // If the current channel is in the list, remove it from the list
+                            live.splice(index, 1);
+
+                            // Check if the list is empty after removing the current channel
+                            if (live.length === 0) {
+                                return sendMessage(channel, `@${username}, no hay canales en vivo en el team ${team.displayName || team.name} (Excepto ${channel.name}, claro)`);
+                            }
+                        }
+
                         let liveChannelsNames = live.map(channel => channel.userName);
                         sendMessage(channel, `@${username}, los canales en vivo del team ${team.displayName} son: ${liveChannelsNames.join(', ')}`);
                     } else {
-                        return
+                        return;
                     }
                 } catch (error) {
                     console.error(error.message);
                 }
-
             }
-
-
 
             return;
     }
