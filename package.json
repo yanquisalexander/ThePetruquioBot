@@ -38,6 +38,7 @@
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.1",
     "ps-list": "^8.1.1",
+    "purgpt.js": "^1.0.0-alpha.5.1",
     "pusher": "^5.1.3",
     "pusher-js": "^8.2.0",
     "suncalc": "^1.9.0",

@@ -7,9 +7,8 @@ export const googleSearch = async (query, limit = 3) => {
 }
 
 const configuration = new Configuration({
-    apiKey: 'sk-DhKAvG6XLq4ONQO07b50Df3d013047AfB82f707c145e13B4',
-    basePath: "https://chattyapi.tech/v1",
-
+    apiKey: 'purgpt-bcqyz0v7l3o79ioq7wcfl',
+    basePath: "https://beta.purgpt.xyz/v1",
 });
 
 let DEFAULT_PROMPT = `
