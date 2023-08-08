@@ -50,17 +50,18 @@ export const addGreetingToStack = (channel, message, options) => {
     greetingsStack.push({ channel, message, ...options });
 };
 
-const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap, isShoutoutGreeting = false) => {
-
-    // Es un shoutout?
-    if(isShoutoutGreeting) {
-        if (shoutoutedUsers[channel][username] && (Date.now() - shoutoutedUsers[channel][username]) < cooldown) {
-            shoutoutedUsers[channel][username] = Date.now();
-            return false;
-        }
+export const canReceiveShoutoutGreeting = (channel, username) => {
+    if (shoutoutedUsers[channel][username] && (Date.now() - shoutoutedUsers[channel][username]) < cooldown) {
         shoutoutedUsers[channel][username] = Date.now();
-        return true;
+        return false;
     }
+    shoutoutedUsers[channel][username] = Date.now();
+    return true;
+}
+
+
+const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) => {
+
 
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {

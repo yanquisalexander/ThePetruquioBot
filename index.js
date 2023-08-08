@@ -22,6 +22,7 @@ import { handleDetoxify } from './modules/detoxify.js';
 import {
     addGreetingToStack,
     canReceiveGreeting,
+    canReceiveShoutoutGreeting,
     getRandomBroadcasterGreeting,
     getRandomGreeting,
 } from './modules/greetings.js';
@@ -126,8 +127,7 @@ const processMessage = async ({ channel, context, username, message }) => {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {
-                if (await canReceiveGreeting(channel, username, channel, true, true)) {
-                    shoutoutedUsers[channel][username] = Date.now();
+                if (canReceiveShoutoutGreeting(channel, username)) {
                     addGreetingToStack(channel, shoutout.message);
                     try {
                         const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
