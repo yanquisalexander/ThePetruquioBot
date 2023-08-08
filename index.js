@@ -115,6 +115,10 @@ const processMessage = async ({ channel, context, username, message }) => {
         activeUsers[channel] = {};
     }
 
+    if (!shoutoutedUsers[channel]) {
+        shoutoutedUsers[channel] = {};
+    }
+
     if (!autoTranslateUsers[channel]) {
         autoTranslateUsers[channel] = {};
     }
