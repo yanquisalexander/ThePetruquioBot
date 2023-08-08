@@ -539,20 +539,28 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                         let live = liveChannels;
 
                         // Check if the current channel is a member of the team
-                        const currentChannelName = channel.name;
+                        const currentChannelName = channel;
                         const isCurrentChannelInTeam = teamChannels.some(channel => channel.name === currentChannelName);
 
                         // Get only live channels that are members of the team
-                        live = live.filter(channel => teamChannels.includes(channel.name));
+                        live = live.filter(liveChannel => teamChannels.some(teamChannel => teamChannel.name === liveChannel.userName));
 
                         // Filter team live channels and remove the current channel if it's a member
                         if (isCurrentChannelInTeam) {
-                            live = live.filter(channel => channel.name !== currentChannelName);
+                            live = live.filter(liveChannel => liveChannel.name !== currentChannelName);
                         }
 
                         // Check if the current channel is live
 
-                        const isCurrentChannelLive = liveChannels.some(channel => channel.userName === currentChannelName); // liveChannels only contains live channels, so if the current channel is not in the array, it's not live
+                        const isCurrentChannelLive = liveChannels.some(liveChannel => liveChannel.userName === currentChannelName); // liveChannels only contains live channels, so if the current channel is not in the array, it's not live
+
+                        /* console.log(live);
+                        console.log('Current channel is live?', isCurrentChannelLive);
+                        console.log('Current channel is in team?', isCurrentChannelInTeam);
+                        console.log('Current channel name:', currentChannelName);
+                        console.log('Team channels:', teamChannels);
+                        console.log('Live channels:', liveChannels);
+                        console.log('Live channels in team:', live); */
 
                         if (live.length === 0 && isCurrentChannelLive) {
                             // No other live channels in the team (excluding the current channel if it's a member)
