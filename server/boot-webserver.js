@@ -30,7 +30,7 @@ export const TwitchEventSub = new EventSubMiddleware({
 // Middlewares
 WebServer.use(cors('*'));
 WebServer.use(passport.initialize());
-WebServer.use('/api/', bodyParser.json(), routes);
+WebServer.use('/v1/', bodyParser.json(), routes);
 
 // Error handling
 WebServer.use((err, req, res, next) => {

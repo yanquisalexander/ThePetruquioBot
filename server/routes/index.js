@@ -38,6 +38,14 @@ let RouterMap = [
         handler: DynamicSitemapRouter
     },
     {
+        path: '/ping',
+        handler: (req, res, next) => {
+            res.status(200).json({
+                message: "pong"
+            })
+        }
+    },
+    {
         path: '*',
         handler: (req, res, next) => {
             res.status(404).json({
