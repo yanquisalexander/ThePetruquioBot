@@ -167,8 +167,11 @@ const processMessage = async ({ channel, context, username, message }) => {
     if (Settings.enable_greetings) {
         if (Settings.bot_muted) return; // Don't greet if bot is muted
 
+        if (!userOnMap && username === channel) // Greet the streamer always, even if not on map
+        {
+            userOnMap = true;
+        }
         if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
-            activeUsers[channel][username] = Date.now();
             let lang = 'en'
             if (userOnMap && userOnMap.countryCode && CountryLangs[userOnMap.countryCode]) {
                 lang = CountryLangs[userOnMap.countryCode]
