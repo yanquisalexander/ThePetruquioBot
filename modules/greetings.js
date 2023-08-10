@@ -32,6 +32,9 @@ const broadcasterGreetings = [
     "Hey boss @#username, welcome back! TakeNRG",
     "Hey @#username, thanks for being an awesome broadcaster! #emote",
     "Hello @#username, hope you're having a great stream! ;)",
+    "Good to see you around @#username, have a great stream! :D",
+    "Have a great stream @#username! #emote",
+    "Who is this handsome guy? @#username! #emote"
 ];
 
 const emotes = [
@@ -150,7 +153,8 @@ const getRandomGreeting = async (username, isBot = false, lang) => {
 
 export const getRandomBroadcasterGreeting = (username) => {
     const greeting = broadcasterGreetings[Math.floor(Math.random() * broadcasterGreetings.length)];
-    return greeting.replace("#username", username);
+    const randomEmote = emotes[Math.floor(Math.random() * emotes.length)];
+    return greeting.replace("#username", username).replace("#emote", randomEmote);
 };
 
 

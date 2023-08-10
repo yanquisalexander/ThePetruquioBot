@@ -83,6 +83,10 @@ export const handleCommand = async ({ channel, context, username, message, toUse
     let command = args.shift().toLowerCase();
     const isUserOnMap = await SpectatorLocation.find(username);
 
+    username = username.replace('@', '');
+    channel = channel.replace('#', '');
+        
+
     let customCommand;
     try {
         customCommand = await Command.findByChannelAndName(channelData.id, command.toLowerCase());
@@ -116,6 +120,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             }
             const user = args[0].toLowerCase();
             if (user) {
+                user = user.replace('@', '');
                 autoTranslateUsers[channel][user] = true;
                 setTimeout(() => {
                     delete autoTranslateUsers[channel][user];
@@ -132,16 +137,17 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 const spectatorLocation = new SpectatorLocation(username, location);
                 await spectatorLocation.getGeocode();
                 await spectatorLocation.save();
-                await pusher.trigger(`map-${channel}`, 'user-location', {
+                await pusher.trigger(`map-${channel}`, 'user-updated', {
                     username,
                     locationName: spectatorLocation.location,
                     latitude: spectatorLocation.latitude,
-                    longitude: spectatorLocation.longitude
+                    longitude: spectatorLocation.longitude,
+                    type: 'location'
                 });
                 WorldMapCache.clear(channel);
-                sendMessage(channel, `Tu ubicación ha sido registrada correctamente.`);
+                sendMessage(channel, `@${username}, tu ubicación ha sido registrada correctamente :)`);
             } else {
-                sendMessage(channel, `Debes especificar una ubicación después del comando !from.`);
+                sendMessage(channel, `@${username}, debes especificar una ubicación después del comando !from`);
             }
             return;
         case 'msg':
@@ -155,17 +161,27 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
                 await worldMap.save();
                 WorldMapCache.clear(channel);
-                sendMessage(channel, `Tu mensaje personalizado ha sido guardado.`);
+                sendMessage(channel, `@${username}, tu mensaje personalizado ha sido guardado.`);
             } else {
-                sendMessage(channel, `Debes especificar un mensaje después del comando !msg.`);
+                sendMessage(channel, `@${username}, debes especificar un mensaje después del comando !msg.`);
             }
             return;
         case 'show':
             if (!settings.enable_community_map) return;
             if (isUserOnMap) {
-                const showMap = new WorldMap(username, channel.replace('#', ''), true);
+                let spectatorLocation = await SpectatorLocation.find(username);
+                const showMap = await WorldMap.get(username, channel);
+
                 await showMap.save();
                 WorldMapCache.clear(channel);
+                await pusher.trigger(`map-${channel}`, 'user-updated', {
+                    username,
+                    latitude: spectatorLocation.latitude,
+                    longitude: spectatorLocation.longitude,
+                    pin_message: showMap.pinMessage,
+                    pin_emote: showMap.pinEmote,
+                    type: 'show'
+                });
                 sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
             } else {
                 sendMessage(channel, `${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
@@ -176,8 +192,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
-            pusher.trigger(`map-${channel}`, 'user-hide', {
-                username
+            pusher.trigger(`map-${channel}`, 'user-updated', {
+                username,
+                type: 'hide'
             });
             WorldMapCache.clear(channel);
             sendMessage(channel, `${username}, listo, tu ubicación ya no será mostrada en el mapa! :(`);
@@ -191,14 +208,15 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 let emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v1/${Object.keys(context.emotes)[0]}/2.0`
                 const emoteMap = new WorldMap(username, channel.replace('#', ''), true, emoteUrl);
                 await emoteMap.save();
-                await pusher.trigger(`map-${channel}`, 'user-emote', {
+                await pusher.trigger(`map-${channel}`, 'user-updated', {
                     username,
-                    emote: emoteUrl
+                    emote: emoteUrl,
+                    type: 'emote'
                 });
                 WorldMapCache.clear(channel);
                 sendMessage(channel, `@${username}, tu Pin se ha sido guardado correctamente.`);
             } else {
-                sendMessage(channel, `@${username}, Debes especificar un emote después del comando !emote.`);
+                sendMessage(channel, `@${username}, debes especificar un emote después del comando !emote.`);
             }
             return;
         case 'refreshmap':
@@ -207,6 +225,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             // Buscar todos los usuarios en el mapa de la comunidad del canal, y actualizar los metadatos de cada usuario
             const usersOnMap = await WorldMap.getChannelMap(channel);
             console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Intentando actualizar sus metadatos...`);
+            sendMessage(channel, `@${username}, actualizando el mapa de la comunidad...`);
             let updatedCount = 0;
             try {
                 for (const user of usersOnMap) {
@@ -218,7 +237,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     // Esperar 5 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
                     await new Promise((resolve) => setTimeout(resolve, 5000));
                 }
-                sendMessage(channel, `Se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
+                sendMessage(channel, `@${username}, se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
                 WorldMapCache.clear(channel);
 
             } catch (error) {
