@@ -96,6 +96,8 @@ const processMessage = async ({ channel, context, username, message }) => {
         console.error(error);
     }
     channel = channel.replace('#', '');
+    username = username.replace('@', '');
+    const displayName = context['display-name'] || username;
 
     const channelData = await Channel.getChannelByName(channel.replace('#', ''));
     const twitchChannelInfo = await getChannelInfo(channel.replace('#', ''));
@@ -177,9 +179,9 @@ const processMessage = async ({ channel, context, username, message }) => {
                 lang = CountryLangs[userOnMap.countryCode]
 
             }
-            let greetingMessage = await getRandomGreeting(username, isBot, lang);
+            let greetingMessage = await getRandomGreeting(displayName, isBot, lang);
             if (isBroadcaster) {
-                greetingMessage = getRandomBroadcasterGreeting(username);
+                greetingMessage = getRandomBroadcasterGreeting(displayName);
             }
             addGreetingToStack(channel, greetingMessage);
         }
