@@ -57,7 +57,10 @@ class WorldMap {
 
     try {
       const result = await db.query(query);
-      return result.rows[0];
+      if(result.rows.length === 0) {
+        return null;
+      }
+      return new WorldMap(result.rows[0].username, result.rows[0].channel_name, result.rows[0].show_on_map, result.rows[0].pin_emote, result.rows[0].pin_message);
     } catch (error) {
       console.error('Error al obtener el registro del WorldMap:', error);
       throw error;
