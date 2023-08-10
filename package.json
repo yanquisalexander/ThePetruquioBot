@@ -43,6 +43,7 @@
     "pusher-js": "^8.2.0",
     "suncalc": "^1.9.0",
     "tesjs": "^1.0.2",
+    "tmi-utils": "^1.0.1",
     "tmi.js": "^1.8.5",
     "tough-cookie": "^4.1.3"
   }

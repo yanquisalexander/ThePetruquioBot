@@ -2366,6 +2366,11 @@ tesjs@^1.0.2:
     node-fetch "2.6.7"
     ws "8.10.0"
 
+tmi-utils@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/tmi-utils/-/tmi-utils-1.0.1.tgz#cd2265d65e6d0d4acdd2f12189db641e4e71a311"
+  integrity sha512-C2wGyla2WSZqw5AwAydjrzaHmMGcpZelhU/tko2IQRbEn3m1l+yV9CAC/mvTz9BDT4q4GqubeoB/9I4Vf/Zfyw==
+
 tmi.js@^1.8.5:
   version "1.8.5"
   resolved "https://registry.yarnpkg.com/tmi.js/-/tmi.js-1.8.5.tgz#8298821677599f163af075113f5d1bd51a648087"

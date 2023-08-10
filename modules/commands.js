@@ -2,7 +2,7 @@ import { Bot, sendMessage } from "../bot.js";
 import { autoTranslateUsers, liveChannels } from "../memory_variables.js";
 import { getRandomFact } from "./random-responses.js";
 import { langExpl, langList, translate } from "./translate.js";
-import { replaceVariables } from "../utils/variable-replacement.js";
+import { messageAsHtml, replaceVariables } from "../utils/variable-replacement.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import WorldMap from "../app/models/WorldMap.js";
 import Channel, { SETTINGS_MODEL } from "../app/models/Channel.js";
@@ -15,7 +15,6 @@ import Shoutout from "../app/models/Shoutout.js";
 import Team from "../app/models/Team.js";
 import { createAssistantResponse } from "./assistant.js";
 import { addToAssistantHistory, clearAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
-
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
 
@@ -85,7 +84,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
     username = username.replace('@', '');
     channel = channel.replace('#', '');
-        
+
 
     let customCommand;
     try {
@@ -153,14 +152,27 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'msg':
             if (!settings.enable_community_map) return;
             if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
-            const messageContent = args.join(' ');
+            let messageContent = args.join(' ');
+
             if (messageContent) {
                 if (messageContent.length > 100) {
                     return sendMessage(channel, `@${username}, el mensaje no puede ser mayor a 100 caracteres.`);
                 }
+                if(context?.emotes) {
+                    let messageWithEmotes = messageAsHtml(message, context?.emotes );
+                    // Eliminamos el comando !msg del mensaje (y el espacio que lo separa)
+                    messageContent = messageWithEmotes.slice(5);
+                    messageContent = `<span>${messageContent}</span>` // Wrap the message in a span to avoid XSS and set inline emotes
+                }
+                
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
                 await worldMap.save();
                 WorldMapCache.clear(channel);
+                await pusher.trigger(`map-${channel}`, 'user-updated', {
+                    username,
+                    pin_message: messageContent,
+                    type: 'message'
+                });
                 sendMessage(channel, `@${username}, tu mensaje personalizado ha sido guardado.`);
             } else {
                 sendMessage(channel, `@${username}, debes especificar un mensaje después del comando !msg.`);
