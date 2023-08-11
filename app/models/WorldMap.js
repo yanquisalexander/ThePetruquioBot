@@ -60,7 +60,8 @@ class WorldMap {
       if(result.rows.length === 0) {
         return null;
       }
-      return new WorldMap(result.rows[0].username, result.rows[0].channel_name, result.rows[0].show_on_map, result.rows[0].pin_emote, result.rows[0].pin_message);
+      const data = result.rows[0];
+      return new WorldMap(data.username, data.channel_name, data.show_on_map, data.pin_emote, data.pin_message);
     } catch (error) {
       console.error('Error al obtener el registro del WorldMap:', error);
       throw error;

@@ -80,7 +80,7 @@ const updateSetting = async (channel, setting, value, username) => {
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings, channelData }) => {
     const args = message.slice(1).split(' ');
     let command = args.shift().toLowerCase();
-    const isUserOnMap = await SpectatorLocation.find(username);
+    const userOnMap = await SpectatorLocation.find(username);
 
     username = username.replace('@', '');
     channel = channel.replace('#', '');
@@ -151,20 +151,20 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'msg':
             if (!settings.enable_community_map) return;
-            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!userOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             let messageContent = args.join(' ');
 
             if (messageContent) {
                 if (messageContent.length > 100) {
                     return sendMessage(channel, `@${username}, el mensaje no puede ser mayor a 100 caracteres.`);
                 }
-                if(context?.emotes) {
-                    let messageWithEmotes = messageAsHtml(message, context?.emotes );
+                if (context?.emotes) {
+                    let messageWithEmotes = messageAsHtml(message, context?.emotes);
                     // Eliminamos el comando !msg del mensaje (y el espacio que lo separa)
                     messageContent = messageWithEmotes.slice(5);
                     messageContent = `<span>${messageContent}</span>` // Wrap the message in a span to avoid XSS and set inline emotes
                 }
-                
+
                 const worldMap = new WorldMap(username, channel.replace('#', ''), true, null, messageContent);
                 await worldMap.save();
                 WorldMapCache.clear(channel);
@@ -180,18 +180,17 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'show':
             if (!settings.enable_community_map) return;
-            if (isUserOnMap) {
-                let spectatorLocation = await SpectatorLocation.find(username);
+            if (userOnMap) {
                 const showMap = await WorldMap.get(username, channel);
-
+                showMap.showOnMap = true;
                 await showMap.save();
                 WorldMapCache.clear(channel);
                 await pusher.trigger(`map-${channel}`, 'user-updated', {
                     username,
-                    latitude: spectatorLocation.latitude,
-                    longitude: spectatorLocation.longitude,
-                    pin_message: showMap.pinMessage,
-                    pin_emote: showMap.pinEmote,
+                    latitude: userOnMap.latitude,
+                    longitude: userOnMap.longitude,
+                    pin_message: userOnMap.pinMessage,
+                    pin_emote: userOnMap.pinEmote,
                     type: 'show'
                 });
                 sendMessage(channel, `${username}, listo, tu ubicación será mostrada en el mapa :) !`);
@@ -201,7 +200,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'hide':
             if (!settings.enable_community_map) return;
-            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!userOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const hideMap = new WorldMap(username, channel.replace('#', ''), false);
             await hideMap.save();
             pusher.trigger(`map-${channel}`, 'user-updated', {
@@ -213,7 +212,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             return;
         case 'emote':
             if (!settings.enable_community_map) return;
-            if (!isUserOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            if (!userOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
             const pinEmote = args[0];
             if (pinEmote) {
                 if (!context?.emotes) return; // If the user didn't send an emote, return
