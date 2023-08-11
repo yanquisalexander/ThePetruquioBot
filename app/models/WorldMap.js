@@ -1,5 +1,20 @@
 import { db } from "../../lib/database.js";
 
+const R = 6371; // Radio de la Tierra en kilómetros
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+    Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distancia en kilómetros
+  return distance;
+}
+
 class WorldMap {
   constructor(username, channelName, showOnMap = true, pinEmote, pinMessage) {
     this.username = username;
@@ -8,6 +23,8 @@ class WorldMap {
     this.pinEmote = pinEmote;
     this.pinMessage = pinMessage;
   }
+
+
 
   static async forgive(username, channelName) {
     const query = `DELETE FROM WorldMap WHERE username = $1 AND channel_name = $2`;
@@ -57,7 +74,7 @@ class WorldMap {
 
     try {
       const result = await db.query(query);
-      if(result.rows.length === 0) {
+      if (result.rows.length === 0) {
         return null;
       }
       const data = result.rows[0];
@@ -87,6 +104,36 @@ class WorldMap {
       throw error;
     }
   }
+
+
+  static async getNeighbours(username, channelName, limit = 3) {
+    try {
+      let map = await this.getChannelMap(channelName);
+      let user = map.find((user) => user.username === username);
+      if (!user) {
+        return [];
+      }
+
+      // Ordenar los usuarios por distancia utilizando la función haversineDistance
+      map.sort((a, b) => {
+        const distanceA = haversineDistance(user.latitude, user.longitude, a.latitude, a.longitude);
+        const distanceB = haversineDistance(user.latitude, user.longitude, b.latitude, b.longitude);
+        return distanceA - distanceB;
+      });
+
+      // Retornar los N vecinos más cercanos (excluyendo al usuario actual)
+      const neighbours = map
+        .filter((neighbour) => neighbour.username !== username)
+        .slice(0, limit);
+
+      return neighbours;
+    } catch (error) {
+      console.error('Error al obtener los vecinos:', error);
+      throw error;
+    }
+  }
+
 }
+
 
 export default WorldMap;

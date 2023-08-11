@@ -77,7 +77,7 @@ class Command {
 
   static async findByChannelAndName(channel_id, name) {
     try {
-      const query = 'SELECT * FROM commands WHERE channel_id = $1 AND name = $2';
+      const query = 'SELECT * FROM commands WHERE channel_id = $1 AND (name = $2 OR command_options->>\'aliasOf\' = $2)';
       const values = [channel_id, name];
       const result = await db.query(query, values);
       const command = result.rows[0];

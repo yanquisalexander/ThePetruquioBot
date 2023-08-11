@@ -87,12 +87,24 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
 
     let customCommand;
+
     try {
         customCommand = await Command.findByChannelAndName(channelData.id, command.toLowerCase());
+
+        if (customCommand) {
+            if (!customCommand.command_options?.enabled) return
+            if (customCommand.command_options.aliasOf) {
+                command = customCommand.command_options.aliasOf; // Si el comando es un alias, reemplazarlo por el comando original
+                customCommand = await Command.findByChannelAndName(channelData.id, customCommand.aliasOf); // Talvez el comando del cual es alias es un comando personalizado
+            }
+
+        }
     } catch (error) {
-        //console.error(error.message);
+        // Manejar el error si es necesario
     }
 
+    console.log(customCommand)
+    console.log(command)
 
     if (command === 'ubica' || command === 'ubicacion' || command === 'ubicación') {
         command = 'from';
@@ -178,12 +190,30 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 sendMessage(channel, `@${username}, debes especificar un mensaje después del comando !msg.`);
             }
             return;
+        case 'neighbours':
+            if (!settings.enable_community_map) return;
+            if (!userOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            try {
+                const neighbours = await WorldMap.getNeighbours(username, channel);
+                if (neighbours.length > 0) {
+                    const neighboursString = neighbours.map(neighbour => `@${neighbour.username}`).join(', ');
+                    sendMessage(channel, `@${username}, tus vecinos de mapa son: ${neighboursString}`);
+                } else {
+                    sendMessage(channel, `@${username}, no tiene vecinos en el mapa.`);
+                }
+                break;
+            } catch (error) {
+                console.error(error);
+                sendMessage(channel, `@${username}, ha ocurrido un error al intentar obtener los vecinos de mapa.`);
+                break
+            }
+
         case 'show':
             if (!settings.enable_community_map) return;
             if (userOnMap) {
                 let showMap;
                 showMap = await WorldMap.get(username, channel);
-                if(!showMap) {
+                if (!showMap) {
                     showMap = new WorldMap(username, channel.replace('#', ''), true);
                 }
                 showMap.showOnMap = true;
@@ -294,7 +324,6 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 return sendMessage(channel, `¡El bot se ha unido al canal de @${joinChannel} correctamente!`);
             }
             return;
-
         case 'part':
             if (channel === Bot.getUsername()) {
                 let partChannel = username; // Por defecto, salir del canal del usuario que envió el comando
