@@ -51,3 +51,5 @@ export const latencyInfo = {
 export const liveChannels = [];
 
 export const assistantCooldowns = [];
+
+export const mapUpdateProgress = [];

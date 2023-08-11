@@ -4,6 +4,7 @@ import Channel from "../../app/models/Channel.js";
 import User from "../../app/models/User.js";
 import Cache from "../../app/Cache.js";
 import { Bot, sendMessage } from "../../bot.js";
+import { mapUpdateProgress } from "../../memory_variables.js";
 
 export const WorldMapCache = new Cache();
 
@@ -33,7 +34,11 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
     if (channelName) {
         if (WorldMapCache.get(channelName)) {
-            return res.json(WorldMapCache.get(channelName));
+            return res.json({
+                map: WorldMapCache.get(channelName),
+                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null
+
+            })
         }
         WorldMap.getChannelMap(channelName).then(async worldMap => {
 
@@ -48,7 +53,11 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
             WorldMapCache.set(channelName, worldMap);
 
-            return res.json(worldMap)
+            return res.json({
+                map: worldMap,
+                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null
+
+            })
 
         }).catch(error => {
             res.status(500).json({ error: error });

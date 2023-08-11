@@ -1,5 +1,5 @@
 import { Bot, sendMessage } from "../bot.js";
-import { autoTranslateUsers, liveChannels } from "../memory_variables.js";
+import { autoTranslateUsers, liveChannels, mapUpdateProgress } from "../memory_variables.js";
 import { getRandomFact } from "./random-responses.js";
 import { langExpl, langList, translate } from "./translate.js";
 import { messageAsHtml, replaceVariables } from "../utils/variable-replacement.js";
@@ -267,21 +267,45 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'refreshmap':
             if (!settings.enable_community_map) return;
             if (!isModerator) return;
+            if (!mapUpdateProgress[channel]) {
+                mapUpdateProgress[channel] = {};
+            }
             // Buscar todos los usuarios en el mapa de la comunidad del canal, y actualizar los metadatos de cada usuario
             const usersOnMap = await WorldMap.getChannelMap(channel);
             console.log(`Se han encontrado ${usersOnMap.length} usuarios en el mapa de la comunidad. Intentando actualizar sus metadatos...`);
             sendMessage(channel, `@${username}, actualizando el mapa de la comunidad...`);
             let updatedCount = 0;
             try {
+                await pusher.trigger(`map-${channel}`, 'system-update', {
+                    total: usersOnMap.length,
+                    updated: 0
+                });
                 for (const user of usersOnMap) {
                     const spectatorLocation = await SpectatorLocation.find(user.username);
                     await spectatorLocation.getGeocode();
                     await spectatorLocation.save();
                     updatedCount++;
+                    mapUpdateProgress[channel] = {
+                        total: usersOnMap.length,
+                        updated: updatedCount
+
+                    }
+
+                    await pusher.trigger(`map-${channel}`, 'system-update', {
+                        total: usersOnMap.length,
+                        updated: updatedCount
+                    });
 
                     // Esperar 5 segundos entre cada actualización para evitar exceder el límite de la API de geocodificación
                     await new Promise((resolve) => setTimeout(resolve, 5000));
                 }
+                delete mapUpdateProgress[channel];
+                await pusher.trigger(`map-${channel}`, 'system-update', {
+                    total: usersOnMap.length,
+                    updated: updatedCount,
+                    done: true
+                });
+
                 sendMessage(channel, `@${username}, se han actualizado los metadatos de ${updatedCount} ${updatedCount.length > 1 ? 'usuarios' : 'usuario'} en el mapa de la comunidad.`);
                 WorldMapCache.clear(channel);
 
