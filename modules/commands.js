@@ -181,7 +181,11 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         case 'show':
             if (!settings.enable_community_map) return;
             if (userOnMap) {
-                const showMap = await WorldMap.get(username, channel);
+                let showMap;
+                showMap = await WorldMap.get(username, channel);
+                if(!showMap) {
+                    showMap = new WorldMap(username, channel.replace('#', ''), true);
+                }
                 showMap.showOnMap = true;
                 await showMap.save();
                 WorldMapCache.clear(channel);
