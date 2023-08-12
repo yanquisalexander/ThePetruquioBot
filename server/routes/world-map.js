@@ -5,6 +5,7 @@ import User from "../../app/models/User.js";
 import Cache from "../../app/Cache.js";
 import { Bot, sendMessage } from "../../bot.js";
 import { mapUpdateProgress } from "../../memory_variables.js";
+import Greeting from "../../app/models/Greetings.js";
 
 export const WorldMapCache = new Cache();
 
@@ -32,6 +33,10 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
         });
     }
 
+    let lastSeens = await Greeting.allLastSeen(channelName);
+
+    console.log(lastSeens);
+
     if (channelName) {
         if (WorldMapCache.get(channelName)) {
             return res.json({
@@ -49,6 +54,11 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
                 if (discord) {
                     marker.discordId = discord.userinfo.id;
                 }
+                lastSeens.map(lastSeen => {
+                    if (lastSeen.username === marker.username) {
+                        marker.last_seen = lastSeen.last_seen;
+                    }
+                })
             }
 
             WorldMapCache.set(channelName, worldMap);

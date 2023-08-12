@@ -1,4 +1,5 @@
 import gtrans from 'node-gtrans';
+import { badWordsList } from '../app/constants/bad-words-list.js';
 
 export const langExpl = [
   'Unlock the magic of translation with commands like !en (English) or !pt (Portuguese).',
@@ -26,9 +27,14 @@ export const langList = [
   'it',
 ];
 
-export const translate = async (message, command, username) => {
+export const translate = async (message, command, username, settings) => {
   const targetLang = command;
   let messageText = message.substring(command.length + 2); // Remove the command and space
+
+  let friendlyMode = false;
+  if (settings && settings.friendly_mode) {
+    friendlyMode = settings.friendly_mode;
+  }
 
   let say = 'say';
 
@@ -69,11 +75,17 @@ export const translate = async (message, command, username) => {
     if (!lazy) {
       try {
         const translatedText = await gtrans(messageText, { to: targetLang });
-        const filteredText = filterTranslation(translatedText.data.translated);
-        return `${username} ${say}: ${filteredText}`;
+        if(friendlyMode) {
+          // Filter offensive language or inappropriate content in friendly mode
+          const filteredText = filterTranslation(translatedText.data.translated);
+          return `${username} ${say}: ${filteredText}`;
+        }
+
+        return `${username} ${say}: ${translatedText.data.translated}`;
+        
       } catch (err) {
         console.error('Translation Error:', err);
-        return `Sorry, ${username}, I couldn't translate that.`;
+        return `Sorry, @${username}, I couldn't translate that.`;
       }
     }
   }
@@ -81,8 +93,8 @@ export const translate = async (message, command, username) => {
 
 const filterTranslation = (text) => {
   // Filter offensive language or inappropriate content
-  if (text.includes('fuck')) {
-    return "I think that would be offensive if I said that";
+  if (badWordsList.some(badWord => text.includes(badWord))) {
+    return "I think that would be offensive if I said that ^^";
   }
 
   // Limit translated message length

@@ -11,6 +11,18 @@ export const SETTINGS_MODEL = {
     type: 'boolean',
     value: false,
   },
+  enable_greetings: {
+    type: 'boolean',
+    value: false,
+  },
+  enable_community_map: {
+    type: 'boolean',
+    value: true,
+  },
+  enable_translation: {
+    type: 'boolean',
+    value: false,
+  },
   enable_community_features: {
     type: 'boolean',
     value: false,
@@ -26,15 +38,15 @@ export const SETTINGS_MODEL = {
     type: 'string',
     value: '',
   },
+  friendly_mode: {
+    type: 'boolean',
+    value: true,
+  },
   shoutout_presentation: {
     type: 'string',
     value: '',
   },
   enable_clip_command: {
-    type: 'boolean',
-    value: false,
-  },
-  enable_translation: {
     type: 'boolean',
     value: false,
   },
@@ -67,14 +79,6 @@ export const SETTINGS_MODEL = {
     type: 'number',
     value: 300,
     experimental: true,
-  },
-  enable_greetings: {
-    type: 'boolean',
-    value: false,
-  },
-  enable_community_map: {
-    type: 'boolean',
-    value: true,
   },
   enable_auto_shoutout: {
     type: 'boolean',

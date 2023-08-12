@@ -9,7 +9,8 @@ export const Bot = new tmi.Client({
         username: process.env.BOT_NAME,
         password: process.env.BOT_PASSWORD
     },
-    channels: process.env.NODE_ENV === 'production' ? await Channel.getAutoJoinChannels() : process.env.CHANNELS.split(',')
+    // @ts-ignore
+    channels: process.env.NODE_ENV === 'production' ? await Channel.getAutoJoinChannels() : process.env.CHANNELS.split(',') || []
 })
 
 
@@ -21,7 +22,7 @@ export const sendMessage = (channel, message, platform = 'twitch') => {
     }
     else if (platform === 'kick') {
         console.log({ channel, message, platform })
-        KickBot.say(channel, message);
+        //KickBot.say(channel, message);
     }
 };
 

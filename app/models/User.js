@@ -161,10 +161,8 @@ class User {
           team_id: null,
           twitch_id: twitchId,
           settings: {},
-          auto_connect: true
+          auto_connect: false
         })
-
-        Bot.join(`#${username}`);
       }
       return new User(userData.id, userData.twitch_id, userData.username, userData.email);
     } catch (error) {

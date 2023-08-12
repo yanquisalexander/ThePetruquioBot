@@ -67,8 +67,11 @@ if (!railwayConnected) {
     console.error(chalk.yellow('Missing RAILWAY_API_KEY in .env file. You cannot use !restart command'));
 }
 
-await WebServer.boot();
+const bootServer = async () => {
+    await WebServer.boot();
+};
 
+bootServer();
 
 
 
@@ -133,7 +136,7 @@ const processMessage = async ({ channel, context, username, message }) => {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
             if (shoutout && shoutout.enabled) {
-                if (canReceiveShoutoutGreeting(channel, username)) {
+                if (await canReceiveShoutoutGreeting(channel, username)) {
                     addGreetingToStack(channel, shoutout.message);
                     try {
                         const nativeShoutout = await HelixClient.asUser(process.env.TWITCH_USER_ID, (async client => {
@@ -155,7 +158,7 @@ const processMessage = async ({ channel, context, username, message }) => {
 
 
     if (autoTranslateUsers[channel][username]) {
-        const translatedMessage = await translate(message, 'en', username);
+        const translatedMessage = await translate(message, 'en', username, settings);
         sendMessage(channel, translatedMessage);
         return;
     }
@@ -445,4 +448,4 @@ async function checkAndRemoveDisconnectedInstances() {
 // Temporizador para verificar y eliminar instancias desconectadas cada 6 segundos, esto dará un margen de 1 minuto para que las instancias se reconecten
 setInterval(checkAndRemoveDisconnectedInstances, 0.20 * 60 * 1000);
 
-await checkAndRemoveDisconnectedInstances(); // Ejecutar inmediatamente al iniciar el bot, para eliminar instancias desconectadas de sesiones anteriores
+checkAndRemoveDisconnectedInstances(); // Ejecutar inmediatamente al iniciar el bot, para eliminar instancias desconectadas de sesiones anteriores

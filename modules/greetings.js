@@ -1,4 +1,5 @@
 import { greetings, sunlightGreetings } from "../app/constants/greeting-list.js";
+import Greeting from "../app/models/Greetings.js";
 import SpectatorLocation from "../app/models/SpectatorLocation.js";
 import { Bot } from "../bot.js";
 import { activeUsers, greetingsStack, shoutoutedUsers } from "../memory_variables.js";
@@ -6,7 +7,7 @@ import { isFollower, knownBots } from "../utils/twitch.js";
 import SunCalc from "suncalc";
 
 
-const cooldown = 21600000; // 6 hours
+const cooldown = 6 * 60 * 60 * 1000; // 6 hours
 
 
 
@@ -53,47 +54,51 @@ export const addGreetingToStack = (channel, message, options) => {
     greetingsStack.push({ channel, message, ...options });
 };
 
-export const canReceiveShoutoutGreeting = (channel, username) => {
-    if (shoutoutedUsers[channel][username] && (Date.now() - shoutoutedUsers[channel][username]) < cooldown) {
-        shoutoutedUsers[channel][username] = Date.now();
+export const canReceiveShoutoutGreeting = async (channel, username) => {
+    let greetingData = await Greeting.findByChannel(username, channel);
+    if (greetingData.shoutoutedAt && (Date.now() - greetingData.shoutoutedAt) < cooldown) {
+        await Greeting.updateShoutoutTimestamp(username, channel);
         return false;
     }
-    shoutoutedUsers[channel][username] = Date.now();
+    await Greeting.updateShoutoutTimestamp(username, channel);
     return true;
 }
 
 
 const canReceiveGreeting = async (channel, username, channelOwner, isUserOnMap) => {
 
+    let greetingData = await Greeting.findByChannel(username, channel);
+    if (!greetingData.enabled) return false; // User has disabled greetings for this channel
+
 
     // Verificar si el usuario es el propietario del canal
     if (username.toLowerCase() === channelOwner.toLowerCase()) {
-        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
-            activeUsers[channel][username] = Date.now();
+        if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen) < cooldown) {
+            await Greeting.updateTimestamp(username, channel);
             return false;
         }
-        activeUsers[channel][username] = Date.now();
+        await Greeting.updateTimestamp(username, channel);
         return true;
     }
 
     // Comprobar si es un bot conocido
     if (knownBots.includes(username.toLowerCase())) {
-        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
-            activeUsers[channel][username] = Date.now();
+        if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen) < cooldown) {
+            await Greeting.updateTimestamp(username, channel);
             return false;
         }
-        activeUsers[channel][username] = Date.now();
+        await Greeting.updateTimestamp(username, channel);
         return true;
     }
 
     // Comprobar si el usuario está en el mapa de la comunidad
     if (isUserOnMap) {
         // Comprobar si el usuario ha pasado al menos 6 horas desde su último mensaje
-        if (activeUsers[channel][username] && (Date.now() - activeUsers[channel][username]) < cooldown) {
-            activeUsers[channel][username] = Date.now();
+        if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen) < cooldown) {
+            await Greeting.updateTimestamp(username, channel);
             return false;
         }
-        activeUsers[channel][username] = Date.now();
+        await Greeting.updateTimestamp(username, channel);
         return true;
     }
 
