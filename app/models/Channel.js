@@ -146,7 +146,12 @@ class Channel {
   static async getChannelByName(name) {
     const cachedChannel = ChannelsCache.get(`channel-${name}`);
     if (cachedChannel) {
-      return cachedChannel;
+      return new Channel({
+        id: cachedChannel.id,
+        name: cachedChannel.name,
+        twitch_id: cachedChannel.twitch_id,
+        settings: cachedChannel.settings,
+      });
     }
 
     const query = 'SELECT * FROM channels WHERE LOWER(name) = $1'; // Buscar por el nombre en minúsculas

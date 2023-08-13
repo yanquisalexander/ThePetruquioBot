@@ -15,6 +15,7 @@ import Shoutout from "../app/models/Shoutout.js";
 import Team from "../app/models/Team.js";
 import { createAssistantResponse } from "./assistant.js";
 import { addToAssistantHistory, clearAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
+import User from "../app/models/User.js";
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
 
@@ -597,7 +598,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {
-                    let translated = await translate(message, command, username)
+                    let translated = await translate(message, command, username, settings)
                     sendMessage(channel, translated)
                 } catch (error) {
                     return

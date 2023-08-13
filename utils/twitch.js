@@ -1,4 +1,4 @@
-import { ApiClient } from '@twurple/api';
+import { ApiClient, HelixUser } from '@twurple/api';
 import { authProvider, appTokenProvider } from '../lib/twitch-auth.js';
 import Cache from '../app/Cache.js';
 import { liveChannels } from '../memory_variables.js';
@@ -38,7 +38,7 @@ export const knownBots = ["streamelements", "streamlabs", "nightbot", "tangerine
 export const getChannelInfo = async (channelName) => {
     const cachedData = TwitchCache.get(channelName);
     if (cachedData) {
-        return cachedData;
+        return new HelixUser(cachedData, HelixClient)
     }
 
     try {
