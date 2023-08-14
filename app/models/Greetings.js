@@ -97,7 +97,6 @@ class Greeting {
             const result = await db.query(query, values);
             if (result.rows.length > 0) {
                 const greeting = result.rows[0];
-                console.log(greeting);
                 // GreetingsCache.set(`${username}-${channel}`, greeting);
                 // Bypass cache for now
                 return new Greeting({
