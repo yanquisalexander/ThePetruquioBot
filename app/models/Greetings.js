@@ -50,7 +50,8 @@ class Greeting {
                 WHERE username = $2 AND channel = $3
                 RETURNING *
             `;
-            const values = [new Date(), username, channel];
+            const shoutoutedAt = new Date(); // Obtener la fecha y hora actual
+            const values = [shoutoutedAt, username, channel];
             const result = await db.query(query, values);
             const updatedGreeting = result.rows[0];
             return new Greeting({
@@ -60,10 +61,12 @@ class Greeting {
                 shoutoutedAt: updatedGreeting.shoutouted_at,
                 enabled: updatedGreeting.enabled,
             });
+
         } catch (error) {
             throw new Error('Error updating greeting: ' + error.message);
         }
     }
+    
 
     static async updateTimestamp(username, channel) {
         try {
@@ -73,7 +76,8 @@ class Greeting {
                 WHERE username = $2 AND channel = $3
                 RETURNING *
             `;
-            const values = [new Date(), username, channel];
+            const lastSeen = new Date(); // Obtener la fecha y hora actual
+            const values = [lastSeen, username, channel];
             const result = await db.query(query, values);
             const updatedGreeting = result.rows[0];
             return new Greeting(updatedGreeting);
@@ -93,6 +97,7 @@ class Greeting {
             const result = await db.query(query, values);
             if (result.rows.length > 0) {
                 const greeting = result.rows[0];
+                console.log(greeting);
                 // GreetingsCache.set(`${username}-${channel}`, greeting);
                 // Bypass cache for now
                 return new Greeting({
@@ -104,7 +109,8 @@ class Greeting {
                 });
             } else {
                 // Create a new greeting data if one doesn't exist
-                const newGreeting = await Greeting.create(username, channel, new Date(), null, true);
+                const lastSeen = new Date();
+                const newGreeting = await Greeting.create(username, channel, lastSeen, null, true);
                 return newGreeting;
             }
         }
