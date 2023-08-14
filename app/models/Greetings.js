@@ -20,7 +20,7 @@ class Greeting {
 
 
 
-    static async create(username, channel) {
+    static async create(username, channel, lastSeen = new Date(), shoutoutedAt = null, enabled = true) {
         try {
             const query = `
                 INSERT INTO greetings (username, channel, last_seen)
@@ -98,7 +98,7 @@ class Greeting {
                 });
             } else {
                 // Create a new greeting data if one doesn't exist
-                const newGreeting = await Greeting.create(username, channel);
+                const newGreeting = await Greeting.create(username, channel, new Date(), null, true);
                 return newGreeting;
             }
         }
