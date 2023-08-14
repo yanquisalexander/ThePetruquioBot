@@ -56,7 +56,6 @@ export const addGreetingToStack = (channel, message, options) => {
 
 export const canReceiveShoutoutGreeting = async (channel, username) => {
     let greetingData = await Greeting.findByChannel(username, channel);
-    console.log(greetingData);
     if (greetingData.shoutoutedAt && (Date.now() - greetingData.shoutoutedAt) < cooldown) {
         await Greeting.updateShoutoutTimestamp(username, channel);
         return false;
