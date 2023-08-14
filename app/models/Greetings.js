@@ -30,7 +30,13 @@ class Greeting {
             const values = [username, channel, lastSeen, shoutoutedAt, enabled];
             const result = await db.query(query, values);
             const newGreeting = result.rows[0];
-            return new Greeting(newGreeting);
+            return new Greeting({
+                id: newGreeting.id,
+                channel: newGreeting.channel,
+                lastSeen: newGreeting.last_seen,
+                shoutoutedAt: newGreeting.shoutouted_at,
+                enabled: newGreeting.enabled,
+            });
         } catch (error) {
             throw new Error('Error creating greeting: ' + error.message);
         }
