@@ -6,6 +6,7 @@ import Cache from "../../app/Cache.js";
 import { Bot, sendMessage } from "../../bot.js";
 import { mapUpdateProgress } from "../../memory_variables.js";
 import Greeting from "../../app/models/Greetings.js";
+import { HelixClient, getChannelInfo } from "../../utils/twitch.js";
 
 export const WorldMapCache = new Cache();
 
@@ -23,6 +24,18 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
         });
     }
 
+    const channelEmotes = await HelixClient.chat.getChannelEmotes(channel.twitch_id);
+
+    channelEmotes.map(emote => {
+        console.log(emote.getFormattedImageUrl('3.0', 'static', 'dark'));
+    })
+
+    let emotes = channelEmotes.map(emote => {
+        return {
+            name: emote.name,
+            url: emote.getFormattedImageUrl('3.0', 'static', 'dark')
+        }
+    })
 
     if (channel.settings.enable_community_map.value === false) {
         return res.status(404).json({
@@ -35,14 +48,12 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
     let lastSeens = await Greeting.allLastSeen(channelName);
 
-    console.log(lastSeens);
-
     if (channelName) {
         if (WorldMapCache.get(channelName)) {
             return res.json({
                 map: WorldMapCache.get(channelName),
-                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null
-
+                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null,
+                emotes
             })
         }
         WorldMap.getChannelMap(channelName).then(async worldMap => {
@@ -65,8 +76,8 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
             return res.json({
                 map: worldMap,
-                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null
-
+                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null,
+                emotes
             })
 
         }).catch(error => {

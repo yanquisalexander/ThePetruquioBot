@@ -78,15 +78,6 @@ class Greeting {
 
 
     static async findByChannel(username, channel) {
-        if (GreetingsCache.get(`${username}-${channel}`)) {
-            return new Greeting({
-                id: GreetingsCache.get(`${username}-${channel}`).id,
-                channel: GreetingsCache.get(`${username}-${channel}`).channel,
-                lastSeen: GreetingsCache.get(`${username}-${channel}`).last_seen,
-                shoutoutedAt: GreetingsCache.get(`${username}-${channel}`).shoutouted_at,
-                enabled: GreetingsCache.get(`${username}-${channel}`).enabled,
-            });
-        }
         try {
             const query = `
                 SELECT * FROM greetings
