@@ -15,7 +15,8 @@ import {
     whisperedUsers,
     latencyInfo,
     liveChannels,
-    shoutoutedUsers
+    shoutoutedUsers,
+    userLocationQueue
 } from './memory_variables.js';
 import { handleCommand } from './modules/commands.js';
 import { handleDetoxify } from './modules/detoxify.js';
@@ -326,126 +327,143 @@ setTimeout(async () => {
     await checkLiveChannels();
 }, 15 * 1000);
 
-
-
-
-
-
-
-
-
-Bot.on('connected', onConnectedHandler);
-Bot.on('chat', onMessageHandler);
-Bot.on('disconnected', (reason) => {
-    console.log(chalk.bgWhite.magenta.bold(`Disconnected from Twitch: ${reason}`));
-})
-Bot.on('clearchat', onChatClearedHandler);
-Bot.on('whisper', onWhisperHandler);
-Bot.on('notice', onNoticeHandler);
-Bot.on('join', (channel, username, self) => {
-    if (self) {
-        botJoinedChannels[channel] = {
-            joinedAt: Date.now()
-        };
-        console.log(chalk.green.bold(`Joined ${channel}`));
-    }
-});
-Bot.on('pong', (latency) => {
-    latencyInfo.lastLatency = latency;
-})
-
-//Bot.on('raided', onRaidedHandler)
-
-
-
-// Registro de la instancia en Redis al iniciarse
-async function registerInstance() {
+setInterval(async () => {
     try {
-        const timestamp = Date.now();
-        await redis.zadd('active_instances', timestamp, instanceId);
-        console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} registered in Redis with timestamp ${timestamp}`));
+        if (userLocationQueue.length > 0) {
+            const user = userLocationQueue.shift();
+            const spectatorLocation = await SpectatorLocation.find(user.username);
+            if (spectatorLocation) {
+                await spectatorLocation.getGeocode();
+                await spectatorLocation.save();
+                console.log(chalk.bgWhite.blue.bold(`SPECTATOR LOCATION: Spectator location for ${user.username} has been updated`));
+            }
+        }
     } catch (error) {
-        console.error('Error registering instance:', error);
+        console.error(error);
+        // Add again to the queue
+        userLocationQueue.push(user);
     }
-}
+}, 5 * 1000);
 
 
-// Obtener la siguiente instancia con el timestamp más bajo
-async function getNextInstance() {
-    try {
-        const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
 
-        if (allInstances.length === 0) {
-            console.log('No active instances found.');
+
+
+
+
+
+    Bot.on('connected', onConnectedHandler);
+    Bot.on('chat', onMessageHandler);
+    Bot.on('disconnected', (reason) => {
+        console.log(chalk.bgWhite.magenta.bold(`Disconnected from Twitch: ${reason}`));
+    })
+    Bot.on('clearchat', onChatClearedHandler);
+    Bot.on('whisper', onWhisperHandler);
+    Bot.on('notice', onNoticeHandler);
+    Bot.on('join', (channel, username, self) => {
+        if (self) {
+            botJoinedChannels[channel] = {
+                joinedAt: Date.now()
+            };
+            console.log(chalk.green.bold(`Joined ${channel}`));
+        }
+    });
+    Bot.on('pong', (latency) => {
+        latencyInfo.lastLatency = latency;
+    })
+
+    //Bot.on('raided', onRaidedHandler)
+
+
+
+    // Registro de la instancia en Redis al iniciarse
+    async function registerInstance() {
+        try {
+            const timestamp = Date.now();
+            await redis.zadd('active_instances', timestamp, instanceId);
+            console.log(chalk.bgWhite.magenta.bold(`Instance ${instanceId} registered in Redis with timestamp ${timestamp}`));
+        } catch (error) {
+            console.error('Error registering instance:', error);
+        }
+    }
+
+
+    // Obtener la siguiente instancia con el timestamp más bajo
+    async function getNextInstance() {
+        try {
+            const allInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
+
+            if (allInstances.length === 0) {
+                console.log('No active instances found.');
+                return null;
+            }
+
+            // Filtrar las instancias y puntuaciones (timestamps) del conjunto ordenado
+            const instanceIds = allInstances.filter((_, index) => index % 2 === 0);
+            const instanceScores = allInstances.filter((_, index) => index % 2 !== 0).map(Number);
+
+            // Encontrar la instancia con el timestamp más bajo
+            const minTimestamp = Math.min(...instanceScores);
+            const minTimestampIndex = instanceScores.indexOf(minTimestamp);
+            const nextInstanceId = instanceIds[minTimestampIndex];
+
+            return nextInstanceId;
+        } catch (error) {
+            console.error('Error getting next instance:', error);
             return null;
         }
-
-        // Filtrar las instancias y puntuaciones (timestamps) del conjunto ordenado
-        const instanceIds = allInstances.filter((_, index) => index % 2 === 0);
-        const instanceScores = allInstances.filter((_, index) => index % 2 !== 0).map(Number);
-
-        // Encontrar la instancia con el timestamp más bajo
-        const minTimestamp = Math.min(...instanceScores);
-        const minTimestampIndex = instanceScores.indexOf(minTimestamp);
-        const nextInstanceId = instanceIds[minTimestampIndex];
-
-        return nextInstanceId;
-    } catch (error) {
-        console.error('Error getting next instance:', error);
-        return null;
     }
-}
 
 
 
 
 
 
-// Registrar la instancia en Redis al iniciarse (solo en producción)
-if (process.env.NODE_ENV === 'production') {
-    registerInstance();
-}
-
-// Enviar un heartbeat a Redis
-
-async function sendHeartbeat() {
-    try {
-        // Utiliza el comando hmset para agregar el campo con la marca de tiempo actual
-        await redis.zadd('active_instances', Date.now(), instanceId);
-    } catch (error) {
-        console.error('Error enviando el heartbeat:', error);
+    // Registrar la instancia en Redis al iniciarse (solo en producción)
+    if (process.env.NODE_ENV === 'production') {
+        registerInstance();
     }
-}
 
-if (process.env.NODE_ENV === 'production') {
-    // Temporizador para enviar señales "heartbeat" cada 30 segundos
-    setInterval(sendHeartbeat, 30 * 1000);
-}
+    // Enviar un heartbeat a Redis
 
-// Verificar y eliminar instancias desconectadas
-async function checkAndRemoveDisconnectedInstances() {
-    try {
-        // Obtén todas las instancias activas y sus marcas de tiempo de "heartbeat" del conjunto ordenado
-        const activeInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
-        const currentTime = Date.now();
-
-        // Filtrar las instancias con marcas de tiempo más antiguas que un umbral (por ejemplo, 1 minuto)
-        const disconnectedInstances = activeInstances.filter((_, index) => index % 2 === 0)
-            .filter((instanceId, index) => currentTime - parseInt(activeInstances[index * 2 + 1]) > 60 * 1000);
-
-        // Eliminar las instancias desconectadas del conjunto ordenado
-        if (disconnectedInstances.length > 0) {
-            await redis.zrem('active_instances', ...disconnectedInstances);
-            console.log(chalk.bgWhite.magenta.bold(`Instancias desconectadas:`, disconnectedInstances));
-            // No es necesario eliminar las claves directamente de Redis, ya que ya lo hicimos con zrem
+    async function sendHeartbeat() {
+        try {
+            // Utiliza el comando hmset para agregar el campo con la marca de tiempo actual
+            await redis.zadd('active_instances', Date.now(), instanceId);
+        } catch (error) {
+            console.error('Error enviando el heartbeat:', error);
         }
-    } catch (error) {
-        console.error('Error verificando y eliminando instancias desconectadas:', error);
     }
-}
+
+    if (process.env.NODE_ENV === 'production') {
+        // Temporizador para enviar señales "heartbeat" cada 30 segundos
+        setInterval(sendHeartbeat, 30 * 1000);
+    }
+
+    // Verificar y eliminar instancias desconectadas
+    async function checkAndRemoveDisconnectedInstances() {
+        try {
+            // Obtén todas las instancias activas y sus marcas de tiempo de "heartbeat" del conjunto ordenado
+            const activeInstances = await redis.zrange('active_instances', 0, -1, 'WITHSCORES');
+            const currentTime = Date.now();
+
+            // Filtrar las instancias con marcas de tiempo más antiguas que un umbral (por ejemplo, 1 minuto)
+            const disconnectedInstances = activeInstances.filter((_, index) => index % 2 === 0)
+                .filter((instanceId, index) => currentTime - parseInt(activeInstances[index * 2 + 1]) > 60 * 1000);
+
+            // Eliminar las instancias desconectadas del conjunto ordenado
+            if (disconnectedInstances.length > 0) {
+                await redis.zrem('active_instances', ...disconnectedInstances);
+                console.log(chalk.bgWhite.magenta.bold(`Instancias desconectadas:`, disconnectedInstances));
+                // No es necesario eliminar las claves directamente de Redis, ya que ya lo hicimos con zrem
+            }
+        } catch (error) {
+            console.error('Error verificando y eliminando instancias desconectadas:', error);
+        }
+    }
 
 
-// Temporizador para verificar y eliminar instancias desconectadas cada 6 segundos, esto dará un margen de 1 minuto para que las instancias se reconecten
-setInterval(checkAndRemoveDisconnectedInstances, 0.20 * 60 * 1000);
+    // Temporizador para verificar y eliminar instancias desconectadas cada 6 segundos, esto dará un margen de 1 minuto para que las instancias se reconecten
+    setInterval(checkAndRemoveDisconnectedInstances, 0.20 * 60 * 1000);
 
-checkAndRemoveDisconnectedInstances(); // Ejecutar inmediatamente al iniciar el bot, para eliminar instancias desconectadas de sesiones anteriores
+    checkAndRemoveDisconnectedInstances(); // Ejecutar inmediatamente al iniciar el bot, para eliminar instancias desconectadas de sesiones anteriores

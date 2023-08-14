@@ -146,20 +146,62 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!settings.enable_community_map) return;
             const location = args.join(' ');
             if (location) {
-                const spectatorLocation = new SpectatorLocation(username, location);
-                await spectatorLocation.getGeocode();
-                await spectatorLocation.save();
-                await pusher.trigger(`map-${channel}`, 'user-updated', {
-                    username,
-                    locationName: spectatorLocation.location,
-                    latitude: spectatorLocation.latitude,
-                    longitude: spectatorLocation.longitude,
-                    type: 'location'
-                });
-                WorldMapCache.clear(channel);
-                sendMessage(channel, `@${username}, tu ubicación ha sido registrada correctamente :)`);
+                // Don't allow coordinates
+                if (location.match(/-?\d+(\.\d+)?, ?-?\d+(\.\d+)?/)) {
+                    sendMessage(channel, `@${username}, buen intento, pero por seguridad no permito que se registren coordenadas :p`);
+                    return;
+                }
+                // Anti-doxxing patterns 
+
+                const patterns = [
+                    /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, // Detección de direcciones IP
+                    /\b\d{10,}\b/, // Detección de números de teléfono                    
+                ];
+
+                for (const pattern of patterns) {
+                    if (location.match(pattern)) {
+                        sendMessage(channel, `@${username}, parece que estás intentando registrar información personal, por suerte lo he detectado y no lo he permitido :)`);
+                        return;
+                    }
+                }
+
+                try {
+                    const spectatorLocation = new SpectatorLocation(username, location);
+                    await spectatorLocation.getGeocode();
+                    await spectatorLocation.save();
+                    await pusher.trigger(`map-${channel}`, 'user-updated', {
+                        username,
+                        locationName: spectatorLocation.location,
+                        latitude: spectatorLocation.latitude,
+                        longitude: spectatorLocation.longitude,
+                        type: 'location'
+                    });
+                    WorldMapCache.clear(channel);
+                    sendMessage(channel, `@${username}, tu ubicación ha sido registrada correctamente :)`);
+                } catch (error) {
+                    console.error(error);
+                    sendMessage(channel, `@${username}, ha ocurrido un error al intentar registrar tu ubicación :(`);
+                }
+
             } else {
                 sendMessage(channel, `@${username}, debes especificar una ubicación después del comando !from`);
+            }
+            return;
+        case 'where':
+            if (!settings.enable_community_map) return;
+            if (!userOnMap) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
+            try {
+                let location = await SpectatorLocation.find(username);
+                if (location) {
+                    if(location.location && (location.latitude && location.longitude)) {
+                        sendMessage(channel, `@${username}, me has dicho que eres de ${location.location} :)`);
+                    } else if (location.location && !(location.latitude && location.longitude)) {
+                        sendMessage(channel, `@${username}, aún debo procesar algunos datos... Intenta de nuevo en unos minutos :)`);
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                sendMessage(channel, `@${username}, ha ocurrido un error mientras intentaba recordar de dónde eres :(`);
             }
             return;
         case 'msg':
@@ -595,6 +637,32 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             }
             break;
+
+        case 'activity':
+            try {
+                let user
+                if (toUser) {
+                    user = toUser.replace('@', '')
+                } else {
+                    user = username
+                }
+
+                console.log(user)
+
+                let userInfo = await User.findByUsername(user)
+                if (!userInfo) return sendMessage(channel, `@${username}, @${user} no tiene una cuenta de PetruquioBot`)
+
+                let discordConnectedAccount = await userInfo.getConnectedAccountInfo('discord')
+                if (!discordConnectedAccount) return sendMessage(channel, `@${username}, @${user} no ha vinculado su cuenta de Discord`)
+
+                console.log(discordConnectedAccount)
+
+
+            } catch (error) {
+
+            }
+            break
+
         default:
             if (langList.includes(command) && settings.enable_translation) {
                 try {

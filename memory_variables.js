@@ -1,3 +1,5 @@
+import e from "express";
+
 export const activeUsers = [];
 
 export const shoutoutedUsers = [];
@@ -53,3 +55,5 @@ export const liveChannels = [];
 export const assistantCooldowns = [];
 
 export const mapUpdateProgress = [];
+
+export const userLocationQueue = [];

@@ -1,5 +1,6 @@
 import { db } from "../../lib/database.js";
 import NodeGeocoder from "node-geocoder";
+import { userLocationQueue } from "../../memory_variables.js";
 
 // Configura el proveedor de geocodificación
 const geocoder = NodeGeocoder({
@@ -19,10 +20,24 @@ class SpectatorLocation {
         try {
             const response = await geocoder.geocode(this.location);
             if (response && response.length > 0) {
-                this.location = response[0].formattedAddress;
+                // Sobreescribe la ubicación con el formato "ciudad, país" para evitar el doxxing de los espectadores
+                this.location = `${response[0].city}, ${response[0].state}, ${response[0].country}`;
                 this.latitude = response[0].latitude;
                 this.longitude = response[0].longitude;
                 this.countryCode = response[0].countryCode;
+            } else {
+                // Don't trigger an error, just set to null because will be retry later
+                this.latitude = null;
+                this.longitude = null;
+                this.countryCode = null;
+
+                // Add to a queue to retry later
+                // ...
+                userLocationQueue.push({
+                    username: this.username,
+                    location: this.location,
+                });
+
             }
         } catch (error) {
             console.error('Error al obtener las coordenadas geográficas:', error);
