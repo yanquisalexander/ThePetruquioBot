@@ -23,11 +23,11 @@ class Greeting {
     static async create(username, channel, lastSeen = new Date(), shoutoutedAt = null, enabled = true) {
         try {
             const query = `
-                INSERT INTO greetings (username, channel, last_seen)
-                VALUES ($1, $2, $3)
+                INSERT INTO greetings (username, channel, last_seen, shoutouted_at, enabled)
+                VALUES ($1, $2, $3, $4, $5)
                 RETURNING *
             `;
-            const values = [username, channel, new Date()];
+            const values = [username, channel, lastSeen, shoutoutedAt, enabled];
             const result = await db.query(query, values);
             const newGreeting = result.rows[0];
             return new Greeting(newGreeting);
