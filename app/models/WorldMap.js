@@ -90,8 +90,7 @@ class WorldMap {
       text: `SELECT sl.latitude, sl.longitude, wm.username, wm.pin_message, wm.pin_emote
                FROM worldmap AS wm
                INNER JOIN spectator_locations AS sl ON wm.username = sl.username
-               WHERE wm.channel_name = $1 AND wm.show_on_map = true
-                     AND sl.latitude IS NOT NULL AND sl.longitude IS NOT NULL`,
+               WHERE wm.channel_name = $1 AND wm.show_on_map = true`,
       values: [channelName],
     };
 
