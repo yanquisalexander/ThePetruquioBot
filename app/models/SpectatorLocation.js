@@ -20,25 +20,12 @@ class SpectatorLocation {
         try {
             const response = await geocoder.geocode(this.location);
             if (response && response.length > 0) {
-                // Sobreescribe la ubicación con el formato "ciudad, país" para evitar el doxxing de los espectadores
-                this.location = `${response[0].city}, ${response[0].state}, ${response[0].country}`;
+                this.location = response[0].formattedAddress; // Actualiza la ubicación con la dirección formateada
                 this.latitude = response[0].latitude;
                 this.longitude = response[0].longitude;
                 this.countryCode = response[0].countryCode;
-            } else {
-                // Don't trigger an error, just set to null because will be retry later
-                this.latitude = null;
-                this.longitude = null;
-                this.countryCode = null;
-
-                // Add to a queue to retry later
-                // ...
-                userLocationQueue.push({
-                    username: this.username,
-                    location: this.location,
-                });
-
             }
+
         } catch (error) {
             console.error('Error al obtener las coordenadas geográficas:', error);
             throw error;
@@ -53,7 +40,7 @@ class SpectatorLocation {
         const insertQuery = {
             text: 'INSERT INTO spectator_locations (username, location, latitude, longitude, country_code) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (username) DO UPDATE SET location = EXCLUDED.location, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, country_code = EXCLUDED.country_code RETURNING *',
             values: [this.username, this.location, this.latitude, this.longitude, this.countryCode], // Asegúrate de incluir this.countryCode
-        };        
+        };
 
         try {
             const result = await db.query(insertQuery);
@@ -108,7 +95,7 @@ class SpectatorLocation {
 
         try {
             const result = await db.query(query);
-            if(result.rows.length === 0) return null; // Si no se encuentra la ubicación del espectador, devuelve null
+            if (result.rows.length === 0) return null; // Si no se encuentra la ubicación del espectador, devuelve null
             return new SpectatorLocation(result.rows[0].username, result.rows[0].location, result.rows[0].latitude, result.rows[0].longitude, result.rows[0].country_code);
         } catch (error) {
             console.error('Error al obtener la ubicación del espectador:', error);
