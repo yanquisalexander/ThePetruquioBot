@@ -337,13 +337,14 @@ setInterval(async () => {
                 await spectatorLocation.save();
                 console.log(chalk.bgWhite.blue.bold(`SPECTATOR LOCATION: Spectator location for ${user.username} has been updated`));
             }
+            delete userLocationQueue[user.username];
         }
     } catch (error) {
         console.error(error);
         // Add again to the queue
         userLocationQueue.push(user);
     }
-}, 5 * 1000);
+}, 5 * 10000);
 
 
 
