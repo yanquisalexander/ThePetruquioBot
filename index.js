@@ -133,6 +133,28 @@ const processMessage = async ({ channel, context, username, message }) => {
         return;
     }
 
+    if (Settings.enable_greetings) {
+        if (Settings.bot_muted) return; // Don't greet if bot is muted
+
+        if (!userOnMap && username === channel) // Greet the streamer always, even if not on map
+        {
+            userOnMap = true;
+        }
+        if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
+            let lang = 'en'
+            if (userOnMap && userOnMap.countryCode && CountryLangs[userOnMap.countryCode]) {
+                lang = CountryLangs[userOnMap.countryCode]
+
+            }
+            let greetingMessage = await getRandomGreeting(displayName, isBot, lang);
+            if (isBroadcaster) {
+                greetingMessage = getRandomBroadcasterGreeting(displayName);
+            }
+            addGreetingToStack(channel, greetingMessage);
+        }
+
+    }
+
     if (Settings.enable_community_features && Settings.enable_auto_shoutout) {
         try {
             let shoutout = await Shoutout.findByTargetStreamer(channelData.id, username);
@@ -170,27 +192,7 @@ const processMessage = async ({ channel, context, username, message }) => {
     }
 
 
-    if (Settings.enable_greetings) {
-        if (Settings.bot_muted) return; // Don't greet if bot is muted
-
-        if (!userOnMap && username === channel) // Greet the streamer always, even if not on map
-        {
-            userOnMap = true;
-        }
-        if (await canReceiveGreeting(channel, username, channel, userOnMap)) {
-            let lang = 'en'
-            if (userOnMap && userOnMap.countryCode && CountryLangs[userOnMap.countryCode]) {
-                lang = CountryLangs[userOnMap.countryCode]
-
-            }
-            let greetingMessage = await getRandomGreeting(displayName, isBot, lang);
-            if (isBroadcaster) {
-                greetingMessage = getRandomBroadcasterGreeting(displayName);
-            }
-            addGreetingToStack(channel, greetingMessage);
-        }
-
-    }
+    
     const isCommand = message.startsWith('!');
     if (isCommand) {
         const args = message.slice(1).split(' ');
