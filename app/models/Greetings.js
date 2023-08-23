@@ -33,7 +33,7 @@ class Greeting {
             return new Greeting({
                 id: newGreeting.id,
                 channel: newGreeting.channel,
-                lastSeen: newGreeting.last_seen,
+                lastSeen: null,
                 shoutoutedAt: newGreeting.shoutouted_at,
                 enabled: newGreeting.enabled,
             });
