@@ -6,12 +6,14 @@ export const greetings = {
         "Hi @#username, good to see you around! #emote",
     ],
     es: [
+        "Holaaaaa @#username! ^^",
         "Hola que tal, @#username? #emote",
         "¡Bienvenido/a, @#username! #emote",
         "Saludos, @#username. ¿Cómo estás? #emote",
         "Hola @#username, ¡qué bueno verte por aquí! #emote",
     ],
     pt: [
+        "Oiiii @#username! ^^",
         "Olá, @#username! #emote",
         "Bem-vindo, @#username! #emote",
         "Saudações, @#username. Como você está? #emote",
