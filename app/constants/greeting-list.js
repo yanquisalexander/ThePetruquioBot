@@ -11,6 +11,9 @@ export const greetings = {
         "¡Bienvenido/a, @#username! #emote",
         "Saludos, @#username. ¿Cómo estás? #emote",
         "Hola @#username, ¡qué bueno verte por aquí! #emote",
+        "Bueeenas @#username! 🎉 ¡Bienvenido/a a la diversión! 🎈",
+        "Como estaaaaas @#username? #emote",
+        "como vas @#username? ;)",
     ],
     pt: [
         "Oiiii @#username! ^^",
@@ -18,6 +21,7 @@ export const greetings = {
         "Bem-vindo, @#username! #emote",
         "Saudações, @#username. Como você está? #emote",
         "Oi @#username, bom te ver por aqui! #emote",
+        "como vai @#username? ;)"
     ],
     fr: [
         "Bonjour, @#username! #emote",
@@ -67,13 +71,17 @@ export const sunlightGreetings = {
     },
     es: {
         morning: [
+            "¡Buenos diaaaas @#username! ☀️ ¡Empieza el día con una sonrisa radiante!",
             "Buenos días, @#username! #emote",
             "Que tengas un buen día, @#username! #emote",
             "Buenos días, @#username. ¿Cómo estás? #emote",
         ],
         afternoon: [
+            "Linda tarde @#username! 🌞 ¿Cómo va tu día?",
             "Buenas tardes, @#username! #emote",
             "Buenas tardes, @#username. ¿Cómo estás? #emote",
+            "¡Holaaa @#username! 🌸 Espero que estés teniendo una tarde genial #emote",
+
         ],
         evening: [
             "Buenas noches, @#username! #emote",
