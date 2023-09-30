@@ -193,7 +193,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             try {
                 let location = await SpectatorLocation.find(username);
                 if (location) {
-                    if(location.location && (location.latitude && location.longitude)) {
+                    if (location.location && (location.latitude && location.longitude)) {
                         sendMessage(channel, `@${username}, me has dicho que eres de ${location.location} :)`);
                     } else if (location.location && !(location.latitude && location.longitude)) {
                         sendMessage(channel, `@${username}, aún debo procesar algunos datos... Intenta de nuevo en unos minutos :)`);
@@ -637,6 +637,27 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 }
             }
             break;
+        case 'ship':
+            // If username is provided, ship the user with the username provided, otherwise, ship the user with the channel
+            let shipUser = args[0];
+            if (shipUser) {
+                shipUser = shipUser.replace('@', '');
+            } else {
+                shipUser = channel.replace('#', '');
+            }
+
+            if (shipUser === username) return sendMessage(channel, `@${username}, no puedes shippearte a ti mismo ;)`);
+
+            let randomPercentage = Math.floor(Math.random() * 100) + 1;
+
+            const half1 = username.slice(0, Math.floor(username.length / 2));
+            const half2 = shipUser.slice(Math.floor(shipUser.length / 2));
+            const shipName = `${half1}${half2}`;
+
+            // Envía el nombre de ship
+            sendMessage(channel, `¡El ship entre @${username} y @${shipUser} se llama "${shipName}", y tiene un ${randomPercentage}% de posibilidades de ser real! :O`);
+            break;
+
 
         case 'activity':
             try {
