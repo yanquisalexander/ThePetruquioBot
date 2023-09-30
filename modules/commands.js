@@ -652,7 +652,26 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             const half1 = username.slice(0, Math.floor(username.length / 2));
             const half2 = shipUser.slice(Math.floor(shipUser.length / 2));
-            const shipName = `${half1}${half2}`;
+            let shipName = [
+                {
+                    name: `${half1}${half2}`,
+                },
+                {
+                    name: `${shipUser}${half1}`,
+                },
+                {
+                    name: `${username}${half2}`,
+                },
+                {
+                    name: `${username}${shipUser}`,
+                },
+                {
+                    name: `${half2}${half1}`,
+                }
+            ]
+
+            // Random name from the array
+            shipName = shipName[Math.floor(Math.random() * shipName.length)].name;
 
             // Envía el nombre de ship
             sendMessage(channel, `¡El ship entre @${username} y @${shipUser} se llama "${shipName}", y tiene un ${randomPercentage}% de posibilidades de ser real! :O`);
