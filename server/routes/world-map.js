@@ -47,14 +47,7 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
     let lastSeens = await Greeting.allLastSeen(channelName);
 
     if (channelName) {
-        if (WorldMapCache.get(channelName)) {
-            // Iterate through the map and delete song requests 
-
-            WorldMapCache.get(channelName).forEach(marker => {
-                if (marker.song) {
-                    delete marker.song
-                }
-            })
+        WorldMap.getChannelMap(channelName).then(async worldMap => {
 
             const songlistChannel = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
             let slQueue = []
@@ -75,13 +68,6 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
                     }
                 }
             }
-            return res.json({
-                map: WorldMapCache.get(channelName),
-                update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null,
-                emotes
-            })
-        }
-        WorldMap.getChannelMap(channelName).then(async worldMap => {
 
             for (const marker of worldMap) {
                 const user = await User.findByUsername(marker.username);
@@ -95,9 +81,14 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
                         marker.last_seen = lastSeen.last_seen;
                     }
                 })
+
+                slQueue.map(request => {
+                    if (request.requests[0].name.toLowerCase() === marker.username) {
+                        marker.song = request.song
+                    }
+                })
             }
 
-            WorldMapCache.set(channelName, worldMap);
 
             return res.json({
                 map: worldMap,
