@@ -170,3 +170,10 @@ export const sunlightGreetings = {
     }
 }
 
+export const defaultShoutoutMessages = [
+    'drop a follow to #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
+    'go check out #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
+    'what are you waiting for? drop a follow to #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
+    'let\'s go show some love to #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
+    'support #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
+]

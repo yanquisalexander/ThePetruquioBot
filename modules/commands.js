@@ -16,6 +16,7 @@ import Team from "../app/models/Team.js";
 import { createAssistantResponse } from "./assistant.js";
 import { addToAssistantHistory, clearAssistantHistory, isAssistantOnCooldown, setAssistantCooldown } from "../lib/assistant-tools.js";
 import User from "../app/models/User.js";
+import { defaultShoutoutMessages } from "../app/constants/greeting-list.js";
 const userCooldowns = {}; // Almacena los tiempos de cooldown por usuario y canal
 const globalCooldowns = {}; // Almacena los tiempos de cooldown globales por canal
 
@@ -535,13 +536,13 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     if (shoutout && shoutout.enabled) {
                         sendMessage(channel, shoutout.message);
                     } else if (shoutout && !shoutout.enabled) {
-                        sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
+                        sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
                     } else {
-                        sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
+                        sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
                     }
                 } catch (error) {
                     console.error(error.message);
-                    sendMessage(channel, `drop a follow to @${targetStreamer} at https://twitch.tv/${targetStreamer} <3 !`);
+                    sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
                 }
             } else {
                 return
