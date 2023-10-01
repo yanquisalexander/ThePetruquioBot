@@ -728,7 +728,12 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             oldUsername = oldUsername.replace('@', '');
 
+            if(oldUsername === username) return sendMessage(channel, `@${username}, tu antiguo nombre de usuario es el mismo que el actual :)`);
+
             try {
+                let userExists = await SpectatorLocation.find(oldUsername);
+
+                if (!userExists) return sendMessage(channel, `@${username}, no tengo tu información registrada, usa el comando !from para registrarla GivePLZ`);
                 await SpectatorLocation.rename(oldUsername, username);
                 sendMessage(channel, `@${username}, listo, ya actualicé tu nombre de usuario en el mapa de la comunidad :)`);
             } catch (error) {
