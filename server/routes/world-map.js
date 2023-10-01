@@ -7,6 +7,7 @@ import { Bot, sendMessage } from "../../bot.js";
 import { mapUpdateProgress } from "../../memory_variables.js";
 import Greeting from "../../app/models/Greetings.js";
 import { HelixClient, getChannelInfo } from "../../utils/twitch.js";
+import axios from "axios";
 
 export const WorldMapCache = new Cache();
 
@@ -26,10 +27,6 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
     const channelEmotes = await HelixClient.chat.getChannelEmotes(channel.twitch_id);
 
-    channelEmotes.map(emote => {
-        console.log(emote.getFormattedImageUrl('3.0', 'static', 'dark'));
-    })
-
     let emotes = channelEmotes.map(emote => {
         return {
             name: emote.name,
@@ -46,10 +43,30 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
         });
     }
 
+
     let lastSeens = await Greeting.allLastSeen(channelName);
 
     if (channelName) {
         if (WorldMapCache.get(channelName)) {
+            const songlistChannel = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
+            let slQueue = []
+            if (songlistChannel.status === 200) {
+                const songlistQueue = await axios.get(`https://api.streamersonglist.com/v1/streamers/${songlistChannel.data.id}/queue`)
+                if (songlistQueue.status === 200) {
+                    slQueue = songlistQueue.data.list
+
+                    for (const request of slQueue) {
+                        const username = request.requests[0].name;
+                        const songRequested = request.song
+
+                        const userInMap = WorldMapCache.get(channelName).find(user => user.username.toLowerCase() === username.toLowerCase())
+
+                        if (userInMap) {
+                            userInMap.song = songRequested
+                        }
+                    }
+                }
+            }
             return res.json({
                 map: WorldMapCache.get(channelName),
                 update: mapUpdateProgress[channelName] ? mapUpdateProgress[channelName] : null,
