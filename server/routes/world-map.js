@@ -48,6 +48,14 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
     if (channelName) {
         if (WorldMapCache.get(channelName)) {
+            // Iterate through the map and delete song requests 
+
+            WorldMapCache.get(channelName).forEach(marker => {
+                if (marker.song) {
+                    delete marker.song
+                }
+            })
+
             const songlistChannel = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
             let slQueue = []
             if (songlistChannel.status === 200) {
