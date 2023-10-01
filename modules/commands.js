@@ -76,6 +76,41 @@ const updateSetting = async (channel, setting, value, username) => {
     }
 }
 
+const handleAdminCommand = async (channel, context, username, message, toUser, isModerator, settings, channelData) => {
+    let adminCommand = message.slice(1).split(' ')[1].toLowerCase(); // Obtener el comando de administrador
+    console.log(adminCommand)
+    switch (adminCommand) {
+        case 'rename':
+            // Allow admin to rename a user on the map
+            let oldUsername = message.slice(1).split(' ')[2].toLowerCase();
+            let newUsername = message.slice(1).split(' ')[3].toLowerCase();
+            if (oldUsername && newUsername) {
+                try {
+                    let userExists = await SpectatorLocation.find(oldUsername);
+                    if (!userExists) return sendMessage(channel, `@${username}, el usuario ${oldUsername} no existe en el mapa de la comunidad.`);
+                    await SpectatorLocation.rename(oldUsername, newUsername);
+                    await WorldMap.rename(oldUsername, newUsername);
+                    sendMessage(channel, `@${username}, el usuario ${oldUsername} ha sido renombrado a ${newUsername} correctamente.`);
+                } catch (error) {
+                    console.error(error);
+                    sendMessage(channel, `@${username}, ha ocurrido un error al intentar renombrar al usuario ${oldUsername}.`);
+                }
+            } else {
+                sendMessage(channel, `@${username}, debes especificar un usuario existente y un nuevo nombre de usuario después del comando !rename.`);
+            }
+            break;
+        case 'map_cache':
+            // Clear the map cache
+            WorldMapCache.clear(channel);
+            sendMessage(channel, `@${username}, la caché del mapa en el canal ${channel} ha sido limpiada.`);
+            break;
+
+
+        default:
+            break;
+    }
+
+}
 
 
 export const handleCommand = async ({ channel, context, username, message, toUser, isModerator, settings, channelData }) => {
@@ -325,6 +360,15 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 });
                 for (const user of usersOnMap) {
                     const spectatorLocation = await SpectatorLocation.find(user.username);
+                    if (!spectatorLocation) {
+                        console.log(`No se ha encontrado la ubicación del usuario ${user.username} en la base de datos. Saltando...`);
+                        // restar 1 al total para que el progreso sea correcto
+                        mapUpdateProgress[channel] = {
+                            total: usersOnMap.length - 1,
+                            updated: updatedCount
+                        }
+                        continue;
+                    }
                     await spectatorLocation.getGeocode();
                     await spectatorLocation.save();
                     updatedCount++;
@@ -677,7 +721,21 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             sendMessage(channel, `¡El ship entre @${username} y @${shipUser} se llama "${shipName}", y tiene un ${randomPercentage}% de posibilidades de ser real! :O`);
             break;
 
+        case 'rename':
+            let oldUsername = args[0];
 
+            if (!oldUsername) return sendMessage(channel, `@${username}, debes especificar tu antiguo nombre de usuario después del comando !rename :)`);
+
+            oldUsername = oldUsername.replace('@', '');
+
+            try {
+                await SpectatorLocation.rename(oldUsername, username);
+                sendMessage(channel, `@${username}, listo, ya actualicé tu nombre de usuario en el mapa de la comunidad :)`);
+            } catch (error) {
+                console.error(error);
+                sendMessage(channel, `@${username}, ha ocurrido un error al intentar actualizar tu nombre de usuario en el mapa de la comunidad :(`);
+            }
+            break;
         case 'activity':
             try {
                 let user
@@ -702,6 +760,9 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             }
             break
+        case 'admin':
+            if (username !== 'alexitoo_uy') return
+            return handleAdminCommand(channel, context, username, message, toUser, isModerator, settings, channelData)
 
         default:
             if (langList.includes(command) && settings.enable_translation) {

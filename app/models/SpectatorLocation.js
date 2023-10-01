@@ -66,6 +66,39 @@ class SpectatorLocation {
         }
     }
 
+    static async rename(oldUsername, newUsername) {
+        try {
+            // Check if the new username already exists in the database
+            const checkUsernameQuery = {
+                text: 'SELECT COUNT(*) FROM spectator_locations WHERE username = $1',
+                values: [newUsername],
+            };
+            const usernameExists = await db.query(checkUsernameQuery);
+    
+            if (usernameExists.rows[0].count > 0) {
+                // The new username already exists, so we need to delete the old one
+                const deleteOldUsernameQuery = {
+                    text: 'DELETE FROM spectator_locations WHERE username = $1',
+                    values: [oldUsername],
+                };
+                await db.query(deleteOldUsernameQuery);
+            } else {
+                // The new username doesn't exist, so we can simply update the old username to the new one
+                const updateUsernameQuery = {
+                    text: 'UPDATE spectator_locations SET username = $1 WHERE username = $2',
+                    values: [newUsername, oldUsername],
+                };
+                await db.query(updateUsernameQuery);
+            }
+    
+            console.log('Username del espectador actualizado con éxito.');
+        } catch (error) {
+            console.error('Error al actualizar el username del espectador:', error);
+            throw error;
+        }
+    }
+    
+
     async delete() {
         const deleteQuery = {
             text: 'DELETE FROM spectator_locations WHERE username = $1',

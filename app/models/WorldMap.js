@@ -104,6 +104,35 @@ class WorldMap {
     }
   }
 
+  static async rename(oldUsername, newUsername) {
+    try {
+        // Verificar si el nuevo nombre de usuario ya existe
+        const checkUsernameQuery = {
+            text: 'SELECT COUNT(*) FROM worldmap WHERE username = $1',
+            values: [newUsername],
+        };
+        const usernameExists = await db.query(checkUsernameQuery);
+
+        if (usernameExists.rows[0].count > 0) {
+            console.error('El nuevo nombre de usuario ya existe en la base de datos. No se puede realizar la actualización.');
+            return; // Puedes agregar una lógica adicional si es necesario en este caso.
+        }
+
+        // Realizar la actualización del nombre de usuario
+        const updateUsernameQuery = {
+            text: 'UPDATE worldmap SET username = $1 WHERE username = $2',
+            values: [newUsername, oldUsername],
+        };
+
+        await db.query(updateUsernameQuery);
+        console.log('Registro del WorldMap actualizado con éxito.');
+    } catch (error) {
+        console.error('Error al actualizar el registro del WorldMap:', error);
+        throw error;
+    }
+}
+
+
 
   static async getNeighbours(username, channelName, limit = 3) {
     try {
