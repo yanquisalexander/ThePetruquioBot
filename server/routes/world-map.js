@@ -48,45 +48,45 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
 
     if (channelName) {
         WorldMap.getChannelMap(channelName).then(async worldMap => {
-
-            const songlistChannel = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
             let slQueue = []
-            if (songlistChannel.status === 200) {
-                const songlistQueue = await axios.get(`https://api.streamersonglist.com/v1/streamers/${songlistChannel.data.id}/queue`)
-                if (songlistQueue.status === 200) {
-                    slQueue = songlistQueue.data.list
 
-                    for (const request of slQueue) {
-                        const username = request.requests[0].name;
-                        const songRequested = request.song
-
-                        const userInMap = WorldMapCache.get(channelName).find(user => user.username.toLowerCase() === username.toLowerCase())
-
-                        if (userInMap) {
-                            userInMap.song = songRequested
-                        }
+            try {
+                const songlistChannel = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
+                
+                if (songlistChannel.status === 200) {
+                    const songlistQueue = await axios.get(`https://api.streamersonglist.com/v1/streamers/${songlistChannel.data.id}/queue`)
+                    if (songlistQueue.status === 200) {
+                        slQueue = songlistQueue.data.list
                     }
                 }
+            } catch (error) {
+                console.log(error)
             }
 
             for (const marker of worldMap) {
                 const user = await User.findByUsername(marker.username);
-                if (!user) continue; // If the user doesn't exist, skip to the next iteration
-                const discord = await user.getConnectedAccountInfo('discord');
-                if (discord) {
-                    marker.discordId = discord.userinfo.id;
+                if (user) {
+                    const discord = await user.getConnectedAccountInfo('discord');
+                    if (discord) {
+                        marker.discordId = discord.userinfo.id;
+                    }
                 }
+
+
                 lastSeens.map(lastSeen => {
                     if (lastSeen.username === marker.username) {
                         marker.last_seen = lastSeen.last_seen;
                     }
                 })
 
-                slQueue.map(request => {
-                    if (request.requests[0].name.toLowerCase() === marker.username) {
-                        marker.song = request.song
-                    }
-                })
+                if (slQueue.length > 0) {
+                    slQueue.map(request => {
+                        if (request.requests[0].name.toLowerCase() === marker.username) {
+                            marker.song = request.song
+                        }
+                    })
+                }
+
             }
 
 
@@ -97,6 +97,7 @@ WorldMapRouter.get("/:channel_name", async (req, res, next) => {
             })
 
         }).catch(error => {
+            console.log(error)
             res.status(500).json({ error: error });
         });
     }
