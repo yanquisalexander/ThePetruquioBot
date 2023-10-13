@@ -536,9 +536,11 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     if (shoutout && shoutout.enabled) {
                         sendMessage(channel, shoutout.message);
                     } else if (shoutout && !shoutout.enabled) {
-                        sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
+                        let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)]
+                        sendMessage(channel, shoutoutMessage.replace('#targetStreamer', targetStreamer))
                     } else {
-                        sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
+                        let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)]
+                        sendMessage(channel, shoutoutMessage.replace('#targetStreamer', targetStreamer))
                     }
                 } catch (error) {
                     console.error(error.message);
