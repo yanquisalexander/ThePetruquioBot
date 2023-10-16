@@ -166,7 +166,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                 console.log(chalk.yellow.bold(`Translation is disabled in ${channel}`));
                 return
             }
-            const user = args[0].toLowerCase();
+            let user = args[0].toLowerCase();
             if (user) {
                 user = user.replace('@', '');
                 autoTranslateUsers[channel][user] = true;
@@ -576,7 +576,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
             if (!isModerator) return;
             if (!settings.enable_community_features) return; // Shoutout module are part of community features, so if they are disabled, don't execute the command
             const action = args[0];
-            const target = args[1];
+            let target = args[1];
             let shoutoutMessage = args.slice(2).join(' ');
             // Replace the @ symbol if it exists
             if (target.startsWith('@')) {

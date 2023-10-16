@@ -34,6 +34,7 @@ import { railwayConnected } from './utils/environment.js';
 import { HelixClient, checkLiveChannels, getChannelInfo, getLiveChannels, isChannelLive, knownBots } from './utils/twitch.js';
 import Shoutout from './app/models/Shoutout.js';
 import { redis } from './lib/redis.js';
+import Database from './lib/database.js';
 
 
 // Monkey patching console.log to add timestamp to logs
@@ -67,6 +68,8 @@ if (!process.env.BOT_NAME || !process.env.BOT_PASSWORD) {
 if (!railwayConnected) {
     console.error(chalk.yellow('Missing RAILWAY_API_KEY in .env file. You cannot use !restart command'));
 }
+
+Database.connect()
 
 const bootServer = async () => {
     await WebServer.boot();
