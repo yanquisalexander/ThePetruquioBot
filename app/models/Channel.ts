@@ -28,6 +28,10 @@ export const SETTINGS_MODEL = {
     value: false,
     experimental: true,
   },
+  enable_birthday: {
+    type: 'boolean',
+    value: true,
+  },
   channel_language: {
     type: 'list',
     value: 'es',
