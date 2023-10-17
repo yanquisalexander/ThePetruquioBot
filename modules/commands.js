@@ -533,22 +533,19 @@ export const handleCommand = async ({ channel, context, username, message, toUse
                     }
 
                     const shoutout = await Shoutout.findByTargetStreamer(channelData.id, targetStreamer);
-                    let shoutoutMessage;
-
                     if (shoutout && shoutout.enabled) {
-                        shoutoutMessage = shoutout.message;
+                        sendMessage(channel, shoutout.message);
+                    } else if (shoutout && !shoutout.enabled) {
+                        let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)]
+                        sendMessage(channel, shoutoutMessage.replace('#targetStreamer', targetStreamer))
                     } else {
-                        shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
-                        shoutoutMessage = shoutoutMessage.replace(/#targetStreamer/g, targetStreamer);
+                        let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)]
+                        sendMessage(channel, shoutoutMessage.replace('#targetStreamer', targetStreamer))
                     }
-
-                    sendMessage(channel, shoutoutMessage);
                 } catch (error) {
                     console.error(error.message);
-                    const randomShoutout = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
-                    sendMessage(channel, randomShoutout.replace(/#targetStreamer/g, targetStreamer));
+                    sendMessage(channel, defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)].replace('#targetStreamer', targetStreamer))
                 }
-
             } else {
                 return
 
@@ -734,7 +731,7 @@ export const handleCommand = async ({ channel, context, username, message, toUse
 
             oldUsername = oldUsername.replace('@', '');
 
-            if (oldUsername === username) return sendMessage(channel, `@${username}, tu antiguo nombre de usuario es el mismo que el actual :)`);
+            if(oldUsername === username) return sendMessage(channel, `@${username}, tu antiguo nombre de usuario es el mismo que el actual :)`);
 
             try {
                 let userExists = await SpectatorLocation.find(oldUsername);
