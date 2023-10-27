@@ -118,6 +118,12 @@ class AccountsController {
                 return res.status(404).json({ error: 'Impersonated user not found' })
             }
 
+            const impersonatedChannel = await impersonatedUser.getChannel();
+
+            if(!impersonatedChannel) {
+                return res.status(404).json({ error: 'Impersonated channel not found' })
+            }
+
             user = {
                 ...user,
                 id: impersonatedUser.twitchId.toString(),
@@ -125,13 +131,14 @@ class AccountsController {
                 email: impersonatedUser.email || null,
                 displayName: impersonatedUser.displayName || impersonatedUser.username,
                 avatar: impersonatedUser.avatar || `https://decapi.me/twitch/avatar/${impersonatedUser.username}`,
+                channel: impersonatedChannel
             }
 
             if(!user) {
                 return res.status(401).json({ error: 'Unauthorized' })
             }
 
-            user.avatar = `https://decapi.me/twitch/avatar/${user.username}`;
+            user.avatar = impersonatedUser.avatar || `https://decapi.me/twitch/avatar/${impersonatedUser.username}`;
 
             return res.json({ user, session });
         }

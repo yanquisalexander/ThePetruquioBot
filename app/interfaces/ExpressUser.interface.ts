@@ -1,3 +1,5 @@
+import Channel from "../models/Channel.model";
+
 export interface ExpressUser {
     id: string;
     username: string;
@@ -7,5 +9,6 @@ export interface ExpressUser {
     session: {
         sessionId: number;
     };
+    channel?: Channel;
     avatar: string;
 }
