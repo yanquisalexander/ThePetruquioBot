@@ -157,6 +157,44 @@ class ChannelsController {
     static async getTwitchChannelsPoints(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
 
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+        if(session?.impersonatedUserId) {
+            const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
+
+            if(!impersonatedUser) {
+                return res.status(404).json({ error: 'Impersonated user not found' })
+            }
+
+            const impersonatedChannel = await impersonatedUser.getChannel();
+
+            if(!impersonatedChannel) {
+                return res.status(404).json({ error: 'Impersonated channel not found' })
+            }
+
+            const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(impersonatedChannel.twitchId);
+
+            if(!channelsPoints) {
+                return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
+            }
+
+            const response = channelsPoints.map((channelPoint) => {
+                return {
+                    id: channelPoint.id,
+                    title: channelPoint.title,
+                    prompt: channelPoint.prompt,
+                    backgroundColor: channelPoint.backgroundColor,
+                    icon: channelPoint.getImageUrl(2),
+                }
+            })
+
+            return res.json({
+                data: {
+                    channelPoints: response,
+                },
+            })
+        }
+
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
         if (!user) {
