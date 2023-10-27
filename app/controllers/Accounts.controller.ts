@@ -128,6 +128,7 @@ class AccountsController {
                 ...user,
                 id: impersonatedUser.twitchId.toString(),
                 twitchId: impersonatedUser.twitchId.toString(),
+                username: impersonatedUser.username,
                 email: impersonatedUser.email || null,
                 displayName: impersonatedUser.displayName || impersonatedUser.username,
                 avatar: impersonatedUser.avatar || `https://decapi.me/twitch/avatar/${impersonatedUser.username}`,
