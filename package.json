@@ -6,11 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --ext ts,js --exec ts-node index.ts",
-    "start": "npx ts-node index.ts"
+    "build": "esbuild --bundle index.ts --platform=node --outfile=dist/index.js --packages=external --format=cjs --target=node18",
+    "start": "node dist/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "esbuild": "^0.19.5",
     "@mkody/twitch-emoticons": "^2.8.3",
     "@soerenmetje/passport-discord": "^1.1.0",
     "@twurple/api": "^6.2.1",

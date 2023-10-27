@@ -6,6 +6,26 @@ import fs from 'fs';
 import { Bot } from '../bot';
 import TranslatorModule from '../app/modules/Translator.module';
 
+
+/* Static imports until fix dynamic imports */
+import AddCommand from '../app/commands/add.command';
+import ConfigCommand from '../app/commands/cfg.command';
+import DeleteCommand from '../app/commands/delete.command';
+import MapEmoteCommand from '../app/commands/emote.command';
+import FromCommand from '../app/commands/from.command';
+import JoinCommand from '../app/commands/join.command';
+import MapCommand from '../app/commands/map.command';
+import MaskCommand from '../app/commands/mask.command';
+import MapMessageCommand from '../app/commands/message.command';
+import RandomMessageCommand from '../app/commands/random.command';
+import ShoutoutCommand from '../app/commands/shoutout.command';
+import ShowCommand from '../app/commands/show.command';
+import UserUpdateCommand from '../app/commands/user-update.command';
+
+/* End of static imports */
+
+
+
 const cooldowns = new Map();
 
 class CommandExecutor {
@@ -31,14 +51,14 @@ class CommandExecutor {
 
     private loadSystemCommands() {
         /* Load files from /app/commands  */
-        const commandFiles = fs.readdirSync('./app/commands');
+/*         const commandFiles = fs.readdirSync('./app/commands');
         console.log(commandFiles)
 
         for (const file of commandFiles) {
             if (file.endsWith('.command.ts')) {
                 try {
                     const command = require(`../app/commands/${file}`).default;
-                    
+
                     if (command && command.name && command.execute) {
                         this.systemCommands.push(command);
                     } else {
@@ -48,9 +68,32 @@ class CommandExecutor {
                     console.error(error);
                 }
             }
+        } */
+
+        /* Load static imports */
+        const commands = [
+            AddCommand,
+            ConfigCommand,
+            DeleteCommand,
+            MapEmoteCommand,
+            FromCommand,
+            JoinCommand,
+            MapCommand,
+            MaskCommand,
+            MapMessageCommand,
+            RandomMessageCommand,
+            ShoutoutCommand,
+            ShowCommand,
+            UserUpdateCommand
+        ];
+
+        for (const command of commands) {
+            this.systemCommands.push(command);
         }
+
+
     }
-    
+
 
     private getSystemCommand(commandName: string): Command | undefined {
         return this.systemCommands.find((command) => command.getName() === commandName);

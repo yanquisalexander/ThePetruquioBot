@@ -7,7 +7,7 @@ import Twitch from "../modules/Twitch.module";
 
 
 
-const MapMessageCommand = new Command(
+const MapEmoteCommand = new Command(
     'emote',
     '*',
     [CommandPermission.VIEWER],
@@ -56,4 +56,4 @@ const MapMessageCommand = new Command(
     }
 );
 
-export default MapMessageCommand;
+export default MapEmoteCommand;
