@@ -141,7 +141,11 @@ export class Bot {
   }
 
   public async joinChannel(channel: string): Promise<void> {
-    await this.client.join(channel);
+    try {
+      await this.client.join(channel);
+    } catch (error) {
+      console.error(chalk.red('[BOT]'), chalk.white('Error joining channel:'), error);
+    }
   }
 
   get joinedChannels(): string[] {
