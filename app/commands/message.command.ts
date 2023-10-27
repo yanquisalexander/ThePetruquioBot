@@ -37,7 +37,7 @@ const MapMessageCommand = new Command(
             }
 
             if(worldmapUser) {
-                worldmapUser.pinMessage = await Twitch.parseEmotes(_channel, _user.rawMessage, _user.raw);
+                worldmapUser.pinMessage = (await Twitch.parseEmotes(_channel, _user.rawMessage, _user.raw)).replace('!msg ', '')
                 await worldmapUser.save();
 
                 SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {

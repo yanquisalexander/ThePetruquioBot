@@ -178,6 +178,8 @@ class Twitch {
         try {
             await this.EmoteFetcher.fetchBTTVEmotes()
             await this.EmoteFetcher.fetchBTTVEmotes(channel.twitchId)
+            await this.EmoteFetcher.fetchTwitchEmotes()
+            await this.EmoteFetcher.fetchTwitchEmotes(channel.twitchId)
         } catch (error) {
             console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Error fetching emotes:'), error);
         }
@@ -190,10 +192,6 @@ class Twitch {
 
         parsedMessage = parser.parse(message, 2)
 
-        if (message.startsWith('!')) {
-            // Remove command and prefix, we only want to replace emotes in the response
-            parsedMessage = parsedMessage.replace(message.split(' ')[0], '');
-        }
 
         if (isMapPin) {
             // Only extract the link from the emote
