@@ -13,16 +13,16 @@ class ChannelsController {
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(session?.impersonatedUserId) {
+        if (session?.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'Impersonated user not found' })
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
 
@@ -54,13 +54,13 @@ class ChannelsController {
                 delete channel.preferences[preferenceKey];
             }
         }
-        
+
 
 
 
         return res.json({
             data: {
-                preferences: {  ...defaultChannelPreferences, ...channel.preferences },
+                preferences: { ...defaultChannelPreferences, ...channel.preferences },
             },
         })
     }
@@ -70,16 +70,16 @@ class ChannelsController {
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(session?.impersonatedUserId) {
+        if (session?.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'Impersonated user not found' })
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
 
@@ -109,19 +109,19 @@ class ChannelsController {
                 },
             })
         }
-    
+
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
-    
+
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-    
+
         const channel = await user.getChannel();
-    
+
         if (!channel) {
             return res.status(404).json({ error: 'Channel not found' });
         }
-    
+
         const preferences = req.body.preferences as ChannelPreferences
 
         if (!preferences) {
@@ -143,56 +143,61 @@ class ChannelsController {
         await channel.save();
 
 
-        
-    
+
+
         return res.json({
             data: {
                 preferences: { ...defaultChannelPreferences, ...channel.preferences },
             },
         });
     }
-    
-    
+
+
 
     static async getTwitchChannelsPoints(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(session?.impersonatedUserId) {
+        if (session?.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'Impersonated user not found' })
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
 
-            const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(impersonatedChannel.twitchId);
+            try {
+                const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(impersonatedChannel.twitchId);
+                if (!channelsPoints) {
+                    return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
+                }
 
-            if(!channelsPoints) {
+                const response = channelsPoints.map((channelPoint) => {
+                    return {
+                        id: channelPoint.id,
+                        title: channelPoint.title,
+                        prompt: channelPoint.prompt,
+                        backgroundColor: channelPoint.backgroundColor,
+                        icon: channelPoint.getImageUrl(2),
+                    }
+                })
+
+                return res.json({
+                    data: {
+                        channelPoints: response,
+                    },
+                })
+            } catch (error) {
                 return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
             }
 
-            const response = channelsPoints.map((channelPoint) => {
-                return {
-                    id: channelPoint.id,
-                    title: channelPoint.title,
-                    prompt: channelPoint.prompt,
-                    backgroundColor: channelPoint.backgroundColor,
-                    icon: channelPoint.getImageUrl(2),
-                }
-            })
 
-            return res.json({
-                data: {
-                    channelPoints: response,
-                },
-            })
         }
 
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
@@ -209,7 +214,7 @@ class ChannelsController {
 
         const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(channel.twitchId);
 
-        if(!channelsPoints) {
+        if (!channelsPoints) {
             return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
         }
 
@@ -230,7 +235,7 @@ class ChannelsController {
         })
     }
 
-    static async getFirstRanking (req: Request, res: Response) {
+    static async getFirstRanking(req: Request, res: Response) {
 
         const channel = await Channel.findByUsername(req.params.channelName);
 
@@ -238,7 +243,7 @@ class ChannelsController {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
-        if(!channel.preferences.firstRankingRewardId?.value || !channel.preferences.enableFirstRanking?.value) {
+        if (!channel.preferences.firstRankingRewardId?.value || !channel.preferences.enableFirstRanking?.value) {
             return res.status(404).json({ error: 'Channel does not have first ranking enabled' });
         }
 
