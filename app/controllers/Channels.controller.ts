@@ -216,27 +216,31 @@ class ChannelsController {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
-        const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(channel.twitchId);
-
-        if (!channelsPoints) {
+        try {
+            const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(channel.twitchId);
+    
+            if (!channelsPoints) {
+                return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
+            }
+    
+            const response = channelsPoints.map((channelPoint) => {
+                return {
+                    id: channelPoint.id,
+                    title: channelPoint.title,
+                    prompt: channelPoint.prompt,
+                    backgroundColor: channelPoint.backgroundColor,
+                    icon: channelPoint.getImageUrl(2),
+                }
+            })
+    
+            return res.json({
+                data: {
+                    channelPoints: response,
+                },
+            })
+        } catch (error) {
             return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
         }
-
-        const response = channelsPoints.map((channelPoint) => {
-            return {
-                id: channelPoint.id,
-                title: channelPoint.title,
-                prompt: channelPoint.prompt,
-                backgroundColor: channelPoint.backgroundColor,
-                icon: channelPoint.getImageUrl(2),
-            }
-        })
-
-        return res.json({
-            data: {
-                channelPoints: response,
-            },
-        })
     }
 
     static async getFirstRanking(req: Request, res: Response) {
