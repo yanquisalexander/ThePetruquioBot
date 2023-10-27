@@ -12,7 +12,7 @@ const ShoutoutCommand = new Command(
     {},
     '', // System commands don't need a response
     async (_user, _args, _channel, _bot) => {
-        if (_channel?.preferences?.enableShoutout) {
+        if (_channel?.preferences?.enableShoutout?.value && _args[0]) {
             let shoutoutMessage = ''
             const targetChannel = _args[0].replace('@', '');
 
