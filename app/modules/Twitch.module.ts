@@ -151,8 +151,11 @@ class Twitch {
             Object.entries(userStateEmotes).forEach(([emoteId, emotePositions]) => {
                 const position = emotePositions[0];
                 const [start, end] = position.split('-');
-                const stringToReplace = message.substring(parseInt(start), parseInt(end) + 1);
-
+                const stringToReplace = message.substring(
+                    parseInt(start, 10),
+                    parseInt(end, 10) + 1
+                );
+                
                 let allowAnimatedPins = channel.preferences.enableAnimatedPins?.value;
 
                 if (isMapPin) {
