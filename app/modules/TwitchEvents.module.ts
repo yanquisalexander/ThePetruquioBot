@@ -121,6 +121,31 @@ class TwitchEvents {
         this.eventSubListeners[channel.twitchId.toString()]['app-revocation'] = listener;
     }
 
+    public static async subscribeToLiveStream(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onStreamOnline(channel.twitchId.toString(), async (event) => {
+            console.log(`[TWITCH EVENT SUB] Stream Online detected for ${event.broadcasterDisplayName} (${event.broadcasterName})`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.broadcasterDisplayName} (${event.broadcasterName})`);
+
+            const channel = await Channel.findByTwitchId(parseInt(event.broadcasterId));
+            if (channel) {
+                if (channel.preferences.enableLiveNotification?.value) {
+                    let message = `@${event.broadcasterDisplayName} is now live on Twitch PopNemo`;
+
+                    if(channel.preferences.liveNotificationMessage?.value && !Utils.emptyString(channel.preferences.liveNotificationMessage?.value)) {
+                        message = channel.preferences.liveNotificationMessage?.value.replace('#user', `@${event.broadcasterDisplayName}`);
+                    }
+
+                    this.bot.sendMessage(channel, message);
+                }
+            } else {
+                console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
+            }
+
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
+    }
+
     public static async unsubscribeToAppRevocation(channel: Channel): Promise<void> {
         const listener = this.eventSubListeners[channel.twitchId.toString()]['app-revocation'];
         if (listener) {
@@ -131,6 +156,7 @@ class TwitchEvents {
     public static async subscribeChannel(channel: Channel): Promise<void> {
         await this.subscribeToChannelPoints(channel);
         await this.subscribeToAppRevocation(channel);
+        await this.subscribeToLiveStream(channel);
     }
 
     public static async unsubscribeChannel(channel: Channel): Promise<void> {
