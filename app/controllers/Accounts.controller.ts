@@ -5,6 +5,7 @@ import UserToken from '../models/UserToken.model';
 import Session from '../models/Session.model';
 import jwt from 'jsonwebtoken';
 import { ExpressUser } from '../interfaces/ExpressUser.interface';
+import TwitchEvents from '../modules/TwitchEvents.module';
 
 
 class AccountsController {
@@ -76,6 +77,8 @@ class AccountsController {
                 user,
                 sessionId: session.sessionId
             }, process.env.JWT_SECRET || 'secret', { expiresIn: '30d' });
+
+            await TwitchEvents.subscribeChannel(channel)
 
             res.json({ token: customToken });
         } catch (error) {
