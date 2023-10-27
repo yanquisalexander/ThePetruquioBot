@@ -133,6 +133,8 @@ class AdminController {
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+    
         
 
         if (!user) {
@@ -157,6 +159,12 @@ class AdminController {
 
         if (!userToImpersonate) {
             return res.status(404).json({ error: 'User not found' });
+        }
+
+        const channel = await user.getChannel();
+
+        if(!channel) {
+            return res.status(404).json({ error: 'You cannot impersonate a user without a channel' });
         }
 
         await session.setImpersonate(userToImpersonate.twitchId);
