@@ -32,7 +32,7 @@ class CommandExecutor {
     private loadSystemCommands() {
         // Define la ruta del directorio de comandos basándote en el entorno
         const commandDirectory = process.env.NODE_ENV === 'production'
-            ? './dist/app/commands' // Ruta en producción
+            ? 'dist/app/commands' // Ruta en producción
             : './app/commands';      // Ruta en desarrollo
 
         const commandFiles = fs.readdirSync(commandDirectory);
