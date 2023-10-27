@@ -1,7 +1,7 @@
 // Command.ts
 
 import { Bot } from "../../bot";
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import Utils from "../../lib/Utils";
 import ChatUser from "../../utils/chat-user";
 import Channel from "./Channel.model";

@@ -1,5 +1,5 @@
 import { AccessToken } from "@twurple/auth";
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import User from "./User.model"; // Asegúrate de importar el modelo User
 
 class UserToken {

@@ -1,4 +1,4 @@
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 
 class SpectatorLocation {
     userId: number;

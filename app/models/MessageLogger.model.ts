@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import Environment from "../../utils/environment";
 import Channel from "./Channel.model";
 import User from "./User.model";

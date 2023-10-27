@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import Cache from "../Cache";
 import Channel from "./Channel.model.js";
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import User from "./User.model";
 
 export const GreetingsCache = new Cache();

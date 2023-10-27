@@ -1,4 +1,4 @@
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import { defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Channel from "./Channel.model";
 import MessageLogger from "./MessageLogger.model";

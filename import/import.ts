@@ -5,7 +5,7 @@ import spectatorLocations from "./spectator_locations.json";
 import worldMaps from "./worldmaps.json";
 import User from "../app/models/User.model";
 import Twitch from "../app/modules/Twitch.module";
-import Database from "../lib/Database";
+import Database from "../lib/DatabaseManager";
 import TwitchAuthenticator from "../app/modules/TwitchAuthenticator.module";
 import SpectatorLocation from "../app/models/SpectatorLocation.model";
 import Geolocation from "../app/modules/Geolocation.module";

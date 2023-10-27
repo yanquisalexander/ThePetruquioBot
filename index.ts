@@ -2,7 +2,7 @@ import chalk from "chalk";
 import dotenv from "dotenv";
 
 import MonkeyPatches from "./lib/MonkeyPatches";
-import Database from "./lib/Database";
+import Database from "./lib/DatabaseManager";
 import { Bot } from "./bot";
 import { handleBotJoin } from "./app/bot/join-handler";
 import { handleChatMessage } from "./app/bot/message-handler";

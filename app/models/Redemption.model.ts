@@ -1,4 +1,4 @@
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import Channel from "./Channel.model";
 import User from "./User.model";
 

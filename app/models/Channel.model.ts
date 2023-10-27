@@ -1,4 +1,4 @@
-import Database from "../../lib/Database";
+import Database from "../../lib/DatabaseManager";
 import { ChannelPreferences, defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import { Command } from "./Command.model";
 import User from "./User.model";
