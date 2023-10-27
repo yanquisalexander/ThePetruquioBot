@@ -4,6 +4,7 @@ import User from "../models/User.model";
 import MemoryVariables from "../../lib/MemoryVariables";
 import { promisify } from "util";
 import { exec } from "child_process";
+import Session from "../models/Session.model";
 
 const removeAnsiColors = (str: string) => str.replace(/\u001b\[[0-9]{1,2}m/g, '');
 
@@ -123,6 +124,45 @@ class AdminController {
             data: {
                 users
             }
+        });
+    }
+
+    static async impersonateUser(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+        
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.admin) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if(!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        const { userId } = req.params
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        const userToImpersonate = await User.findByTwitchId(parseInt(userId));
+
+        if (!userToImpersonate) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        await session.setImpersonate(userToImpersonate.twitchId);
+
+        return res.json({
+            sucess: true
         });
     }
 }

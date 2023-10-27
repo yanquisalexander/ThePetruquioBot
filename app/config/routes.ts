@@ -28,6 +28,7 @@ router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate
 
 router.get('/admin/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.dashboardIndex);
 router.get('/admin/users', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.getUsers);
+router.post('/admin/users/:userId/impersonate', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.impersonateUser);
 
 
 router.post('/admin/console', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.remoteConsole);
