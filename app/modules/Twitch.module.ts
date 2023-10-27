@@ -163,7 +163,7 @@ class Twitch {
                 } else {
                     stringReplacements.push({
                         stringToReplace,
-                        template: `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0" class="map-popup-emote">`
+                        template: `<img src='https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0' class='map-popup-emote'>`
                     })
                 }
 
