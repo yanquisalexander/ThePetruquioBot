@@ -1,4 +1,4 @@
-import pg from 'pg';
+import pg, { QueryResult } from 'pg';
 import 'dotenv/config'
 import chalk from 'chalk';
 
@@ -15,7 +15,7 @@ class Database {
                 host: process.env.DB_HOST || 'localhost',
                 port: parseInt(process.env.DB_PORT as string || '5432'),
                 user: process.env.DB_USER || 'postgres',
-                password: process.env.DB_PASS || 'postgres',
+                password: process.env.DB_PASS || '',
             });
 
             console.log(chalk.green('[DATABASE MANAGER]'), chalk.yellow('Conectado a la base de datos'));
@@ -27,16 +27,17 @@ class Database {
         }
     }
 
-    static async query(text: string, params: any[] = []): Promise<any> {
+    static async query(text: string, params: any[] = []): Promise<QueryResult> {
         const client = await Database.pool.connect();
-
+    
         try {
             const result = await client.query(text, params);
-            return result.rows;
+            return result;
         } finally {
             client.release();
         }
     }
+    
 
     static async runMigration(sql: string, name: string): Promise<void> {
         const client = await Database.pool.connect();

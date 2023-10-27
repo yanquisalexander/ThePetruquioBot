@@ -1,0 +1,45 @@
+import { Router } from "express";
+import AccountsController from "../controllers/Accounts.controller";
+import Passport from "../../lib/Passport";
+import ChannelsController from "../controllers/Channels.controller";
+import AdminController from "../controllers/Admin.controller";
+import WorldMapController from "../controllers/WorldMap.controller";
+import StatsController from "../controllers/Stats.controller";
+import CommandsController from "../controllers/Commands.controller";
+
+
+const router = Router();
+
+router.post('/accounts/getToken', AccountsController.getToken);
+
+router.get('/accounts/me', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentUser);
+
+router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentSession);
+
+router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
+
+router.get('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getPreferences);
+router.put('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.updatePreferences);
+router.get('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.getCommands);
+router.put('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.editCommand);
+router.post('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.createCommand);
+router.delete('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.deleteCommand);
+router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getTwitchChannelsPoints);
+
+router.get('/admin/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.dashboardIndex);
+router.get('/admin/users', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.getUsers);
+
+
+router.post('/admin/console', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.remoteConsole);
+
+router.get('/worldmap/:channelName/splash.png', WorldMapController.getSplashEmoteset);
+router.get('/worldmap/:channelName/splash.json', WorldMapController.getSplashEmoteset);
+router.get('/worldmap/:channelName', WorldMapController.getWorldMap);
+
+router.get('/rankings/:channelName', ChannelsController.getFirstRanking);
+
+router.get('/stats/uptime', StatsController.uptime);
+router.get('/stats/live-channels', StatsController.getLiveChannels);
+
+
+export default router;

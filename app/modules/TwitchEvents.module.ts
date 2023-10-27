@@ -1,0 +1,176 @@
+import { EventSubMiddleware } from "@twurple/eventsub-http";
+
+import Environment from "../../utils/environment";
+import Twitch from "./Twitch.module";
+import { HelixUser } from "@twurple/api";
+import Channel from "../models/Channel.model";
+import { channel } from "diagnostics_channel";
+import Utils from "../../lib/Utils";
+import Redemption from "../models/Redemption.model";
+import User from "../models/User.model";
+import { Bot } from "../../bot";
+
+type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
+
+
+class TwitchEvents {
+    // this have EventSubSubscription instances. It should be like eventSubListeners[channelId][eventName]
+    private static eventSubListeners: { [key: string]: { [key: string]: EventSubSubscription } } = {};
+    private static TwitchEventSub: EventSubMiddleware;
+    private static bot: Bot;
+
+    public static async setup(): Promise<void> {
+        this.bot = await Bot.getInstance();
+        this.TwitchEventSub = new EventSubMiddleware({
+            apiClient: Twitch.HelixApp,
+            hostName: Environment.hostname,
+            pathPrefix: '/twitch/eventsub',
+            secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT',
+            legacySecrets: false
+        });
+    }
+
+    public static async subscribeToChannelPoints(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onChannelRedemptionAdd(channel.twitchId.toString(), async (event) => {
+            console.log(`[TWITCH EVENT SUB] Channel Points Redemption on #${event.broadcasterDisplayName} (${event.broadcasterName})`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`);
+            console.log(`[TWITCH EVENT SUB] Reward: ${event.rewardTitle}`);
+            console.log(`[TWITCH EVENT SUB] Message: ${event.input}`);
+
+            console.log(event)
+
+            const channelData = await Channel.findByTwitchId(channel.twitchId);
+
+            if (channelData) {
+                try {
+                    const user = await User.findByTwitchId(parseInt(event.userId));
+                    const rewardInfo = await Twitch.Helix.channelPoints.getCustomRewardById(event.broadcasterId, event.rewardId);
+                    await Redemption.create({
+                        channel: channelData,
+                        user: user,
+                        eventId: event.id,
+                        rewardId: event.rewardId,
+                        redemptionDate: event.redemptionDate,
+                        rewardCost: event.rewardCost,
+                        rewardIcon: rewardInfo?.getImageUrl(2) || null,
+                        rewardName: event.rewardTitle,
+                        message: event.input,
+                    });
+                } catch (error) {
+                    console.error(`[TWITCH EVENT SUB] Error while logging redemption: ${(error as Error).message}`);
+                }
+
+                if (channelData.preferences.enableFirstRanking?.value) {
+                    if (!Utils.emptyString(channelData.preferences.firstRankingRewardId?.value)) {
+                        if (channelData.preferences.firstRankingRewardId?.value === event.rewardId) {
+                            console.log(`[TWITCH EVENT SUB] First Ranking Reward detected on channel ${event.broadcasterDisplayName} (${event.broadcasterName})`);
+                            let redemeedMessage = `@${event.userDisplayName} has redeemed "${event.rewardTitle}" PopNemo`;
+
+                            if(channelData.preferences.firstRankingRedeemedMessage?.value && !Utils.emptyString(channelData.preferences.firstRankingRedeemedMessage?.value)) {
+                                redemeedMessage = channelData.preferences.firstRankingRedeemedMessage?.value.replace('#user', `@${event.userDisplayName}`).replace('#reward', event.rewardTitle);
+                            }
+                            this.bot.sendMessage(channelData, redemeedMessage);
+
+                        } else {
+                            /* 
+                                TODO: In a future, we can add Workflows to the bot, so we can add more reward handlers here.
+                                For example, trigger alerts, messages, webhooks, etc.
+                            */
+                        }
+                    } else {
+                        console.log(`[TWITCH EVENT SUB] First Ranking Reward enabled but not configured on channel ${event.broadcasterDisplayName} (${event.broadcasterName}). Skipping...`);
+                    }
+                }
+            }
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['channel-points'] = listener;
+
+        console.log(`[TWITCH EVENT SUB] Channel Points listener for channel ${channel.twitchId} started.`);
+    }
+
+    public static async unsubscribeToChannelPoints(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['channel-points'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async subscribeToAppRevocation(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onUserAuthorizationRevoke(process.env.TWITCH_CLIENT_ID as string, async (event) => {
+            console.log(`[TWITCH EVENT SUB] App Revocation detected for ${event.userDisplayName} (${event.userName})`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`);
+
+            const user = await User.findByTwitchId(parseInt(event.userId));
+            if (user) {
+                const channel = await user.getChannel();
+                if (channel) {
+                    await this.unsubscribeChannel(channel);
+                    channel.autoJoin = false;
+                    await channel.save();
+                    console.log(`[TWITCH EVENT SUB] Channel ${channel.twitchId} (${channel.user.username}) unsubscribed from all events.`);
+                    console.log(`[TWITCH EVENT SUB] Disconnecting from channel ${channel.twitchId} (${channel.user.username})`);
+                    this.bot.getBotClient().part(channel.user.username);
+                }
+            } else {
+                console.log(`[TWITCH EVENT SUB] User ${event.userDisplayName} (${event.userName}) not found on database. Skipping...`);
+            }
+
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['app-revocation'] = listener;
+    }
+
+    public static async unsubscribeToAppRevocation(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['app-revocation'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async subscribeChannel(channel: Channel): Promise<void> {
+        await this.subscribeToChannelPoints(channel);
+        await this.subscribeToAppRevocation(channel);
+    }
+
+    public static async unsubscribeChannel(channel: Channel): Promise<void> {
+        await this.unsubscribeToChannelPoints(channel);
+        await this.unsubscribeToAppRevocation(channel);
+    }
+
+    public static async subscribeAllChannels(): Promise<void> {
+        const channels = await Channel.getAutoJoinChannels();
+        for (const channel of channels) {
+            if(!this.eventSubListeners[channel.twitchId.toString()]) {
+                this.eventSubListeners[channel.twitchId.toString()] = {};
+            }
+            await this.subscribeChannel(channel);
+        }
+    }
+
+    public static async unsubscribeAllChannels(): Promise<void> {
+        const channels = await Channel.getAutoJoinChannels();
+        for (const channel of channels) {
+            await this.unsubscribeChannel(channel);
+        }
+
+        this.eventSubListeners = {};
+    }
+
+    public static get middleware(): EventSubMiddleware {
+        return this.TwitchEventSub;
+    }
+    public static async markAsReady() {
+        this.TwitchEventSub.markAsReady();
+    }
+
+    public static getListenersForChannel(channel: Channel): EventSubSubscription[] {
+        const listeners: EventSubSubscription[] = [];
+        for (const listener of Object.values(this.eventSubListeners[channel.twitchId.toString()])) {
+            listeners.push(listener);
+        }
+        return listeners;
+    }
+}
+
+export default TwitchEvents;

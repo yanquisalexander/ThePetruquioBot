@@ -1,0 +1,905 @@
+﻿[
+  {
+     "username":"jesip8",
+     "location":"Hemosillo, Sonora",
+     "latitude":"",
+     "longitude":"",
+     "country_code":""
+  },
+  {
+     "username":"wllsgigi",
+     "location":"Montevideo, Uruguay",
+     "latitude":"-34.9058916",
+     "longitude":"-56.1913095",
+     "country_code":"UY"
+  },
+  {
+     "username":"mr_sam96",
+     "location":"Buenos Aires, Barrio La Paz, Barrio Policial, Mariano Acosta, Partido de Merlo, Buenos Aires, 1724, Argentina",
+     "latitude":"-34.6881214",
+     "longitude":"-58.8190944",
+     "country_code":"AR"
+  },
+  {
+     "username":"thekillaxt",
+     "location":"Florencia, Caquetá, RAP Amazonía, Colombia",
+     "latitude":"1.7554212",
+     "longitude":"-75.60811976268113",
+     "country_code":"CO"
+  },
+  {
+     "username":"maaca____",
+     "location":"Villa Ballester, Partido de General San Martín, Buenos Aires, Argentina",
+     "latitude":"-34.5483812",
+     "longitude":"-58.5564925",
+     "country_code":"AR"
+  },
+  {
+     "username":"camiiiii____",
+     "location":"Perimetro Urbano Pereira, Pereira, AMCO, Area Metropolitana Centro Occidente, Risaralda, RAP Eje Cafetero, Colombia",
+     "latitude":"4.8143159",
+     "longitude":"-75.6946778",
+     "country_code":"CO"
+  },
+  {
+     "username":"hcbismarck_gi",
+     "location":"Santa Cruz, Bolivia",
+     "latitude":"-17.333333",
+     "longitude":"-61.5",
+     "country_code":"BO"
+  },
+  {
+     "username":"erika_fernandez01",
+     "location":"Madrid, Comunidad de Madrid, España",
+     "latitude":"40.4167047",
+     "longitude":"-3.7035825",
+     "country_code":"ES"
+  },
+  {
+     "username":"nestor_guishe",
+     "location":"UABC Facultad de Medicina Mexicali, Avenida De la Libertad, Mexicali, Baja California, 21000, México",
+     "latitude":"32.643741",
+     "longitude":"-115.47457318332947",
+     "country_code":"MX"
+  },
+  {
+     "username":"fifioficialok",
+     "location":"Malvín, Montevideo, 11403, Uruguay",
+     "latitude":"-34.8896923",
+     "longitude":"-56.0947675",
+     "country_code":"UY"
+  },
+  {
+     "username":"mizarfz",
+     "location":"MONTEVIDEO - URUGUAY, 1813, Lima, Villa Muñoz, Montevideo, 11800, Uruguay",
+     "latitude":"-34.8927002",
+     "longitude":"-56.178654",
+     "country_code":"UY"
+  },
+  {
+     "username":"cristiannnnnn_",
+     "location":"Colombia",
+     "latitude":"4.099917",
+     "longitude":"-72.9088133",
+     "country_code":"CO"
+  },
+  {
+     "username":"tuquitto",
+     "location":"Villa Adelina, Vicente López, Partido de Vicente López, Buenos Aires, Argentina",
+     "latitude":"-34.5273655",
+     "longitude":"-58.5474701",
+     "country_code":"AR"
+  },
+  {
+     "username":"gianfrancosuarez",
+     "location":"Pais, La Floresta, Sevillano, Diez de Octubre, La Habana, Diez de Octubre, 10055, Cuba",
+     "latitude":"23.087004",
+     "longitude":"-82.3735714",
+     "country_code":""
+  },
+  {
+     "username":"francoa2o",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":""
+  },
+  {
+     "username":"felipe_carrozzino",
+     "location":"Necochea, Partido de Necochea, Buenos Aires, Argentina",
+     "latitude":"-38.5545494",
+     "longitude":"-58.7392624",
+     "country_code":""
+  },
+  {
+     "username":"ellotu",
+     "location":"Río Gallegos, Municipio de Río Gallegos, Güer Aike, Santa Cruz, 9400, Argentina",
+     "latitude":"-51.64607595",
+     "longitude":"-69.26322885452636",
+     "country_code":"AR"
+  },
+  {
+     "username":"ferchuheavy",
+     "location":"Mar del Plata, Partido de General Pueyrredón, Buenos Aires, Argentina",
+     "latitude":"-37.9977225",
+     "longitude":"-57.5482703",
+     "country_code":"AR"
+  },
+  {
+     "username":"0marning",
+     "location":"Guadalajara, Jalisco, México",
+     "latitude":"20.6720375",
+     "longitude":"-103.338396",
+     "country_code":""
+  },
+  {
+     "username":"fabi_guille",
+     "location":"La Floresta, Canelones, 16200, Uruguay",
+     "latitude":"-34.7537689",
+     "longitude":"-55.675739",
+     "country_code":"UY"
+  },
+  {
+     "username":"danila02__",
+     "location":"Canada",
+     "latitude":"61.0666922",
+     "longitude":"-107.991707",
+     "country_code":"CA"
+  },
+  {
+     "username":"nmlocod",
+     "location":"Bogotá, Bogotá Distrito Capital - Municipio, RAP (Especial) Central, Colombia",
+     "latitude":"4.6529539",
+     "longitude":"-74.0835643",
+     "country_code":"CO"
+  },
+  {
+     "username":"weonsitto",
+     "location":"Tasmania, Australia",
+     "latitude":"-42.035067",
+     "longitude":"146.6366887",
+     "country_code":"AU"
+  },
+  {
+     "username":"romiinikk",
+     "location":"Maldonado, 20000, Uruguay",
+     "latitude":"-34.9087162",
+     "longitude":"-54.9582718",
+     "country_code":"UY"
+  },
+  {
+     "username":"stephen_soy_elrockerodark",
+     "location":"Old Toronto, Toronto, Golden Horseshoe, Ontario, Canada",
+     "latitude":"43.6534817",
+     "longitude":"-79.3839347",
+     "country_code":"CA"
+  },
+  {
+     "username":"almitta512",
+     "location":"Paso de los Toros, Tacuarembó, 45100, Uruguay",
+     "latitude":"-32.8108095",
+     "longitude":"-56.5174948",
+     "country_code":"UY"
+  },
+  {
+     "username":"woman53",
+     "location":"Dénia, la Marina Alta, Alacant / Alicante, Comunitat Valenciana, España",
+     "latitude":"38.8408382",
+     "longitude":"0.1061105",
+     "country_code":"ES"
+  },
+  {
+     "username":"caari_na",
+     "location":"San José, Hospital, Cantón San José, Provincia San José, 10103, Costa Rica",
+     "latitude":"9.9325427",
+     "longitude":"-84.0795782",
+     "country_code":"CR"
+  },
+  {
+     "username":"soyfacy",
+     "location":"San José, 80000, Uruguay",
+     "latitude":"-34.3396765",
+     "longitude":"-56.7138662",
+     "country_code":"UY"
+  },
+  {
+     "username":"manulrrs",
+     "location":"Quilmes, Partido de Quilmes, Buenos Aires, Argentina",
+     "latitude":"-34.7303025",
+     "longitude":"-58.268868",
+     "country_code":"AR"
+  },
+  {
+     "username":"tronchisgi",
+     "location":"Ciudad de Mendoza, Sección 2ª Barrio Cívico, Departamento Capital, Mendoza, Argentina",
+     "latitude":"-32.8894155",
+     "longitude":"-68.8446177",
+     "country_code":"AR"
+  },
+  {
+     "username":"santi_manz",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"fioalvar",
+     "location":"Lambaré, Central, Región Oriental, Paraguay / Paraguái",
+     "latitude":"-25.3455354",
+     "longitude":"-57.6261456",
+     "country_code":"PY"
+  },
+  {
+     "username":"milusd",
+     "location":"Villa Adelina, Vicente López, Partido de Vicente López, Buenos Aires, Argentina",
+     "latitude":"-34.5273655",
+     "longitude":"-58.5474701",
+     "country_code":"AR"
+  },
+  {
+     "username":"esckia",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"jota_uy",
+     "location":"Río Branco, Cerro Largo, 37100, Uruguay",
+     "latitude":"-32.588689",
+     "longitude":"-53.3780831",
+     "country_code":"UY"
+  },
+  {
+     "username":"luckready",
+     "location":"Castelldefels, Baix Llobregat, Barcelona, Catalunya, 08860, España",
+     "latitude":"41.2861022",
+     "longitude":"1.9824173",
+     "country_code":"ES"
+  },
+  {
+     "username":"alpargator",
+     "location":"Unión, Montevideo, 11600, Uruguay",
+     "latitude":"-34.8802364",
+     "longitude":"-56.1376878",
+     "country_code":"UY"
+  },
+  {
+     "username":"shogo1993",
+     "location":"Centro, Montevideo, 11100, Uruguay",
+     "latitude":"-34.9060667",
+     "longitude":"-56.1896562",
+     "country_code":"UY"
+  },
+  {
+     "username":"oscarsito_c",
+     "location":"Mendoza, Argentina",
+     "latitude":"-34.787093049999996",
+     "longitude":"-68.43818677312292",
+     "country_code":"AR"
+  },
+  {
+     "username":"winnye_91",
+     "location":"Perímetro Urbano Bucaramanga, Bucaramanga, Metropolitana, Santander, RAP Gran Santander, Colombia",
+     "latitude":"7.1255169",
+     "longitude":"-73.1182624",
+     "country_code":"CO"
+  },
+  {
+     "username":"solemnsnowman",
+     "location":"Montevideo, Uruguay",
+     "latitude":"-34.9058916",
+     "longitude":"-56.1913095",
+     "country_code":"UY"
+  },
+  {
+     "username":"julie_julepp",
+     "location":"Ciudad de Mendoza, Sección 2ª Barrio Cívico, Departamento Capital, Mendoza, Argentina",
+     "latitude":"-32.8894155",
+     "longitude":"-68.8446177",
+     "country_code":"AR"
+  },
+  {
+     "username":"mashigirl",
+     "location":"Lima, Lima Metropolitana, Lima, Perú",
+     "latitude":"-12.0002116",
+     "longitude":"-76.8330796",
+     "country_code":"PE"
+  },
+  {
+     "username":"agusgi",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"tronchispro",
+     "location":"Distrito Ciudad de Las Heras, Departamento Las Heras, Mendoza, M5539KTR, Argentina",
+     "latitude":"-32.8521368",
+     "longitude":"-68.834782",
+     "country_code":"AR"
+  },
+  {
+     "username":"alexialunaaa",
+     "location":"Lima, Lima Metropolitana, Lima, Perú",
+     "latitude":"-12.0621065",
+     "longitude":"-77.0365256",
+     "country_code":"PE"
+  },
+  {
+     "username":"trinniiq",
+     "location":"Punta Del Este, Maldonado, 20100, Uruguay",
+     "latitude":"-34.9632342",
+     "longitude":"-54.9439981",
+     "country_code":"UY"
+  },
+  {
+     "username":"antorta_",
+     "location":"La Plata, Partido de La Plata, Buenos Aires, Argentina",
+     "latitude":"-34.9206797",
+     "longitude":"-57.9537638",
+     "country_code":"AR"
+  },
+  {
+     "username":"heratokk",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"nicobtez",
+     "location":"Estación Temperley, Avenida Meeks, Temperley, Partido de Lomas de Zamora, Buenos Aires, B1832DEF, Argentina",
+     "latitude":"-34.7745874",
+     "longitude":"-58.3976179",
+     "country_code":"AR"
+  },
+  {
+     "username":"octita",
+     "location":"Oro Verde, Distrito Sauce, Departamento Paraná, Entre Ríos, Argentina",
+     "latitude":"-31.8254963",
+     "longitude":"-60.5165484",
+     "country_code":"AR"
+  },
+  {
+     "username":"lachola6",
+     "location":"South Carolina, United States",
+     "latitude":"33.6874388",
+     "longitude":"-80.4363743",
+     "country_code":"US"
+  },
+  {
+     "username":"aannntoo",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"cons_a",
+     "location":"Misiones, Argentina",
+     "latitude":"-26.737224",
+     "longitude":"-54.4315257",
+     "country_code":"AR"
+  },
+  {
+     "username":"nayesjs",
+     "location":"Lima, Lima Metropolitana, Lima, Perú",
+     "latitude":"-12.0621065",
+     "longitude":"-77.0365256",
+     "country_code":"PE"
+  },
+  {
+     "username":"elsalmon",
+     "location":"Corrientes, Argentina",
+     "latitude":"-28.991123",
+     "longitude":"-57.812560597566716",
+     "country_code":"AR"
+  },
+  {
+     "username":"brenpiola",
+     "location":"Salta, Argentina",
+     "latitude":"-25.1076701",
+     "longitude":"-64.3494964",
+     "country_code":"AR"
+  },
+  {
+     "username":"gustavoflash23",
+     "location":"Aguada, Montevideo, 11100, Uruguay",
+     "latitude":"-34.8966763",
+     "longitude":"-56.1893663",
+     "country_code":"UY"
+  },
+  {
+     "username":"redseyz",
+     "location":"Morelos, México",
+     "latitude":"18.75",
+     "longitude":"-99",
+     "country_code":"MX"
+  },
+  {
+     "username":"scrim59_grey",
+     "location":"Querétaro, México",
+     "latitude":"20.5927744",
+     "longitude":"-100.3902245",
+     "country_code":"MX"
+  },
+  {
+     "username":"fisskii",
+     "location":"Sevilla, Andalucía, España",
+     "latitude":"37.3886303",
+     "longitude":"-5.9953403",
+     "country_code":"ES"
+  },
+  {
+     "username":"paltiiix",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"oriitaagi",
+     "location":"Sierras Chicas, Country San Isidro, Villa Allende, Municipio de Villa Allende, Pedanía Río Ceballos, Departamento Colón, Córdoba, X5111, Argentina",
+     "latitude":"-31.303428850000003",
+     "longitude":"-64.2494520318887",
+     "country_code":"AR"
+  },
+  {
+     "username":"joacocorne",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"zaik0zko",
+     "location":"Viña del Mar, Provincia de Valparaíso, Región de Valparaíso, Chile",
+     "latitude":"-33.0244535",
+     "longitude":"-71.5517636",
+     "country_code":"CL"
+  },
+  {
+     "username":"emirgi",
+     "location":"Villa Amelia, Municipio de Villa Amelia, Departamento Rosario, Santa Fe, 2101, Argentina",
+     "latitude":"-33.1759838",
+     "longitude":"-60.6641381",
+     "country_code":"AR"
+  },
+  {
+     "username":"jeanksa",
+     "location":"Perímetro Urbano Santiago de Cali, Cali, Sur, Valle del Cauca, RAP Pacífico, Colombia",
+     "latitude":"3.4520339",
+     "longitude":"-76.5329352",
+     "country_code":"CO"
+  },
+  {
+     "username":"shuliipalmi",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"nestipink_rize",
+     "location":"Municipio de Firmat, Departamento General López, Santa Fe, Argentina",
+     "latitude":"-33.4581071",
+     "longitude":"-61.4860292",
+     "country_code":"AR"
+  },
+  {
+     "username":"valenpr0roblox74",
+     "location":"Ezeiza & Buenos Aires, Buenos Aires, Banfield, Partido de Lomas de Zamora, Buenos Aires, 1828, Argentina",
+     "latitude":"-34.746468",
+     "longitude":"-58.3686758",
+     "country_code":"AR"
+  },
+  {
+     "username":"antriste",
+     "location":"Santiago, Provincia de Santiago, Región Metropolitana de Santiago, Chile",
+     "latitude":"-33.4377756",
+     "longitude":"-70.6504502",
+     "country_code":"CL"
+  },
+  {
+     "username":"luisa_fernandxx",
+     "location":"Cartagena de Indias, Dique, Bolívar, RAP Caribe, Colombia",
+     "latitude":"10.4266746",
+     "longitude":"-75.5443419",
+     "country_code":"CO"
+  },
+  {
+     "username":"itsrainingwoman",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"nicoielm",
+     "location":"Bogotá, Bogotá Distrito Capital - Municipio, RAP (Especial) Central, Colombia",
+     "latitude":"4.6529539",
+     "longitude":"-74.0835643",
+     "country_code":"CO"
+  },
+  {
+     "username":"bordakito",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"lautoz",
+     "location":"Beccar, Partido de San Isidro, Buenos Aires, Argentina",
+     "latitude":"-34.4635418",
+     "longitude":"-58.5343404",
+     "country_code":"AR"
+  },
+  {
+     "username":"naanegi",
+     "location":"Río Cuarto, Municipio de Río Cuarto, Pedanía Río Cuarto, Departamento Río Cuarto, Córdoba, X5800, Argentina",
+     "latitude":"-33.1237585",
+     "longitude":"-64.3489782",
+     "country_code":"AR"
+  },
+  {
+     "username":"hawkeyyy",
+     "location":"Bahía Blanca, Partido de Bahía Blanca, Buenos Aires, Argentina",
+     "latitude":"-38.7176522",
+     "longitude":"-62.2654871",
+     "country_code":"AR"
+  },
+  {
+     "username":"aimargi",
+     "location":"Rafaela, Municipio de Rafaela, Departamento Castellanos, Santa Fe, S2300, Argentina",
+     "latitude":"-31.2526923",
+     "longitude":"-61.4916758",
+     "country_code":"AR"
+  },
+  {
+     "username":"drogoo115",
+     "location":"Santiago, Provincia de Santiago, Región Metropolitana de Santiago, Chile",
+     "latitude":"-33.4377756",
+     "longitude":"-70.6504502",
+     "country_code":"CL"
+  },
+  {
+     "username":"utcsanti11",
+     "location":"Montevideo, Uruguay",
+     "latitude":"-34.9058916",
+     "longitude":"-56.1913095",
+     "country_code":"UY"
+  },
+  {
+     "username":"locar_s2",
+     "location":"Club Atlético River Plate, 7597, Avenida Presidente Figueroa Alcorta, Barrio River, Belgrano, Buenos Aires, Comuna 13, Ciudad Autónoma de Buenos Aires, C1424BCL, Argentina",
+     "latitude":"-34.5450868",
+     "longitude":"-58.44842272098764",
+     "country_code":"AR"
+  },
+  {
+     "username":"sammwy",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"hellhound2",
+     "location":"Madagasikara / Madagascar, Province d’Antananarivo, Madagasikara / Madagascar",
+     "latitude":"-18.779148749999997",
+     "longitude":"46.71217161656727",
+     "country_code":"MG"
+  },
+  {
+     "username":"jmgnz",
+     "location":"Vitoria-Gasteiz, Gasteizko kuadrilla/Cuadrilla de Vitoria, Araba/Álava, Euskadi, España",
+     "latitude":"42.8465088",
+     "longitude":"-2.6724025",
+     "country_code":"ES"
+  },
+  {
+     "username":"ladypan_",
+     "location":"Santa Catarina, Região Sul, Brasil",
+     "latitude":"-27.0628367",
+     "longitude":"-51.114965",
+     "country_code":"BR"
+  },
+  {
+     "username":"keen_v",
+     "location":"Santa Fe, Santa Fe Capital, Departamento La Capital, Santa Fe, S3000, Argentina",
+     "latitude":"-31.6186951",
+     "longitude":"-60.7019561",
+     "country_code":"AR"
+  },
+  {
+     "username":"celinanaa",
+     "location":"Estación Norte, Mar del Plata, Partido de General Pueyrredón, Buenos Aires, Argentina",
+     "latitude":"-37.9849187",
+     "longitude":"-57.5655634",
+     "country_code":"AR"
+  },
+  {
+     "username":"diegojramirezf",
+     "location":"Cr 90 71A 81, Bogotá",
+     "latitude":"",
+     "longitude":"",
+     "country_code":""
+  },
+  {
+     "username":"heartdelrey",
+     "location":"Tijuana, Municipio de Tijuana, Baja California, 22320, México",
+     "latitude":"32.5317397",
+     "longitude":"-117.0195295",
+     "country_code":"MX"
+  },
+  {
+     "username":"gustavopalmi",
+     "location":"sancasteabro, mexico",
+     "latitude":"",
+     "longitude":"",
+     "country_code":""
+  },
+  {
+     "username":"corvuspalmi1821",
+     "location":"La Rioja, Argentina",
+     "latitude":"-29.9729781",
+     "longitude":"-67.0487944",
+     "country_code":"AR"
+  },
+  {
+     "username":"jorge3029_",
+     "location":"Veracruz, México",
+     "latitude":"19.333333",
+     "longitude":"-96.666667",
+     "country_code":"MX"
+  },
+  {
+     "username":"jorgepalmi_dzx",
+     "location":"Lima, Lima Metropolitana, Lima, Perú",
+     "latitude":"-12.0621065",
+     "longitude":"-77.0365256",
+     "country_code":"PE"
+  },
+  {
+     "username":"gen_omaticvm",
+     "location":"Barcelona, Barcelonès, Barcelona, Catalunya, 08001, España",
+     "latitude":"41.3828939",
+     "longitude":"2.1774322",
+     "country_code":"ES"
+  },
+  {
+     "username":"feeli_ofnox",
+     "location":"València, Comarca de València, València / Valencia, Comunitat Valenciana, España",
+     "latitude":"39.4697065",
+     "longitude":"-0.3763353",
+     "country_code":"ES"
+  },
+  {
+     "username":"juanse_vs12",
+     "location":"Buenos Aires, Comuna 6, Ciudad Autónoma de Buenos Aires, Argentina",
+     "latitude":"-34.6075682",
+     "longitude":"-58.4370894",
+     "country_code":"AR"
+  },
+  {
+     "username":"justluishere",
+     "location":"México",
+     "latitude":"23.6585116",
+     "longitude":"-102.0077097",
+     "country_code":"MX"
+  },
+  {
+     "username":"jolatsitodzxnox",
+     "location":"Viña del Mar, Provincia de Valparaíso, Región de Valparaíso, Chile",
+     "latitude":"-33.0244535",
+     "longitude":"-71.5517636",
+     "country_code":"CL"
+  },
+  {
+     "username":"xdeacks",
+     "location":"Aeropuerto Internacional Ministro Pistarini, Patricias Argentinas, Villa Guillermina, Ezeiza, Partido de Ezeiza, Buenos Aires, B1804, Argentina",
+     "latitude":"-34.81681415",
+     "longitude":"-58.54742335052262",
+     "country_code":"AR"
+  },
+  {
+     "username":"frannpons",
+     "location":"Florencio Varela, Partido de Florencio Varela, Buenos Aires, Argentina",
+     "latitude":"-34.8044384",
+     "longitude":"-58.2783224",
+     "country_code":"AR"
+  },
+  {
+     "username":"el_mateamargo",
+     "location":"Rosario, Municipio de Rosario, Gran Rosario, Departamento Rosario, Santa Fe, S2000, Argentina",
+     "latitude":"-32.9593609",
+     "longitude":"-60.6617024",
+     "country_code":"AR"
+  },
+  {
+     "username":"sebita",
+     "location":"Monte Grande, Partido de Esteban Echeverría, Buenos Aires, Argentina",
+     "latitude":"-34.8192731",
+     "longitude":"-58.4664257",
+     "country_code":"AR"
+  },
+  {
+     "username":"carobezzoni",
+     "location":"Córdoba, Municipio de Córdoba, Pedanía Capital, Departamento Capital, Córdoba, X5000, Argentina",
+     "latitude":"-31.4166867",
+     "longitude":"-64.1834193",
+     "country_code":"AR"
+  },
+  {
+     "username":"xecta",
+     "location":"Ingeniero Budge, Partido de Lomas de Zamora, Buenos Aires, Argentina",
+     "latitude":"-34.7122459",
+     "longitude":"-58.4587643",
+     "country_code":"AR"
+  },
+  {
+     "username":"itsgisellec",
+     "location":"Partido de Almirante Brown, Buenos Aires, Argentina",
+     "latitude":"-34.7973853",
+     "longitude":"-58.3885508",
+     "country_code":"AR"
+  },
+  {
+     "username":"chocolatedelujo",
+     "location":"Argentina",
+     "latitude":"-34.9964963",
+     "longitude":"-64.9672817",
+     "country_code":"AR"
+  },
+  {
+     "username":"mdiazcor",
+     "location":"Uruguay",
+     "latitude":"-32.8755548",
+     "longitude":"-56.0201525",
+     "country_code":"UY"
+  },
+  {
+     "username":"ikazzu_",
+     "location":"Uruguay",
+     "latitude":"-32.8755548",
+     "longitude":"-56.0201525",
+     "country_code":"UY"
+  },
+  {
+     "username":"axelpallero_719",
+     "location":"Virgen, Calle Párroco Rodriguez Vega, La Tosca, Lomo de Los Santos, Tejeda, Las Palmas, Canarias, 35360, España",
+     "latitude":"27.996703",
+     "longitude":"-15.615038",
+     "country_code":"ES"
+  },
+  {
+     "username":"elhansa",
+     "location":"Municipio Santa Cruz de la Sierra, Provincia Andrés Ibáñez, Santa Cruz, Bolivia",
+     "latitude":"-17.7834936",
+     "longitude":"-63.1820853",
+     "country_code":"BO"
+  },
+  {
+     "username":"lua_dmcc",
+     "location":"Coronel Oviedo, Caaguazú, Región Oriental, Paraguay / Paraguái",
+     "latitude":"-25.450055",
+     "longitude":"-56.4406994",
+     "country_code":"PY"
+  },
+  {
+     "username":"lautiams",
+     "location":"Boulogne Sur Mer, Comandante Luis Piedra Buena, Villa Ruedita, Boulogne Sur Mer, Partido de San Isidro, Buenos Aires, B1609AWA, Argentina",
+     "latitude":"-34.509026",
+     "longitude":"-58.5648877",
+     "country_code":"AR"
+  },
+  {
+     "username":"itandrade01",
+     "location":"Paulínia, Região Imediata de Campinas, Região Metropolitana de Campinas, Região Geográfica Intermediária de Campinas, São Paulo, Região Sudeste, Brasil",
+     "latitude":"-22.7630391",
+     "longitude":"-47.1532213",
+     "country_code":"BR"
+  },
+  {
+     "username":"alejandro_lactolate",
+     "location":"Maldonado, 20000, Uruguay",
+     "latitude":"-34.9087162",
+     "longitude":"-54.9582718",
+     "country_code":"UY"
+  },
+  {
+     "username":"markoy_presley",
+     "location":"Ciudad de México, México",
+     "latitude":"19.4326296",
+     "longitude":"-99.1331785",
+     "country_code":"MX"
+  },
+  {
+     "username":"lakhaso",
+     "location":"España",
+     "latitude":"39.3260685",
+     "longitude":"-4.8379791",
+     "country_code":"ES"
+  },
+  {
+     "username":"alexitoo_uy",
+     "location":"Río Branco, Cerro Largo, 37100, Uruguay",
+     "latitude":"-32.588689",
+     "longitude":"-53.3780831",
+     "country_code":"UY"
+  },
+  {
+     "username":"gagoquesito_1623",
+     "location":"Ciudad de México, México",
+     "latitude":"19.4326296",
+     "longitude":"-99.1331785",
+     "country_code":"MX"
+  },
+  {
+     "username":"michiloves_sami_and_cami",
+     "location":"Aguascalientes, México",
+     "latitude":"22.0000001",
+     "longitude":"-102.5000001",
+     "country_code":"MX"
+  },
+  {
+     "username":"sharith_17",
+     "location":"Girón, Metropolitana, Santander, RAP Gran Santander, Colombia",
+     "latitude":"7.0732333",
+     "longitude":"-73.1689196",
+     "country_code":"CO"
+  },
+  {
+     "username":"sami_lalindaa",
+     "location":"Perímetro Urbano Medellín, Medellín, Valle de Aburrá, Antioquia, RAP del Agua y la Montaña, Colombia",
+     "latitude":"6.2443382",
+     "longitude":"-75.573553",
+     "country_code":"CO"
+  },
+  {
+     "username":"samuel78_yt",
+     "location":"Perímetro Urbano Neiva, Norte, Huila, RAP (Especial) Central, Colombia",
+     "latitude":"2.9257038",
+     "longitude":"-75.2893937",
+     "country_code":"CO"
+  },
+  {
+     "username":"janudk",
+     "location":"Argentina",
+     "latitude":"-34.9964963",
+     "longitude":"-64.9672817",
+     "country_code":"AR"
+  },
+  {
+     "username":"pemicci",
+     "location":"Nicaragua",
+     "latitude":"12.6090157",
+     "longitude":"-85.2936911",
+     "country_code":"NI"
+  },
+  {
+     "username":"nathalylover",
+     "location":"Londrina, Região Geográfica Imediata de Londrina, Região Geográfica Intermediária de Londrina, Paraná, Região Sul, Brasil",
+     "latitude":"-23.3112878",
+     "longitude":"-51.1595023",
+     "country_code":"BR"
+  },
+  {
+     "username":"simp_de_juan_",
+     "location":"Bonao, Monseñor Nouel, República Dominicana",
+     "latitude":"18.9426446",
+     "longitude":"-70.4414197474793",
+     "country_code":"DO"
+  },
+  {
+     "username":"lukeskytss",
+     "location":"Aeropuerto Internacional Ministro Pistarini, TAXI, Aeropuerto Internacional Ezeiza, Partido de Ezeiza, Buenos Aires, B1802, Argentina",
+     "latitude":"-34.81681415",
+     "longitude":"-58.54742335052262",
+     "country_code":"AR"
+  }
+]
