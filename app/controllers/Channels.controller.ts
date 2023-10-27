@@ -5,10 +5,33 @@ import Channel from '../models/Channel.model';
 import Twitch from '../modules/Twitch.module';
 import { ChannelPreferences, defaultChannelPreferences } from '../../utils/ChannelPreferences.class';
 import Redemption from '../models/Redemption.model';
+import Session from '../models/Session.model';
 
 class ChannelsController {
     static async getPreferences(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
+
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+        if(session?.impersonatedUserId) {
+            const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
+
+            if(!impersonatedUser) {
+                return res.status(404).json({ error: 'Impersonated user not found' })
+            }
+
+            const impersonatedChannel = await impersonatedUser.getChannel();
+
+            if(!impersonatedChannel) {
+                return res.status(404).json({ error: 'Impersonated channel not found' })
+            }
+
+            return res.json({
+                data: {
+                    preferences: { ...defaultChannelPreferences, ...impersonatedChannel.preferences },
+                },
+            })
+        }
 
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
@@ -44,6 +67,48 @@ class ChannelsController {
 
     static async updatePreferences(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
+
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+        if(session?.impersonatedUserId) {
+            const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
+
+            if(!impersonatedUser) {
+                return res.status(404).json({ error: 'Impersonated user not found' })
+            }
+
+            const impersonatedChannel = await impersonatedUser.getChannel();
+
+            if(!impersonatedChannel) {
+                return res.status(404).json({ error: 'Impersonated channel not found' })
+            }
+
+            const preferences = req.body.preferences as ChannelPreferences
+
+            if (!preferences) {
+                return res.status(400).json({ error: 'Preferences are required' });
+            }
+
+            const preferencesKeys = Object.keys(preferences);
+
+            for (const preferenceKey of preferencesKeys) {
+                // @ts-ignore
+                if (impersonatedChannel.preferences[preferenceKey] === undefined) {
+                    return res.status(400).json({ error: `Preference ${preferenceKey} does not exist` });
+                } else {
+                    // @ts-ignore
+                    impersonatedChannel.preferences[preferenceKey].value = preferences[preferenceKey].value;
+                }
+            }
+
+            await impersonatedChannel.save();
+
+            return res.json({
+                data: {
+                    preferences: { ...defaultChannelPreferences, ...impersonatedChannel.preferences },
+                },
+            })
+        }
     
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
     
