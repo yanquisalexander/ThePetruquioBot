@@ -13,7 +13,11 @@ class ChannelsController {
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if (session?.impersonatedUserId) {
+        if(!session) {
+            return res.status(404).json({ error: 'Session not found' })
+        }
+
+        if (session.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
             if (!impersonatedUser) {
