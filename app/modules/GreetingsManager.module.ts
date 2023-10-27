@@ -119,6 +119,12 @@ class GreetingsManager {
     public static async canReceiveShoutoutGreeting(channel: Channel, user: User) {
         let greetingData = await Greeting.findByChannel(channel, user);
         if (!greetingData) {
+            try {
+                await Greeting.create(user, channel, new Date(), new Date(), true);
+                return true;
+            } catch (error) {
+                console.error(chalk.red('[GREETINGS]'), chalk.white('Error creating greeting:'), error);
+            }
             return false
         }
 
