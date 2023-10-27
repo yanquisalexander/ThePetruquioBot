@@ -13,6 +13,8 @@ class ChannelsController {
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
+        console.log(session);
+
         if(!session) {
             return res.status(404).json({ error: 'Session not found' })
         }
@@ -29,6 +31,8 @@ class ChannelsController {
             if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
+
+            console.log(impersonatedChannel);
 
             return res.json({
                 data: {
