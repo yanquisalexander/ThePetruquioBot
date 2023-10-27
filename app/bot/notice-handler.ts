@@ -13,7 +13,7 @@ export const noticeHandler = async (channel: string, msgid: string, message: str
             console.error(`[${channel}] Error leaving channel:`, error);
         }
 
-        const channelDb = await Channel.findByUsername(channel);
+        const channelDb = await Channel.findByUsername(channel.replace('#', ''));
 
         if(channelDb) {
             channelDb.autoJoin = false;
