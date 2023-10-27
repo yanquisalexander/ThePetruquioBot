@@ -155,7 +155,7 @@ class Twitch {
                     parseInt(start, 10),
                     parseInt(end, 10) + 1
                 );
-                
+
                 let allowAnimatedPins = channel.preferences.enableAnimatedPins?.value;
 
                 if (isMapPin) {
@@ -189,8 +189,7 @@ class Twitch {
 
         const parser = new EmoteParser(this.EmoteFetcher, {
             type: 'html',
-            template: '<img alt="{name}" class="map-popup-emote" src="{link}">',
-            match: /([A-Za-z0-9_]+)|(\S+)/g
+            template: '<img alt="{name}" class="map-popup-emote" src="{link}">'
         });
 
         parsedMessage = parser.parse(message, 2)
