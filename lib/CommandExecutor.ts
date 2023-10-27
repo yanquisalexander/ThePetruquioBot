@@ -32,9 +32,6 @@ class CommandExecutor {
     private loadSystemCommands() {
         /* Load files from /app/commands  */
         const commandFiles = fs.readdirSync('./app/commands');
-    
-        
-
         console.log(commandFiles)
 
         for (const file of commandFiles) {
