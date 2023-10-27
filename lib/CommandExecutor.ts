@@ -30,18 +30,24 @@ class CommandExecutor {
 
 
     private loadSystemCommands() {
-        /* Load files from /app/commands  */
-        const commandFiles = fs.readdirSync('./app/commands');
-    
+        // Define la ruta del directorio de comandos basándote en el entorno
+        const commandDirectory = process.env.NODE_ENV === 'production'
+            ? './dist/app/commands' // Ruta en producción
+            : './app/commands';      // Ruta en desarrollo
+
+        const commandFiles = fs.readdirSync(commandDirectory);
+
+        console.log(commandFiles)
+
         for (const file of commandFiles) {
-            if (file.endsWith('.command.ts')) {
+            if (file.endsWith('.command.ts') || file.endsWith('.command.js')) { 
                 try {
-                    const command = require(`../app/commands/${file}`).default;
-                    
-                    if (command && command.name && command.execute) {
-                        this.systemCommands.push(command);
+                    const commandModule = require(`../${commandDirectory}/${file}`);
+
+                    if (commandModule && commandModule.default && commandModule.default.name && commandModule.default.execute) {
+                        this.systemCommands.push(commandModule.default);
                     } else {
-                        console.error(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Command ${file} is not valid.`));
+                        console.error('[COMMAND EXECUTOR]', `Command ${file} is not valid.`);
                     }
                 } catch (error) {
                     console.error(error);
