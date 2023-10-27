@@ -19,7 +19,7 @@ class GreetingsManager {
 
     */
 
-    private static cooldown = Environment.isDevelopment ? 30* 1000 : 6 * 60 * 60 * 1000;
+    private static cooldown = Environment.isDevelopment ? 30 * 1000 : 6 * 60 * 60 * 1000;
 
     public static knownBots: string[] = ["streamelements", "streamlabs", "nightbot", "tangerinebot_"];
 
@@ -79,17 +79,17 @@ class GreetingsManager {
         }
     }
 
-    private static async getSunlightGreeting(username: string, lang: string) : Promise<string[] | undefined> {
+    private static async getSunlightGreeting(username: string, lang: string): Promise<string[] | undefined> {
         if (!username || !lang) return;
 
         const user = await User.findByUsername(username);
-        if(!user) {
+        if (!user) {
             return greetings[lang];
         }
 
         const userLocation = await SpectatorLocation.findByUserId(user.twitchId);
 
-        if(!userLocation || !userLocation.latitude || !userLocation.longitude) {
+        if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
             return greetings[lang];
         }
 
@@ -97,7 +97,7 @@ class GreetingsManager {
         const times = SunCalc.getTimes(date, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
         const hour = date.getHours();
 
-        if ( hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
+        if (hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
             return sunlightGreetings[lang].morning
         } else if (hour >= times.sunriseEnd.getHours() && hour < times.sunset.getHours()) {
             return sunlightGreetings[lang].afternoon
@@ -135,6 +135,12 @@ class GreetingsManager {
 
         let greetingData = await Greeting.findByChannel(channel, user);
         if (!greetingData) {
+            try {
+                await Greeting.create(user, channel, new Date(), null, true);
+                return Boolean(userOnMap)
+            } catch (error) {
+                console.error(chalk.red('[GREETINGS]'), chalk.white('Error creating greeting:'), error);
+            }
             return false
         }
         if (!greetingData.enabled) return false;

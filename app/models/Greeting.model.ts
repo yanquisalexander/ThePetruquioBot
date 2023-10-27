@@ -127,6 +127,16 @@ class Greeting {
             throw new Error('Error finding greeting: ' + (error as Error).message);
         }
     }
+
+    async save(): Promise<void> {
+        const query = `
+            INSERT INTO greetings (user_id, channel, last_seen, shoutouted_at, enabled)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (user_id, channel) DO UPDATE SET last_seen = $3, shoutouted_at = $4, enabled = $5
+        `;
+        const values = [this.twitchId, this.channel.twitchId, this.lastSeen, this.shoutoutedAt, this.enabled];
+        await Database.query(query, values);
+    }
 }
 
 export default Greeting;
