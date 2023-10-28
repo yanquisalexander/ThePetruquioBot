@@ -4,7 +4,6 @@ import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 
 import User from '../app/models/User.model';
 import Session from '../app/models/Session.model';
-import Channel from '../app/models/Channel.model';
 
 class Passport {
     constructor() {

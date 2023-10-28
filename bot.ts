@@ -1,4 +1,4 @@
-import tmi, { client } from 'tmi.js';
+import tmi from 'tmi.js';
 import 'dotenv/config';
 import Channel from './app/models/Channel.model';
 import chalk from 'chalk';
@@ -100,7 +100,7 @@ export class Bot {
       const channel = await user.getChannel();
       if (!channel) {
         try {
-          const botChannel = await user.createChannelWithPreferences();
+          await user.createChannelWithPreferences();
         } catch (error) {
           console.error(chalk.red('[FATAL ERROR]'), chalk.white('Error creating bot channel:'), error);
         }

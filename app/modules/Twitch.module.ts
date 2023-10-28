@@ -5,7 +5,6 @@ import { Bot } from '../../bot';
 import Channel from '../models/Channel.model';
 import MemoryVariables from '../../lib/MemoryVariables';
 import TwitchEmoticons from '@mkody/twitch-emoticons';
-import User from '../models/User.model';
 import { ChatUserstate } from 'tmi.js';
 const { EmoteFetcher, EmoteParser } = TwitchEmoticons;
 

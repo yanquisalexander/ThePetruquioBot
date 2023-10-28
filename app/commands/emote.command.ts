@@ -47,7 +47,7 @@ const MapEmoteCommand = new Command(
                 if(Utils.emptyString(imgSrc)) {
                     imgSrc = emoteUrl
                 }
-                if (worldmapUser && imgSrc) {
+                if (imgSrc) {
                     worldmapUser.pinEmote = imgSrc;
                     await worldmapUser.save();
 
