@@ -1,3 +1,4 @@
+import Utils from "../../lib/Utils";
 import { Command, CommandPermission } from "../models/Command.model";
 import SpectatorLocation from "../models/SpectatorLocation.model";
 import User from "../models/User.model";
@@ -39,15 +40,24 @@ const MapEmoteCommand = new Command(
             if(worldmapUser) {
                 if(!_args[0]) return _bot.sendMessage(_channel.user.username, `@${_user.displayName}, debes especificar un emote para tu pin.`);
                 let emote = '!emote ' + _args[0]
-                worldmapUser.pinEmote = await Twitch.parseEmotes(_channel, emote, _user.raw, true);
-                await worldmapUser.save();
+                let emoteUrl = await Twitch.parseEmotes(_channel, emote, _user.raw, true)
+                emoteUrl = emoteUrl.replace('!emote ', '')
+                let imgSrc = emoteUrl.match(/src="([^"]+)"/)?.[1];
+                
+                if(Utils.emptyString(imgSrc)) {
+                    imgSrc = emoteUrl
+                }
+                if (worldmapUser && imgSrc) {
+                    worldmapUser.pinEmote = imgSrc;
+                    await worldmapUser.save();
 
-                SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {
-                    type: 'message',
-                    username: _user.username,
-                });
+                    SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {
+                        type: 'message',
+                        username: _user.username,
+                    });
+                }
 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu mensaje personalizado ha sido guardado ;)`);
+                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu pin personalizado ha sido guardado ;)`);
             }
         }
 
