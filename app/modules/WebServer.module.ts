@@ -1,8 +1,5 @@
 import 'dotenv/config'
 import express, { Express } from 'express';
-import { EventSubMiddleware } from '@twurple/eventsub-http';
-import Twitch from './Twitch.module';
-import Environment from '../../utils/environment';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import router from '../config/routes';

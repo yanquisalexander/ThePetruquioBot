@@ -2,9 +2,7 @@ import { EventSubMiddleware } from "@twurple/eventsub-http";
 
 import Environment from "../../utils/environment";
 import Twitch from "./Twitch.module";
-import { HelixUser } from "@twurple/api";
 import Channel from "../models/Channel.model";
-import { channel } from "diagnostics_channel";
 import Utils from "../../lib/Utils";
 import Redemption from "../models/Redemption.model";
 import User from "../models/User.model";

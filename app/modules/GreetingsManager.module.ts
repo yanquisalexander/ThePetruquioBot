@@ -21,7 +21,7 @@ class GreetingsManager {
 
     private static cooldown = Environment.isDevelopment ? 30 * 1000 : 6 * 60 * 60 * 1000;
 
-    public static knownBots: string[] = ["streamelements", "streamlabs", "nightbot", "tangerinebot_"];
+    private static knownBotsList: string[] = ["streamelements", "streamlabs", "nightbot", "tangerinebot_"];
 
     private static greetingStacks: { channel: string, greeting: string, options: string[] }[] = [];
 
@@ -161,7 +161,7 @@ class GreetingsManager {
             return true;
         }
 
-        if (this.knownBots.includes(user.username)) {
+        if (this.knownBotsList.includes(user.username)) {
             if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen.getTime()) < this.cooldown) {
                 await Greeting.updateTimestamp(user, channel);
                 return false;
@@ -211,8 +211,8 @@ class GreetingsManager {
     }
 
 
-    public get knownBots(): string[] {
-        return this.knownBots;
+    public static get knownBots(): string[] {
+        return GreetingsManager.knownBotsList;
     }
 
 

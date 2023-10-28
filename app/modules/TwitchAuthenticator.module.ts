@@ -1,6 +1,6 @@
 import axios from "axios";
 import "dotenv/config";
-import { RefreshingAuthProvider, AppTokenAuthProvider, TokenInfo, TokenInfoData, AccessToken, exchangeCode } from '@twurple/auth';
+import { RefreshingAuthProvider, AppTokenAuthProvider, TokenInfoData, AccessToken, exchangeCode } from '@twurple/auth';
 import chalk from "chalk";
 import UserToken from "../models/UserToken.model";
 import Environment from "../../utils/environment";

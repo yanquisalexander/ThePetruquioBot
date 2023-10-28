@@ -23,8 +23,8 @@ const MapCommand = new Command(
     {},
     '', // System commands don't need a response
     async (_user, _args, _channel, _bot) => {
-        if(!_channel.preferences.enableCommunityMap) return '';
-        if (_channel?.preferences?.mapCommandMessage && _channel.preferences.mapCommandMessage.value.length > 0) {
+        if(!_channel.preferences.enableCommunityMap?.value) return;
+        if (_channel?.preferences?.mapCommandMessage?.value && _channel.preferences.mapCommandMessage.value.length > 0) {
             _bot.sendMessage(_channel.user.username, `${_channel.preferences.mapCommandMessage.value?.replace('#map_url', `petruquio.live/c/${_channel.user.username}/map`)}`);
             return '';
         } else {
