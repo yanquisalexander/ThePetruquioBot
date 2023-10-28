@@ -140,69 +140,63 @@ class Twitch {
     }
 
     public static async parseEmotes(channel: Channel, message: string, userstate: ChatUserstate, isMapPin?: boolean): Promise<string> {
-        let parsedMessage = '';
-        let userStateEmotes = userstate.emotes;
+        let parsedMessage = message; // Inicializa con el mensaje original
+        const userStateEmotes = userstate.emotes;
 
         const stringReplacements: { stringToReplace: string, template: string }[] = [];
 
-        // Replace userstate emotes with the url before parsing BTTV and FFZ emotes
-
+        // Procesa las sustituciones de emotes del userstate
         if (userStateEmotes) {
             Object.entries(userStateEmotes).forEach(([emoteId, emotePositions]) => {
                 const position = emotePositions[0];
                 const [start, end] = position.split('-');
                 const stringToReplace = message.substring(
-                    parseInt(start, 10),
-                    parseInt(end, 10) + 1
+                    parseInt(start),
+                    parseInt(end) + 1
                 );
 
                 let allowAnimatedPins = channel.preferences.enableAnimatedPins?.value;
 
-                if (isMapPin) {
-                    stringReplacements.push({
-                        stringToReplace,
-                        template: allowAnimatedPins ? `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0` : `https://static-cdn.jtvnw.net/emoticons/v1/${emoteId}/3.0`
-                    })
-                } else {
-                    stringReplacements.push({
-                        stringToReplace,
-                        template: `<img src='https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0' class='map-popup-emote'>`
-                    })
-                }
+                const template = isMapPin
+                    ? allowAnimatedPins
+                        ? `https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0`
+                        : `https://static-cdn.jtvnw.net/emoticons/v1/${emoteId}/3.0`
+                    : `<img src="https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/light/3.0" class="map-popup-emote">`;
 
+                stringReplacements.push({
+                    stringToReplace,
+                    template,
+                });
+            });
 
-                message = stringReplacements.reduce((result, replacement) => {
-                    return result.replace(replacement.stringToReplace, replacement.template);
-                }, message);
+            // Realiza las sustituciones en el mensaje
+            stringReplacements.forEach((replacement) => {
+                parsedMessage = parsedMessage.replace(replacement.stringToReplace, replacement.template);
             });
         }
 
         console.log('Fetching emotes...');
         try {
-            await this.EmoteFetcher.fetchBTTVEmotes()
-            await this.EmoteFetcher.fetchBTTVEmotes(channel.twitchId)
-            await this.EmoteFetcher.fetchTwitchEmotes()
-            await this.EmoteFetcher.fetchTwitchEmotes(channel.twitchId)
+            await this.EmoteFetcher.fetchBTTVEmotes();
+            await this.EmoteFetcher.fetchBTTVEmotes(channel.twitchId);
+            await this.EmoteFetcher.fetchTwitchEmotes();
+            await this.EmoteFetcher.fetchTwitchEmotes(channel.twitchId);
         } catch (error) {
             console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Error fetching emotes:'), error);
         }
 
         const parser = new EmoteParser(this.EmoteFetcher, {
             type: 'html',
-            template: '<img alt="{name}" class="map-popup-emote" src="{link}">'
+            template: '<img alt="{name}" class="map-popup-emote" src="{link}">',
+            match: /(\w+)/g,
         });
 
-        parsedMessage = parser.parse(message, 2)
-
-
-        if (isMapPin) {
-            // Only extract the link from the emote
-            parsedMessage = parsedMessage.replace(/<img.*?src="(.*?)".*?>/g, '$1');
-            return parsedMessage;
-        }
+        // Realiza el parsing final con las sustituciones
+        parsedMessage = parser.parse(parsedMessage, 2);
 
         return parsedMessage;
     }
+
 }
 
 export default Twitch;
