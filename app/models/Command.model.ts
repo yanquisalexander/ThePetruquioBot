@@ -32,6 +32,7 @@ class Command {
     description: string;
     preferences: CommandPreferences;
     response: string;
+    enabled?: boolean;
     /* 
         Callback should be used by system commands only
     */
@@ -47,6 +48,7 @@ class Command {
         response: string,
         callback?: (user: ChatUser, args: string[], channel: Channel, bot: Bot) => Promise<string | void>,
         id?: number,
+        enabled?: boolean
     ) {
         this.name = name;
         this.channelToExecute = channelToExecute;
@@ -56,6 +58,7 @@ class Command {
         this.response = response;
         this.callback = callback;
         this.id = id;
+        this.enabled = enabled;
     }
 
     getName() {

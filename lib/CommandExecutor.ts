@@ -21,6 +21,7 @@ import RandomMessageCommand from '../app/commands/random.command';
 import ShoutoutCommand from '../app/commands/shoutout.command';
 import ShowCommand from '../app/commands/show.command';
 import UserUpdateCommand from '../app/commands/user-update.command';
+import LanguageCommand from '../app/commands/lang.command';
 
 /* End of static imports */
 
@@ -51,24 +52,24 @@ class CommandExecutor {
 
     private loadSystemCommands() {
         /* Load files from /app/commands  */
-/*         const commandFiles = fs.readdirSync('./app/commands');
-        console.log(commandFiles)
-
-        for (const file of commandFiles) {
-            if (file.endsWith('.command.ts')) {
-                try {
-                    const command = require(`../app/commands/${file}`).default;
-
-                    if (command && command.name && command.execute) {
-                        this.systemCommands.push(command);
-                    } else {
-                        console.error(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Command ${file} is not valid.`));
+        /*         const commandFiles = fs.readdirSync('./app/commands');
+                console.log(commandFiles)
+        
+                for (const file of commandFiles) {
+                    if (file.endsWith('.command.ts')) {
+                        try {
+                            const command = require(`../app/commands/${file}`).default;
+        
+                            if (command && command.name && command.execute) {
+                                this.systemCommands.push(command);
+                            } else {
+                                console.error(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Command ${file} is not valid.`));
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
                     }
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        } */
+                } */
 
         /* Load static imports */
         const commands = [
@@ -84,7 +85,8 @@ class CommandExecutor {
             RandomMessageCommand,
             ShoutoutCommand,
             ShowCommand,
-            UserUpdateCommand
+            UserUpdateCommand,
+            LanguageCommand
         ];
 
         for (const command of commands) {
