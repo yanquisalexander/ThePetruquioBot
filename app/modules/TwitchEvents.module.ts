@@ -124,16 +124,21 @@ class TwitchEvents {
             console.log(`[TWITCH EVENT SUB] Stream Online detected for ${event.broadcasterDisplayName} (${event.broadcasterName})`);
             console.log(`[TWITCH EVENT SUB] User: ${event.broadcasterDisplayName} (${event.broadcasterName})`);
 
-            const channel = await Channel.findByTwitchId(parseInt(event.broadcasterId));
-            if (channel) {
-                if (channel.preferences.enableLiveNotification?.value) {
+            const streamInfo = await event.getStream();
+
+            const channelData = await Channel.findByTwitchId(parseInt(event.broadcasterId));
+            if (channelData) {
+                if (channelData.preferences.enableLiveNotification?.value) {
                     let message = `@${event.broadcasterDisplayName} is now live on Twitch PopNemo`;
 
-                    if(channel.preferences.liveNotificationMessage?.value && !Utils.emptyString(channel.preferences.liveNotificationMessage?.value)) {
-                        message = channel.preferences.liveNotificationMessage?.value.replace('#user', `@${event.broadcasterDisplayName}`);
+                    if(channelData.preferences.liveNotificationMessage?.value && !Utils.emptyString(channelData.preferences.liveNotificationMessage?.value)) {
+                        message = channelData.preferences.liveNotificationMessage?.value
+                        message = message.replace('#user', `@${event.broadcasterDisplayName}`);
+                        message = message.replace('#game', streamInfo?.gameName || '');
+                        message = message.replace('#title', streamInfo?.title || '');
                     }
 
-                    this.bot.sendMessage(channel, message);
+                    this.bot.sendMessage(channelData, message);
                 }
             } else {
                 console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
