@@ -30,6 +30,15 @@ class WebServer {
             origin: '*'
         }));
         app.use('/v2/', bodyParser.json(), router);
+        app.get('/v1/*', (req, res) => {
+            res.status(410).json({
+                error_type: "deprecated",
+                errors: [
+                    "PetruquioBot API v1 is deprecated and was removed. Please use v2 instead."
+                ],
+                more_info: "https://www.petruquio.live"
+            })
+        });
         app.use(Passport.getPassport().initialize());
 
         app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -51,7 +60,7 @@ class WebServer {
         this.app = app;
         console.log(`[WEB SERVER] Finished setting up web server.`);
 
-       
+
     }
 
     public static async boot(): Promise<void> {
