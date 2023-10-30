@@ -128,7 +128,7 @@ class CommandExecutor {
 
                 return await command.execute(user, args, channelData, bot);
             } else {
-                if (TranslatorModule.languageList.includes(commandName) && channelData.preferences.enableTransitions?.value) {
+                if (TranslatorModule.languageList.includes(commandName) && channelData.preferences.enableTranslations?.value) {
                     const translated = await TranslatorModule.generateMessage(commandName, args.join(' '), user.displayName);
                     return translated;
                 }
