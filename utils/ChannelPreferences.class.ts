@@ -3,6 +3,7 @@ enum FieldTypes {
     TEXT = "text",
     CHANNEL_POINT = "channel_point",
     NUMBER = "number",
+    LIST = "list",
 }
 
 export class ChannelPreferences {
@@ -18,9 +19,17 @@ export class ChannelPreferences {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
     };
-    enableTransitions?: {
+    enableTranslations?: {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
+    };
+    enableFollowAlerts?: {
+        value: boolean;
+        field_type: FieldTypes.BOOLEAN;
+    };
+    followAlertMessages?: {
+        value: string[];
+        field_type: FieldTypes.LIST;
     };
     mapCommandMessage?: {
         value: string;
@@ -47,6 +56,10 @@ export class ChannelPreferences {
         field_type: FieldTypes.TEXT;
     };
     enableShoutout?: {
+        value: boolean;
+        field_type: FieldTypes.BOOLEAN;
+    };
+    autoDisableEmoteOnly?: {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
     };
@@ -83,9 +96,17 @@ export const defaultChannelPreferences: ChannelPreferences = {
         value: false,
         field_type: FieldTypes.BOOLEAN,
     },
-    enableTransitions: {
+    enableTranslations: {
         value: true,
         field_type: FieldTypes.BOOLEAN,
+    },
+    enableFollowAlerts: {
+        value: false,
+        field_type: FieldTypes.BOOLEAN,
+    },
+    followAlertMessages: {
+        value: [],
+        field_type: FieldTypes.LIST,
     },
     mapCommandMessage: {
         value: "",
@@ -112,6 +133,10 @@ export const defaultChannelPreferences: ChannelPreferences = {
         field_type: FieldTypes.TEXT,
     },
     enableShoutout: {
+        value: false,
+        field_type: FieldTypes.BOOLEAN,
+    },
+    autoDisableEmoteOnly: {
         value: false,
         field_type: FieldTypes.BOOLEAN,
     },
