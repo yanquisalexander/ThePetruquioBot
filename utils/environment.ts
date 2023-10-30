@@ -14,7 +14,15 @@ class Environment {
     }
 
     static get hostname(): string {
-        return process.env.HOSTNAME || process.env.NODE_ENV === 'development' ? 'api-local.petruquio.live' : 'api.petruquio.live';
+        if (process.env.HOSTNAME) {
+            return process.env.HOSTNAME;
+        }
+
+        if (process.env.NODE_ENV === 'development') {
+            return 'api-local.petruquio.live';
+        }
+
+        return 'api.petruquio.live';
     }
 
     static get https(): boolean {
