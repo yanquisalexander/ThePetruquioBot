@@ -202,11 +202,45 @@ class TwitchEvents {
         }
     }
 
+    public static async subscribeToFollows(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onChannelFollow(channel.twitchId.toString(), process.env.TWITCH_USER_ID || '', async (event) => {
+            console.log(`[TWITCH EVENT SUB] Follow detected for ${event.userName}`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.userName}`);
+
+            const user = await User.findByTwitchId(parseInt(event.broadcasterId));
+            if (user) {
+                const channel = await user.getChannel();
+                if (channel) {
+                    if (channel.preferences.enableFollowAlerts?.value) {
+                        let message = `@${event.userName}, welcome in to the community! PopNemo`;
+
+                        if(channel.preferences.followAlertMessages?.value && channel.preferences.followAlertMessages?.value.length > 0) {
+                            message = channel.preferences.followAlertMessages?.value[Math.floor(Math.random() * channel.preferences.followAlertMessages?.value.length)];
+                            message = message.replace('#user', `@${event.userName}`);
+                        }
+
+                        this.bot.sendMessage(channel, message);
+                    }
+                }
+            } else {
+                console.log(`[TWITCH EVENT SUB] User ${event.userName} not found on database. Skipping...`);
+            }
+
+        });
+
+        if(Environment.isDevelopment) {
+            console.log(await listener.getCliTestCommand());
+        }
+
+        this.eventSubListeners[channel.twitchId.toString()]['follows'] = listener;
+    }
+
     public static async subscribeChannel(channel: Channel): Promise<void> {
         await this.subscribeToChannelPoints(channel);
         await this.subscribeToAppRevocation(channel);
         await this.subscribeToLiveStream(channel);
         await this.suscribeToUserUpdate(channel);
+        await this.subscribeToFollows(channel);
     }
 
     public static async unsubscribeChannel(channel: Channel): Promise<void> {
