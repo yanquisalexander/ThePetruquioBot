@@ -126,7 +126,9 @@ class TwitchEvents {
 
             const streamInfo = await event.getStream();
 
+
             const channelData = await Channel.findByTwitchId(parseInt(event.broadcasterId));
+            console.log(channelData)
             if (channelData) {
                 if (channelData.preferences.enableLiveNotification?.value) {
                     let message = `@${event.broadcasterDisplayName} is now live on Twitch PopNemo`;
@@ -145,6 +147,10 @@ class TwitchEvents {
             }
 
         });
+
+        if(Environment.isDevelopment) {
+            console.log(await listener.getCliTestCommand())
+        }
 
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
