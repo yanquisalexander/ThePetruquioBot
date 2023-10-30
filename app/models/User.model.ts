@@ -90,7 +90,7 @@ class User {
     async createChannelWithPreferences(): Promise<Channel> {
         const channel = await Channel.findByTwitchId(this.twitchId);
         if (!channel) {
-            const newChannel = new Channel(this.twitchId, true, defaultChannelPreferences, this);
+            const newChannel = new Channel(this.twitchId, false, defaultChannelPreferences, this);
             newChannel.save();
             return newChannel;
         }
