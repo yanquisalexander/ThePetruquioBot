@@ -15,7 +15,7 @@ const ShoutoutCommand = new Command(
     async (user, args, channel, bot) => {
         if (channel?.preferences?.enableShoutout?.value && args[0]) {
             const targetChannel = args[0].replace('@', '');
-            const targetChannelTwitchUser = await Twitch.getUser(targetChannel);
+            const targetChannelTwitchUser = await Twitch.getUser(targetChannel.toLowerCase());
 
             let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
 
@@ -33,6 +33,7 @@ const ShoutoutCommand = new Command(
                         }
                     }
                 }
+
 
                 try {
                     await Twitch.shoutout(channel, targetChannelTwitchUser);
