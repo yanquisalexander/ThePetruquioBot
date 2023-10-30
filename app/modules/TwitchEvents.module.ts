@@ -148,9 +148,8 @@ class TwitchEvents {
 
         });
 
-        if(Environment.isDevelopment) {
             console.log(await listener.getCliTestCommand())
-        }
+        
 
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
