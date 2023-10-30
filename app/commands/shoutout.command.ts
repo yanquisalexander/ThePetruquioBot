@@ -1,8 +1,9 @@
 import { defaultShoutoutMessages } from "../constants/Greetings.constants";
-import Channel from "../models/Channel.model";
-import { Command, CommandPermission } from "../models/Command.model";
 import Twitch from "../modules/Twitch.module";
-
+import Shoutout from "../models/Shoutout.model";
+import User from "../models/User.model";
+import { Command, CommandPermission } from "../models/Command.model";
+import Utils from "../../lib/Utils";
 
 const ShoutoutCommand = new Command(
     'so',
@@ -11,30 +12,37 @@ const ShoutoutCommand = new Command(
     'Realiza un shoutout a un canal.',
     {},
     '', // System commands don't need a response
-    async (_user, _args, _channel, _bot) => {
-        if (_channel?.preferences?.enableShoutout?.value && _args[0]) {
-            let shoutoutMessage = ''
-            const targetChannel = _args[0].replace('@', '');
+    async (user, args, channel, bot) => {
+        if (channel?.preferences?.enableShoutout?.value && args[0]) {
+            const targetChannel = args[0].replace('@', '');
+            const targetChannelTwitchUser = await Twitch.getUser(targetChannel);
 
-            const targetChannelUser = await Twitch.getUser(targetChannel);
+            let shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
 
-            if (!targetChannelUser) {
-                shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
-                _bot.sendMessage(_channel.user.username, `${shoutoutMessage.replace(/#targetStreamer/g, targetChannel)}`);
-                return '';
+            if (targetChannelTwitchUser) {
+                const targetShoutoutUser = await User.findByTwitchId(parseInt(targetChannelTwitchUser.id));
+                const targetShoutoutUserChannel = await targetShoutoutUser?.getChannel();
+                if (targetShoutoutUser) {
+                    const so = await Shoutout.find(channel, targetShoutoutUser);
+
+                    if (so && so.messages.length > 0) {
+                        shoutoutMessage = so.messages[Math.floor(Math.random() * so.messages.length)];
+                    } else {
+                        if (targetShoutoutUserChannel?.preferences?.shoutoutPresentation?.value && !Utils.emptyString(targetShoutoutUserChannel?.preferences?.shoutoutPresentation?.value)) {
+                            shoutoutMessage = targetShoutoutUserChannel.preferences.shoutoutPresentation?.value || shoutoutMessage;
+                        }
+                    }
+                }
+
+                try {
+                    await Twitch.shoutout(channel, targetChannelTwitchUser);
+                } catch (error) {
+                    console.error(error);
+                }
             }
 
-            try {
-                await Twitch.shoutout(_channel, targetChannelUser);
-            } catch (error) {
-                console.error(error);
-            }
-
-            shoutoutMessage = defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
-            _bot.sendMessage(_channel.user.username, `${shoutoutMessage.replace(/#targetStreamer/g, targetChannelUser?.displayName || targetChannel)}`);
-
+            bot.sendMessage(channel.user.username, shoutoutMessage.replace(/#targetStreamer/g, targetChannelTwitchUser?.displayName || targetChannel));
         }
-        return '';
     }
 );
 

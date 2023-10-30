@@ -7,6 +7,11 @@ enum FieldTypes {
 }
 
 export class ChannelPreferences {
+    shoutoutPresentation?: {
+        value: string;
+        field_type: FieldTypes.TEXT;
+    
+    };
     enableCommunityMap?: {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
@@ -84,6 +89,10 @@ export class ChannelPreferences {
 
 
 export const defaultChannelPreferences: ChannelPreferences = {
+    shoutoutPresentation: {
+        value: "",
+        field_type: FieldTypes.TEXT,
+    },
     enableCommunityMap: {
         value: true,
         field_type: FieldTypes.BOOLEAN,
