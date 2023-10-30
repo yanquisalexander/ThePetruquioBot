@@ -1,6 +1,7 @@
 import Database from "../../lib/DatabaseManager";
 import { ChannelPreferences, defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import { Command } from "./Command.model";
+import Shoutout from "./Shoutout.model";
 import User from "./User.model";
 import WorldMap from "./WorldMap.model";
 
@@ -109,8 +110,9 @@ class Channel {
         return await Command.getChannelCommands(this);
     }
 
-    
-    
+    public async getShoutouts(): Promise<any[]> {
+        return await Shoutout.getChannelShoutouts(this);
+    }
 
     public static async findOrCreate(id: number): Promise<Channel> {
         const channel = await Channel.findByTwitchId(id);

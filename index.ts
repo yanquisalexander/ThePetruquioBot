@@ -19,6 +19,7 @@ import TwitchEvents from "./app/modules/TwitchEvents.module";
 import Environment from "./utils/environment";
 import Passport from "./lib/Passport";
 import SocketIO from "./app/modules/SocketIO.module";
+import Shoutout from "./app/models/Shoutout.model";
 
 MonkeyPatches.apply();
 

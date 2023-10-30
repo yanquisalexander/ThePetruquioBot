@@ -6,6 +6,7 @@ import AdminController from "../controllers/Admin.controller";
 import WorldMapController from "../controllers/WorldMap.controller";
 import StatsController from "../controllers/Stats.controller";
 import CommandsController from "../controllers/Commands.controller";
+import CommunitiesController from "../controllers/Communities.controller";
 
 
 const router = Router();
@@ -25,6 +26,11 @@ router.put('/channel/commands/:commandId', Passport.getPassport().authenticate('
 router.post('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.createCommand);
 router.delete('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.deleteCommand);
 router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getTwitchChannelsPoints);
+
+router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts);
+router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout);
+router.put('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.updateShoutout);
+router.delete('/channel/community/shoutouts/:targetStreamerId', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.deleteShoutout);
 
 router.get('/admin/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.dashboardIndex);
 router.get('/admin/users', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.getUsers);
