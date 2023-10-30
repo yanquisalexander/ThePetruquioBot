@@ -26,6 +26,14 @@ class TwitchEvents {
             secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT',
             legacySecrets: false
         });
+
+        this.TwitchEventSub.onRevoke(async (event) => {
+            console.log(`[TWITCH EVENT SUB] Revoked subscription with ID ${event.id}`);
+        });
+
+        this.TwitchEventSub.onSubscriptionCreateFailure(async (event, error) => {
+            console.log(`[TWITCH EVENT SUB] Failed to create subscription with ID ${event.id}`);
+        });
     }
 
     public static async subscribeToChannelPoints(channel: Channel): Promise<void> {
@@ -83,8 +91,6 @@ class TwitchEvents {
         });
 
         this.eventSubListeners[channel.twitchId.toString()]['channel-points'] = listener;
-
-        console.log(`[TWITCH EVENT SUB] Channel Points listener for channel ${channel.twitchId} started.`);
     }
 
     public static async unsubscribeToChannelPoints(channel: Channel): Promise<void> {
@@ -128,7 +134,6 @@ class TwitchEvents {
 
 
             const channelData = await Channel.findByTwitchId(parseInt(event.broadcasterId));
-            console.log(channelData)
             if (channelData) {
                 if (channelData.preferences.enableLiveNotification?.value) {
                     let message = `@${event.broadcasterDisplayName} is now live on Twitch PopNemo`;
@@ -146,16 +151,52 @@ class TwitchEvents {
                 console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
             }
 
-        });
-
-            console.log(await listener.getCliTestCommand())
-        
+        });        
 
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
 
+    
+
     public static async unsubscribeToAppRevocation(channel: Channel): Promise<void> {
         const listener = this.eventSubListeners[channel.twitchId.toString()]['app-revocation'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async unsubscribeToLiveStream(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['live-stream'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async suscribeToUserUpdate(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onUserUpdate(channel.twitchId.toString(), async (event) => {
+            console.log(`[TWITCH EVENT SUB] User Update detected for ${event.userDisplayName} (${event.userName})`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`);
+
+            const user = await User.findByTwitchId(parseInt(event.userId));
+            if (user) {
+                const channel = await user.getChannel();
+                if (channel) {
+                    channel.user.username = event.userName;
+                    channel.user.displayName = event.userDisplayName;
+                    await channel.user.save();
+                    console.log(`[TWITCH EVENT SUB] Channel ${channel.twitchId} (${channel.user.username}) updated.`);
+                }
+            } else {
+                console.log(`[TWITCH EVENT SUB] User ${event.userDisplayName} (${event.userName}) not found on database. Skipping...`);
+            }
+
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['user-update'] = listener;
+    }
+
+    public static async unsubscribeToUserUpdate(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['user-update'];
         if (listener) {
             listener.stop();
         }
@@ -165,11 +206,14 @@ class TwitchEvents {
         await this.subscribeToChannelPoints(channel);
         await this.subscribeToAppRevocation(channel);
         await this.subscribeToLiveStream(channel);
+        await this.suscribeToUserUpdate(channel);
     }
 
     public static async unsubscribeChannel(channel: Channel): Promise<void> {
         await this.unsubscribeToChannelPoints(channel);
         await this.unsubscribeToAppRevocation(channel);
+        await this.unsubscribeToLiveStream(channel);
+        await this.unsubscribeToUserUpdate(channel);
     }
 
     public static async subscribeAllChannels(): Promise<void> {
