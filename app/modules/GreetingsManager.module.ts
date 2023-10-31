@@ -69,7 +69,7 @@ class GreetingsManager {
     private static async getRandomGreetingList(username: string, isBot: boolean, lang: string) {
         console.log(chalk.blue(`[GREETINGS] Getting random greeting list for ${username}, isBot: ${isBot}, lang: ${lang}`));
         if (isBot) {
-            if (username === 'tangerinebot_') {
+            if (username.toLowerCase() === 'tangerinebot_') {
                 return this.tangerinebotRandomGreetings;
             } else {
                 return this.botGreetings;
