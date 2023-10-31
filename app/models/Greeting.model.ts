@@ -128,6 +128,25 @@ class Greeting {
         }
     }
 
+    static async getByUser(user: User): Promise<any[]> {
+        try {
+            const query = `
+                SELECT * FROM greetings
+                WHERE user_id = $1
+            `;
+            const values = [user.twitchId];
+            const result = await Database.query(query, values);
+            if (result) {
+                return result.rows;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    }
+
     async save(): Promise<void> {
         const query = `
             INSERT INTO greetings (user_id, channel, last_seen, shoutouted_at, enabled)

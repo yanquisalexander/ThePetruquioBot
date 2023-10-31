@@ -20,6 +20,9 @@ router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { ses
 
 router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
 
+router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
+router.get('/account/messages', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getMessages);
+
 router.get('/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.index);
 router.post('/dashboard/join', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.join);
 router.post('/dashboard/part', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.part);

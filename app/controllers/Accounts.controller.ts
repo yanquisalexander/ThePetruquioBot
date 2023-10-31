@@ -160,6 +160,52 @@ class AccountsController {
 
         res.json({ message: 'Session destroyed' });
     }
+
+    static async getGreetingsData(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' })
+        }
+
+        const greetingsData = await user.getGreetingsData();
+
+
+
+        res.json({
+            data: {
+                greetings: greetingsData
+            }
+        });
+    }
+
+    static async getMessages(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' })
+        }
+
+        const messages = await user.getMessages();
+
+        res.json({
+            data: {
+                messages
+            }
+        });
+    }
 }
 
 export default AccountsController;

@@ -1,6 +1,7 @@
 import Database from "../../lib/DatabaseManager";
 import { defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Channel from "./Channel.model";
+import Greeting from "./Greeting.model";
 import MessageLogger from "./MessageLogger.model";
 
 class User {
@@ -85,6 +86,10 @@ class User {
 
     async getMessages(): Promise<any[]> {
         return await MessageLogger.getByUser(this);
+    }
+
+    public async getGreetingsData(): Promise<any> {
+        return await Greeting.getByUser(this);
     }
 
     async createChannelWithPreferences(): Promise<Channel> {

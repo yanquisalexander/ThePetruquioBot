@@ -14,16 +14,21 @@ interface MessageData {
 class MessageLogger {
     static async getByUser(user: User): Promise<any[]> {
         try {
-            const query = 'SELECT * FROM messages WHERE sender_id = $1';
+            const query = `
+                SELECT u.avatar, u.display_name, u.username, m.content, m.timestamp
+                FROM messages m
+                JOIN users u ON m.channel_id = u.twitch_id
+                WHERE m.sender_id = $1 ORDER BY m.timestamp DESC
+            `;
             const values = [user.twitchId];
             
             const result = await Database.query(query, values);
             return result.rows;
-
         } catch (error) {
             return [];
         }
     }
+    
     public static async logMessage(messageData: MessageData): Promise<void> {
         const { sender, channel, content, timestamp } = messageData;
 
