@@ -7,6 +7,7 @@ import WorldMapController from "../controllers/WorldMap.controller";
 import StatsController from "../controllers/Stats.controller";
 import CommandsController from "../controllers/Commands.controller";
 import CommunitiesController from "../controllers/Communities.controller";
+import DashboardController from "../controllers/Dashboard.controller";
 
 
 const router = Router();
@@ -18,6 +19,10 @@ router.get('/accounts/me', Passport.getPassport().authenticate('jwt', { session:
 router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentSession);
 
 router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
+
+router.get('/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.index);
+router.post('/dashboard/join', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.join);
+router.post('/dashboard/part', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.part);
 
 router.get('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getPreferences);
 router.put('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.updatePreferences);

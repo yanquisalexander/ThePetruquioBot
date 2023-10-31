@@ -129,6 +129,10 @@ export class Bot {
         this.client.say(channel, message);
         return;
       }
+      if(channel.preferences.botMuted?.value) {
+        console.log(chalk.yellow('[BOT]'), chalk.white('Bot muted in channel #'), chalk.green(channel.user.username));
+        return;
+      }
       this.client.say(channel.user.username, message);
     } else if (platform === Platform.Kick) {
       console.log({ channel, message, platform });
