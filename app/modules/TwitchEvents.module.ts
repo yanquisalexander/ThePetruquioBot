@@ -140,7 +140,7 @@ class TwitchEvents {
 
                     if(channelData.preferences.liveNotificationMessage?.value && !Utils.emptyString(channelData.preferences.liveNotificationMessage?.value)) {
                         message = channelData.preferences.liveNotificationMessage?.value
-                        message = message.replace('#user', `@${event.broadcasterDisplayName}`);
+                        message = message.replace('#channel', `${event.broadcasterDisplayName}`);
                         message = message.replace('#game', streamInfo?.gameName || '');
                         message = message.replace('#title', streamInfo?.title || '');
                     }
