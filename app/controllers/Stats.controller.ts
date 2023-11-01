@@ -22,7 +22,22 @@ class StatsController {
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         return res.status(200).json({
             data: {
-                channels: MemoryVariables.getLiveChannels(),
+                channels: MemoryVariables.getLiveChannels().map(stream => {
+                    return {
+                        username: stream.userName,
+                        display_name: stream.userDisplayName,
+                        title: stream.title,
+                        viewers: stream.viewers,
+                        thumbnail_url: stream.thumbnailUrl,
+                        started_at: stream.startDate,
+                        language: stream.language,
+                        tags: stream.tags,
+                        game_id: stream.gameId,
+                        game_name: stream.gameName,
+                        type: stream.type,
+                        is_mature: stream.isMature,
+                    }
+                }),
                 last_updated: lastUpdated,
                 next_update_in: nextUpdateIn
             }
