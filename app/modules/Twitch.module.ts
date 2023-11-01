@@ -99,32 +99,38 @@ class Twitch {
             const bot = await Bot.getInstance();
             const channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
             const currentLive = await this.getLiveChannels(channels);
-    
-            const currentLiveChannels = await Promise.all(currentLive.map(async (channel) => {
-                const liveStream = await channel.getStream();
-                return liveStream ? liveStream : null;
-            }));
-    
-            const newLiveChannels = currentLiveChannels.filter(channel => channel !== null) as HelixStream[];
+
+            const currentLiveChannels: HelixStream[] = [];
+
+            currentLive.map(async user => {
+                let liveStream = await user.getStream();
+                if (liveStream) {
+                    currentLiveChannels.push(liveStream);
+                } else {
+                    console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`User ${user.name} is not live.`));
+                }
+            })
+
+            const newLiveChannels = currentLiveChannels.filter(channel => !MemoryVariables.getLiveChannels().includes(channel));
             const offlineChannels = MemoryVariables.getLiveChannels().filter(channel => !currentLiveChannels.includes(channel));
-    
+
             if (newLiveChannels.length > 0) {
                 console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
             }
-    
+
             if (offlineChannels.length > 0) {
                 offlineChannels.forEach(channel => {
                     const index = MemoryVariables.getLiveChannels().indexOf(channel);
                     MemoryVariables.getLiveChannels().splice(index, 1);
                 });
             }
-    
-            MemoryVariables.setLiveChannels(currentLiveChannels as HelixStream[]);
+
+            MemoryVariables.setLiveChannels(currentLiveChannels);
         } catch (error) {
             console.error(error);
         }
     }
-    
+
 
     public static async initializeLiveMonitor(): Promise<void> {
         setInterval(async () => {
