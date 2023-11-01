@@ -18,12 +18,17 @@ class StatsController {
     }
 
     public static async getLiveChannels(req: Request, res: Response): Promise<Response> {
+        const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
+        const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         return res.status(200).json({
             data: {
-                channels: MemoryVariables.getLiveChannels()
+                channels: MemoryVariables.getLiveChannels(),
+                last_updated: lastUpdated,
+                next_update_in: nextUpdateIn
             }
         })
     }
+
 }
 
 export default StatsController;

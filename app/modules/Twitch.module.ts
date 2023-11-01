@@ -126,6 +126,7 @@ class Twitch {
             }
 
             MemoryVariables.setLiveChannels(currentLiveChannels);
+            MemoryVariables.setLastLiveStreamsCheck(new Date());
         } catch (error) {
             console.error(error);
         }

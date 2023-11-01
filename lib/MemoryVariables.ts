@@ -4,6 +4,7 @@ class MemoryVariables {
     private static latency: number = 0;
     private static liveChannels: HelixStream[] | null = [];
     private static logs: string[] = [];
+    private static lastLiveStreamsCheck: Date = new Date();
 
     public static getLatency(): number {
         return this.latency;
@@ -27,6 +28,14 @@ class MemoryVariables {
 
     public static setLogs(logs: string[]): void {
         this.logs = logs;
+    }
+
+    public static getLastLiveStreamsCheck(): Date {
+        return this.lastLiveStreamsCheck;
+    }
+
+    public static setLastLiveStreamsCheck(date: Date): void {
+        this.lastLiveStreamsCheck = date;
     }
 }
 
