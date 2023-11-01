@@ -1,6 +1,8 @@
+import { HelixStream } from "@twurple/api";
+
 class MemoryVariables {
     private static latency: number = 0;
-    private static liveChannels: string[] = [];
+    private static liveChannels: HelixStream[] | null = [];
     private static logs: string[] = [];
 
     public static getLatency(): number {
@@ -11,11 +13,11 @@ class MemoryVariables {
         this.latency = latency;
     }
 
-    public static getLiveChannels(): string[] {
-        return this.liveChannels;
+    public static getLiveChannels(): HelixStream[] {
+        return this.liveChannels || [];
     }
 
-    public static setLiveChannels(channels: string[]): void {
+    public static setLiveChannels(channels: HelixStream[]): void {
         this.liveChannels = channels;
     }
 

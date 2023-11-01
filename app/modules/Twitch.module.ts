@@ -1,4 +1,4 @@
-import { ApiClient, HelixUser } from '@twurple/api'
+import { ApiClient, HelixStream, HelixUser } from '@twurple/api'
 import TwitchAuthenticator from './TwitchAuthenticator.module';
 import chalk from 'chalk';
 import { Bot } from '../../bot';
@@ -99,37 +99,32 @@ class Twitch {
             const bot = await Bot.getInstance();
             const channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
             const currentLive = await this.getLiveChannels(channels);
-
-            const currentLiveChannels = currentLive.reduce((result, channel) => {
-                result.push(channel.name);
-                return result;
-            }, [] as string[]);
-
-            const newLiveChannels = currentLiveChannels.filter(channel => !MemoryVariables.getLiveChannels().includes(channel));
-
-            if (newLiveChannels.length > 0) {
-                console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.join(', ')}`));
-            }
-
+    
+            const currentLiveChannels = await Promise.all(currentLive.map(async (channel) => {
+                const liveStream = await channel.getStream();
+                return liveStream ? liveStream : null;
+            }));
+    
+            const newLiveChannels = currentLiveChannels.filter(channel => channel !== null) as HelixStream[];
             const offlineChannels = MemoryVariables.getLiveChannels().filter(channel => !currentLiveChannels.includes(channel));
-
+    
+            if (newLiveChannels.length > 0) {
+                console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
+            }
+    
             if (offlineChannels.length > 0) {
                 offlineChannels.forEach(channel => {
                     const index = MemoryVariables.getLiveChannels().indexOf(channel);
                     MemoryVariables.getLiveChannels().splice(index, 1);
                 });
-
             }
-
-            MemoryVariables.setLiveChannels(currentLiveChannels);
+    
+            MemoryVariables.setLiveChannels(currentLiveChannels as HelixStream[]);
         } catch (error) {
-
+            console.error(error);
         }
-
-
-
-
     }
+    
 
     public static async initializeLiveMonitor(): Promise<void> {
         setInterval(async () => {
