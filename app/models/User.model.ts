@@ -1,8 +1,10 @@
+import { HelixUser } from "@twurple/api";
 import Database from "../../lib/DatabaseManager";
 import { defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Channel from "./Channel.model";
 import Greeting from "./Greeting.model";
 import MessageLogger from "./MessageLogger.model";
+import Twitch from "../modules/Twitch.module";
 
 class User {
     username: string;
@@ -11,14 +13,16 @@ class User {
     displayName?: string;
     avatar?: string;
     admin?: boolean;
+    birthday?: Date | null;
 
-    constructor(username: string, twitchId: number, email?: string, displayName?: string, avatar?: string, admin?: boolean) {
+    constructor(username: string, twitchId: number, email?: string, displayName?: string, avatar?: string, admin?: boolean, birthday?: Date) {
         this.username = username;
         this.twitchId = twitchId;
         this.email = email;
         this.displayName = displayName;
         this.avatar = avatar;
         this.admin = admin || false;
+        this.birthday = birthday;
     }
 
     public static async findByUsername(username: string): Promise<User | null> {
@@ -34,7 +38,8 @@ class User {
                 userData.email,
                 userData.display_name || userData.username,
                 userData.avatar || null,
-                userData.admin
+                userData.admin,
+                userData.birthday_date || null
             );
         } else {
             return null;
@@ -54,7 +59,8 @@ class User {
                 userData.email,
                 userData.display_name || userData.username,
                 userData.avatar || null,
-                userData.admin
+                userData.admin,
+                userData.birthday_date || null
             );
         } else {
             return null;
@@ -73,7 +79,8 @@ class User {
                 userData.email,
                 userData.display_name || userData.username,
                 userData.avatar || null,
-                userData.admin
+                userData.admin,
+                userData.birthday_date || null
             ));
         }
 
@@ -103,10 +110,33 @@ class User {
     }
 
     public async save(): Promise<void> {
-        const query = 'INSERT INTO users (username, twitch_id, email, display_name, avatar) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (twitch_id) DO UPDATE SET username = $1, email = $3, display_name = $4, avatar = $5 RETURNING twitch_id';
-        const values = [this.username, this.twitchId, this.email, this.displayName, this.avatar];
-        const result = await Database.query(query, values);
-        this.twitchId = result.rows[0].twitch_id;
+        const query = 'INSERT INTO users (username, twitch_id, email, display_name, avatar, birthday_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (twitch_id) DO UPDATE SET username = $1, email = $3, display_name = $4, avatar = $5, birthday_date = $6 RETURNING twitch_id';
+        const values = [this.username, this.twitchId, this.email, this.displayName, this.avatar, this.birthday];
+        try {
+            const result = await Database.query(query, values);
+            this.twitchId = result.rows[0].twitch_id;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error saving user: ' + error);
+        }
+    }
+
+    isBirthdayToday(): boolean {
+        if (!this.birthday) {
+            return false;
+        }
+        const today = new Date();
+        return this.birthday.getDate() === today.getDate() && this.birthday.getMonth() === today.getMonth();
+    }
+
+    async fromHelix(): Promise<HelixUser | null> {
+        try {
+            let user = await Twitch.getUser(this.username);
+            return user;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
 }
 

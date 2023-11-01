@@ -51,7 +51,7 @@ class Greeting {
             const query = `
                 UPDATE greetings
                 SET shoutouted_at = $1
-                WHERE user_id = $2 AND channel = $
+                WHERE user_id = $2 AND channel = $3
                 RETURNING *
             `;
             const shoutoutedAt = new Date(); // Obtener la fecha y hora actual

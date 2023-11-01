@@ -22,6 +22,7 @@ import ShoutoutCommand from '../app/commands/shoutout.command';
 import ShowCommand from '../app/commands/show.command';
 import UserUpdateCommand from '../app/commands/user-update.command';
 import LanguageCommand from '../app/commands/lang.command';
+import BirthdayCommand from '../app/commands/birthday.command';
 
 /* End of static imports */
 
@@ -86,7 +87,8 @@ class CommandExecutor {
             ShoutoutCommand,
             ShowCommand,
             UserUpdateCommand,
-            LanguageCommand
+            LanguageCommand,
+            BirthdayCommand,
         ];
 
         for (const command of commands) {

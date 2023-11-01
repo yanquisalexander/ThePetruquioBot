@@ -177,3 +177,49 @@ export const defaultShoutoutMessages: string[] = [
     'let\'s go show some love to #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
     'support #targetStreamer at https://twitch.tv/#targetStreamer <3 !',
 ];
+
+
+export const birthdayGreetings: Record<string, string[]> = {
+    es: [
+        "¡Feliz cumpleaños @#username! 🎉🥳",
+        "Hoy es un día especial, ¡feliz cumpleaños @#username! 🎂🎈",
+        "Feliz cumpleaños @#username, ¡que tengas un día maravilloso! 🎁🥂",
+        "En este día especial, te deseamos un muy feliz cumpleaños @#username. ¡Celebremos juntos! 🎉🎂"
+    ],
+    en: [
+        "Happy birthday @#username! 🎉🥳",
+        "Today is a special day, happy birthday @#username! 🎂🎈",
+        "Happy birthday @#username, have a wonderful day! 🎁🥂",
+        "On this special day, we wish you a very happy birthday @#username. Let's celebrate together! 🎉🎂"
+    ],
+    pt: [
+        "Feliz aniversário @#username! 🎉🥳",
+        "Hoje é um dia especial, feliz aniversário @#username! 🎂🎈",
+        "Feliz aniversário @#username, tenha um dia maravilhoso! 🎁🥂",
+        "Neste dia especial, desejamos a você um feliz aniversário @#username. Vamos comemorar juntos! 🎉🎂"
+    ],
+    fr: [
+        "Joyeux anniversaire @#username! 🎉🥳",
+        "Aujourd'hui est un jour spécial, joyeux anniversaire @#username! 🎂🎈",
+        "Joyeux anniversaire @#username, passez une merveilleuse journée! 🎁🥂",
+        "En ce jour spécial, nous vous souhaitons un très joyeux anniversaire @#username. Célébrons ensemble! 🎉🎂"
+    ],
+    de: [
+        "Alles Gute zum Geburtstag @#username! 🎉🥳",
+        "Heute ist ein besonderer Tag, alles Gute zum Geburtstag @#username! 🎂🎈",
+        "Alles Gute zum Geburtstag @#username, haben Sie einen wundervollen Tag! 🎁🥂",
+        "An diesem besonderen Tag wünschen wir Ihnen einen sehr schönen Geburtstag @#username. Feiern wir zusammen! 🎉🎂"
+    ],
+    it: [
+        "Buon compleanno @#username! 🎉🥳",
+        "Oggi è un giorno speciale, buon compleanno @#username! 🎂🎈",
+        "Buon compleanno @#username, buona giornata! 🎁🥂",
+        "In questo giorno speciale ti auguriamo un buon compleanno @#username. Festeggiamo insieme! 🎉🎂"
+    ],
+    ru: [
+        "С днем рождения @#username! 🎉🥳",
+        "Сегодня особенный день, с днем рождения @#username! 🎂🎈",
+        "С днем рождения @#username, хорошего дня! 🎁🥂",
+        "В этот особенный день мы желаем вам счастливого дня рождения @#username. Давайте праздновать вместе! 🎉🎂"
+    ]
+};

@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import Environment from "../../utils/environment";
-import { sunlightGreetings, defaultShoutoutMessages, greetings } from "../constants/Greetings.constants";
+import { sunlightGreetings, greetings, birthdayGreetings } from "../constants/Greetings.constants";
 import Channel from "../models/Channel.model";
 import Greeting from "../models/Greeting.model";
 import User from "../models/User.model";
@@ -66,8 +66,11 @@ class GreetingsManager {
         return !(random < 0.8)
     }
 
-    private static async getRandomGreetingList(username: string, isBot: boolean, lang: string) {
+    private static async getRandomGreetingList(username: string, isBot: boolean, lang: string, isUserBirthday?: boolean) {
         console.log(chalk.blue(`[GREETINGS] Getting random greeting list for ${username}, isBot: ${isBot}, lang: ${lang}`));
+        if(isUserBirthday) {
+            return birthdayGreetings[lang];
+        }
         if (isBot) {
             if (username.toLowerCase() === 'tangerinebot_') {
                 return this.tangerinebotRandomGreetings;
@@ -108,8 +111,8 @@ class GreetingsManager {
         }
     }
 
-    public static async getRandomGreeting(username: string, isBot: boolean, lang: string) {
-        const greetingList = await this.getRandomGreetingList(username, isBot, lang);
+    public static async getRandomGreeting(username: string, isBot: boolean, lang: string, isUserBirthday?: boolean) {
+        const greetingList = await this.getRandomGreetingList(username, isBot, lang, isUserBirthday);
         // @ts-expect-error
         const greeting = greetingList[Math.floor(Math.random() * greetingList.length)];
         const randomEmote = this.emotes[Math.floor(Math.random() * this.emotes.length)];
@@ -173,7 +176,6 @@ class GreetingsManager {
         if (userOnMap) {
             if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen.getTime()) < this.cooldown) {
                 await Greeting.updateTimestamp(user, channel);
-                console.log(chalk.yellow(`[GREETINGS] ${user.username} was on the map, but it's on cooldown`));
                 return false;
             }
             await Greeting.updateTimestamp(user, channel);

@@ -72,7 +72,7 @@ class TwitchEvents {
                             console.log(`[TWITCH EVENT SUB] First Ranking Reward detected on channel ${event.broadcasterDisplayName} (${event.broadcasterName})`);
                             let redemeedMessage = `@${event.userDisplayName} has redeemed "${event.rewardTitle}" PopNemo`;
 
-                            if(channelData.preferences.firstRankingRedeemedMessage?.value && !Utils.emptyString(channelData.preferences.firstRankingRedeemedMessage?.value)) {
+                            if (channelData.preferences.firstRankingRedeemedMessage?.value && !Utils.emptyString(channelData.preferences.firstRankingRedeemedMessage?.value)) {
                                 redemeedMessage = channelData.preferences.firstRankingRedeemedMessage?.value.replace('#user', `@${event.userDisplayName}`).replace('#reward', event.rewardTitle);
                             }
                             this.bot.sendMessage(channelData, redemeedMessage);
@@ -89,6 +89,10 @@ class TwitchEvents {
                 }
             }
         });
+
+        if(!this.eventSubListeners[channel.twitchId.toString()]) {
+            this.eventSubListeners[channel.twitchId.toString()] = {};
+        }
 
         this.eventSubListeners[channel.twitchId.toString()]['channel-points'] = listener;
     }
@@ -138,7 +142,7 @@ class TwitchEvents {
                 if (channelData.preferences.enableLiveNotification?.value) {
                     let message = `@${event.broadcasterDisplayName} is now live on Twitch PopNemo`;
 
-                    if(channelData.preferences.liveNotificationMessage?.value && !Utils.emptyString(channelData.preferences.liveNotificationMessage?.value)) {
+                    if (channelData.preferences.liveNotificationMessage?.value && !Utils.emptyString(channelData.preferences.liveNotificationMessage?.value)) {
                         message = channelData.preferences.liveNotificationMessage?.value
                         message = message.replace('#channel', `${event.broadcasterDisplayName}`);
                         message = message.replace('#game', streamInfo?.gameName || '');
@@ -151,12 +155,12 @@ class TwitchEvents {
                 console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
             }
 
-        });        
+        });
 
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
 
-    
+
 
     public static async unsubscribeToAppRevocation(channel: Channel): Promise<void> {
         const listener = this.eventSubListeners[channel.twitchId.toString()]['app-revocation'];
@@ -214,7 +218,7 @@ class TwitchEvents {
                     if (channel.preferences.enableFollowAlerts?.value) {
                         let message = `@${event.userName}, welcome in to the community! PopNemo`;
 
-                        if(channel.preferences.followAlertMessages?.value && channel.preferences.followAlertMessages?.value.length > 0) {
+                        if (channel.preferences.followAlertMessages?.value && channel.preferences.followAlertMessages?.value.length > 0) {
                             message = channel.preferences.followAlertMessages?.value[Math.floor(Math.random() * channel.preferences.followAlertMessages?.value.length)];
                             message = message.replace('#user', `@${event.userName}`);
                         }
@@ -228,7 +232,7 @@ class TwitchEvents {
 
         });
 
-        if(Environment.isDevelopment) {
+        if (Environment.isDevelopment) {
             console.log(await listener.getCliTestCommand());
         }
 
@@ -253,7 +257,7 @@ class TwitchEvents {
     public static async subscribeAllChannels(): Promise<void> {
         const channels = await Channel.getAutoJoinChannels();
         for (const channel of channels) {
-            if(!this.eventSubListeners[channel.twitchId.toString()]) {
+            if (!this.eventSubListeners[channel.twitchId.toString()]) {
                 this.eventSubListeners[channel.twitchId.toString()] = {};
             }
             await this.subscribeChannel(channel);

@@ -11,6 +11,7 @@ import GreetingsManager from "../modules/GreetingsManager.module";
 import SpectatorLocation from "../models/SpectatorLocation.model";
 import Twitch from "../modules/Twitch.module";
 import { CountrieLocales } from "../constants/CountrieLocales.constants";
+import Shoutout from "../models/Shoutout.model";
 
 export const handleChatMessage = async (channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
     const bot = await Bot.getInstance();
@@ -97,10 +98,28 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
             if (user.isBroadcaster) {
                 greeting = GreetingsManager.getRandomBroadcasterGreeting(user.displayName);
             } else {
-                greeting = await GreetingsManager.getRandomGreeting(user.displayName, user.isBot, lang);
+                greeting = await GreetingsManager.getRandomGreeting(user.displayName, user.isBot, lang, userData.isBirthdayToday());
             }
 
             GreetingsManager.addToGreetingStack(channelName, greeting);
+        }
+
+        if (await GreetingsManager.canReceiveShoutoutGreeting(channelData, userData)) {
+            const greeting = await Shoutout.find(channelData, userData)
+            console.log(greeting)
+            if (greeting) {
+                console.log(chalk.yellow(`[GREETINGS]`), `${chalk.hex(user.color).bold(user.displayName)} is eligible for a shoutout greeting!`);
+                GreetingsManager.addToGreetingStack(channelName, greeting.messages[Math.floor(Math.random() * greeting.messages.length)]);
+                try {
+                    let helixUser = await userData.fromHelix();
+                    if(!helixUser) {
+                        return;
+                    }
+                    await Twitch.shoutout(channelData, helixUser)
+                } catch (error) {
+                    console.error(chalk.red(`[ERROR]`), `Error shouting out ${chalk.bold(user.username)}: ${error}`);
+                }
+            }
         }
     }
 
