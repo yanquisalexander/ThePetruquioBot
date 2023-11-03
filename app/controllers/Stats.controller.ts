@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import MemoryVariables from "../../lib/MemoryVariables";
 import { Bot } from "../../bot";
+import MessageLogger from "../models/MessageLogger.model";
 
 
 class StatsController {
@@ -49,6 +50,15 @@ class StatsController {
         return res.status(200).json({
             data: {
                 channels: bot.joinedChannels
+            }
+        })
+    }
+
+    public static async getProcessedMessages(req: Request, res: Response): Promise<Response> {
+        const total = await MessageLogger.getCount();
+        return res.status(200).json({
+            data: {
+                messages: total
             }
         })
     }

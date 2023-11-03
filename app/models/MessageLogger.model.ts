@@ -45,7 +45,16 @@ class MessageLogger {
         }
     }
 
-
+    public static async getCount(): Promise<number> {
+        try {
+            const query = 'SELECT COUNT(*) FROM messages';
+            const result = await Database.query(query);
+            return result.rows[0].count;
+        } catch (error) {
+            console.error('Error al obtener cantidad de mensajes:', error);
+            return 0;
+        }
+    }
 }
 
 export default MessageLogger;
