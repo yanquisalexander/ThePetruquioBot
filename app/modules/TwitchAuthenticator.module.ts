@@ -88,7 +88,8 @@ class TwitchAuthenticator {
         this.RefreshingAuthProvider = new RefreshingAuthProvider({
             clientId: this.clientId,
             clientSecret: this.clientSecret,
-            onRefresh: async (userId, token) => {
+            // @ts-ignore
+            onRefresh: async (userId: string, token: AccessToken) => {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.white(`Refreshing token for user ${userId}`));
                 const userToken = await UserToken.findByUserId(parseInt(userId));
                 if (!userToken) {
@@ -97,10 +98,12 @@ class TwitchAuthenticator {
                 userToken.tokenData = token;
                 await userToken.save();
             },
-            onRefreshFailure: (userId) => {
+            onRefreshFailure: (userId: string) => {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.red(`Failed to refresh token for user ${userId}`));
             }
         });
+
+        this.RefreshingAuthProvider.onRefresh
 
         const userTokens = await UserToken.getAll();
         for (const userToken of userTokens) {

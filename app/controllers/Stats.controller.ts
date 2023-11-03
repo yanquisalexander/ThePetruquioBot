@@ -44,6 +44,15 @@ class StatsController {
         })
     }
 
+    public static async getJoinedChannels(req: Request, res: Response): Promise<Response> {
+        const bot = await Bot.getInstance();
+        return res.status(200).json({
+            data: {
+                channels: bot.joinedChannels
+            }
+        })
+    }
+
 }
 
 export default StatsController;

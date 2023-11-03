@@ -18,10 +18,14 @@ const FromCommand = new Command(
         if (!user) {
             return;
         } else {
+
+            if (_args.length === 0) {
+                return _bot.sendMessage(_channel.user.username, `@${_user.displayName}, para actualizar tu ubicación en el mapa, debes escribir !from <ciudad, país> ;)`);
+            }
             let userLocation = await SpectatorLocation.findByUserId(user.twitchId);
-            if(!userLocation) {
+            if (!userLocation) {
                 let geoData = await Geolocation.getLocalization(_args.join(' '));
-                if(!geoData) {
+                if (!geoData) {
                     _bot.sendMessage(_channel.user.username, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
                     return '';
                 }
@@ -39,7 +43,7 @@ const FromCommand = new Command(
                 return;
             } else {
                 let geoData = await Geolocation.getLocalization(_args.join(' '));
-                if(!geoData) {
+                if (!geoData) {
                     _bot.sendMessage(_channel.user.username, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
                     return;
                 }

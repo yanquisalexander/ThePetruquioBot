@@ -23,8 +23,7 @@ class TwitchEvents {
             apiClient: Twitch.HelixApp,
             hostName: Environment.hostname,
             pathPrefix: '/twitch/eventsub',
-            secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT',
-            legacySecrets: false
+            secret: 'A.RANDOM.SECRET.PETRUQUIO.BOT'
         });
 
         this.TwitchEventSub.onRevoke(async (event) => {
@@ -105,7 +104,7 @@ class TwitchEvents {
     }
 
     public static async subscribeToAppRevocation(channel: Channel): Promise<void> {
-        const listener = this.TwitchEventSub.onUserAuthorizationRevoke(process.env.TWITCH_CLIENT_ID as string, async (event) => {
+        const listener = this.TwitchEventSub.onUserAuthorizationRevoke(async (event) => {
             console.log(`[TWITCH EVENT SUB] App Revocation detected for ${event.userDisplayName} (${event.userName})`);
             console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`);
 

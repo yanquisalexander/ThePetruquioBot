@@ -56,7 +56,7 @@ class Twitch {
         }
 
         const twitchShoutout = this.Helix.asUser(moderator, async api => {
-            const shoutout = await api.chat.shoutoutUser(fromChannel.twitchId, targetChannel, moderator.id);
+            const shoutout = await api.chat.shoutoutUser(fromChannel.twitchId, targetChannel);
             return shoutout;
         });
 

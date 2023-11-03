@@ -55,6 +55,7 @@ router.get('/rankings/:channelName', ChannelsController.getFirstRanking);
 
 router.get('/stats/uptime', StatsController.uptime);
 router.get('/stats/live-channels', StatsController.getLiveChannels);
+router.get('/stats/joined-channels', StatsController.getJoinedChannels);
 
 
 export default router;
