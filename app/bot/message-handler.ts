@@ -12,6 +12,7 @@ import SpectatorLocation from "../models/SpectatorLocation.model";
 import Twitch from "../modules/Twitch.module";
 import { CountrieLocales } from "../constants/CountrieLocales.constants";
 import Shoutout from "../models/Shoutout.model";
+import RandomResponses from "../modules/RandomResponses.module";
 
 export const handleChatMessage = async (channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
     const bot = await Bot.getInstance();
@@ -59,6 +60,13 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
     }
 
     const userOnMap = await SpectatorLocation.findByUserId(userData.twitchId);
+
+
+    /* If PetruquioBot is mentioned, show a random message (@petruquiobot) */
+    if(message.toLowerCase().includes(`@${bot.getBotClient().getUsername().toLowerCase()}`)) {
+        if (userData.username === 'tangerinebot_') return // TangerineBot causes infinite loops
+        return bot.sendMessage(channelName, RandomResponses.processRandomResponse(message.toLowerCase(), userstate, channelData, bot));
+    }
 
 
 
