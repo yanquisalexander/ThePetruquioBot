@@ -118,7 +118,7 @@ class Redemption {
     }
   }
 
-  static async findByChannelAndRewardId(channel: Channel, rewardId: string): Promise<any[]> {
+  static async firstRankingLeaderboard(channel: Channel, rewardId: string): Promise<any[]> {
     try {
       const query = `
       SELECT
@@ -152,6 +152,49 @@ class Redemption {
       throw new Error((error as Error).message);
     }
   }
+
+
+  static async findByChannelAndReward(channel: Channel, rewardId: string, groupAndCount: boolean = false): Promise<any[]> {
+    try {
+      let query = `
+  SELECT u.twitch_id AS user_id,
+  u.username AS user_username,
+  u.display_name AS user_display_name,
+  u.avatar AS user_avatar`;
+
+      if (groupAndCount) {
+        query += `,
+  COUNT(*) AS redemption_count`;
+      }
+
+      query += `
+  FROM redemption_history AS rh
+  LEFT JOIN users AS u ON rh.user_id = u.twitch_id
+  WHERE channel_id = $1
+  AND reward_id = $2`;
+
+      if (groupAndCount) {
+        query += `
+  GROUP BY
+  u.twitch_id
+  ORDER BY
+  redemption_count DESC;`;
+      } else {
+        query += `
+  ORDER BY
+  redemption_date DESC;`;
+      }
+
+
+      const values = [channel.twitchId, rewardId];
+
+      const result = await Database.query(query, values);
+      return result.rows;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+
 
 
 }

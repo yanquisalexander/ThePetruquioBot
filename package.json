@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --ext ts,js --exec ts-node index.ts",
-    "build": "esbuild --bundle --minify index.ts --platform=node --outfile=dist/index.js --packages=external",
+    "build": "ts-node ./scripts/build.ts",
     "start": "node dist/index.js"
   },
   "author": "",
@@ -72,6 +72,7 @@
     "@types/passport-jwt": "^3.0.11",
     "@types/pg": "^8.10.3",
     "@types/suncalc": "^1.9.1",
+    "esbuild-plugin-import-glob": "^0.1.1",
     "nodemon": "^2.0.19",
     "ts-node": "^10.9.1"
   }

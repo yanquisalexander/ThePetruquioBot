@@ -13,6 +13,10 @@ class Environment {
         return process.env.WEBSITE_URL || process.env.NODE_ENV === 'development' ? 'http://localhost:8888' : 'https://petruquio.live';
     }
 
+    static get rootDir(): string {
+        return __dirname + '/..';
+    }
+
     static get hostname(): string {
         if (process.env.HOSTNAME) {
             return process.env.HOSTNAME;

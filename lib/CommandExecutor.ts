@@ -5,26 +5,10 @@ import ChatUser from '../utils/chat-user';
 import fs from 'fs';
 import { Bot } from '../bot';
 import TranslatorModule from '../app/modules/Translator.module';
-
-
-/* Static imports until fix dynamic imports */
-import AddCommand from '../app/commands/add.command';
-import ConfigCommand from '../app/commands/cfg.command';
-import DeleteCommand from '../app/commands/delete.command';
-import MapEmoteCommand from '../app/commands/emote.command';
-import FromCommand from '../app/commands/from.command';
-import JoinCommand from '../app/commands/join.command';
-import MapCommand from '../app/commands/map.command';
-import MaskCommand from '../app/commands/mask.command';
-import MapMessageCommand from '../app/commands/message.command';
-import RandomMessageCommand from '../app/commands/random.command';
-import ShoutoutCommand from '../app/commands/shoutout.command';
-import ShowCommand from '../app/commands/show.command';
-import UserUpdateCommand from '../app/commands/user-update.command';
-import LanguageCommand from '../app/commands/lang.command';
-import BirthdayCommand from '../app/commands/birthday.command';
-
-/* End of static imports */
+import Environment from '../utils/environment';
+// @ts-ignore
+import * as SystemCommands from '../app/commands/*.command.ts';
+const { default: systemCommandsArray, filenames } = SystemCommands;
 
 
 
@@ -34,7 +18,9 @@ class CommandExecutor {
     private systemCommands: Command[] = [];
     private static instance: CommandExecutor | null = null;
     constructor() {
-        this.loadSystemCommands();
+        this.loadCommands().then((commands) => {
+            this.systemCommands = commands;
+        });
     }
 
     public static getInstance(): CommandExecutor {
@@ -51,51 +37,27 @@ class CommandExecutor {
 
 
 
-    private loadSystemCommands() {
-        /* Load files from /app/commands  */
-        /*         const commandFiles = fs.readdirSync('./app/commands');
-                console.log(commandFiles)
-        
-                for (const file of commandFiles) {
-                    if (file.endsWith('.command.ts')) {
-                        try {
-                            const command = require(`../app/commands/${file}`).default;
-        
-                            if (command && command.name && command.execute) {
-                                this.systemCommands.push(command);
-                            } else {
-                                console.error(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Command ${file} is not valid.`));
-                            }
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    }
-                } */
-
-        /* Load static imports */
-        const commands = [
-            AddCommand,
-            ConfigCommand,
-            DeleteCommand,
-            MapEmoteCommand,
-            FromCommand,
-            JoinCommand,
-            MapCommand,
-            MaskCommand,
-            MapMessageCommand,
-            RandomMessageCommand,
-            ShoutoutCommand,
-            ShowCommand,
-            UserUpdateCommand,
-            LanguageCommand,
-            BirthdayCommand,
-        ];
-
-        for (const command of commands) {
-            this.systemCommands.push(command);
+    async loadCommands(): Promise<Command[]> {
+        const commands = [];
+    
+        if (!Array.isArray(systemCommandsArray)) {
+            throw new Error('systemCommandsArray debe ser una matriz');
         }
-
-
+    
+        for (let command of systemCommandsArray) {
+            command = command.default;
+            if (!command || !command.name || !command.execute) {
+                console.log(`[COMMAND EXECUTOR] ${chalk.red('ERROR:')} Command ${command.name} is invalid.`);
+            }
+    
+            commands.push(command);
+            console.log(
+                chalk.green('[COMMAND EXECUTOR]'),
+                chalk.white(`Loaded command ${command.name}.`)
+            );
+        }
+    
+        return commands;
     }
 
 

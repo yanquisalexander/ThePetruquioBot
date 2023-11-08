@@ -259,11 +259,13 @@ class ChannelsController {
             return res.status(404).json({ error: 'Channel does not have first ranking enabled' });
         }
 
-        const redemptions = await Redemption.findByChannelAndRewardId(channel, channel.preferences.firstRankingRewardId?.value);
+        const redemptions = await Redemption.firstRankingLeaderboard(channel, channel.preferences.firstRankingRewardId?.value);
+        const historical = await Redemption.findByChannelAndReward(channel, channel.preferences.firstRankingRewardId?.value, true);
 
         return res.json({
             data: {
                 redemptions,
+                historical,
             },
         })
     }
