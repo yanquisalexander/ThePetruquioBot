@@ -3,6 +3,7 @@ import MemoryVariables from "../../lib/MemoryVariables";
 import { Bot } from "../../bot";
 import MessageLogger from "../models/MessageLogger.model";
 import User from "../models/User.model";
+import Twitch from "../modules/Twitch.module";
 
 
 class StatsController {
@@ -13,13 +14,22 @@ class StatsController {
     public static async getStats(req: Request, res: Response): Promise<Response> {
         // Englobe all the stats in a single endpoint
         const bot = await Bot.getInstance();
+        const joinedChannels = await Twitch.getUsersByList(bot.joinedChannels);
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         const processedMessages = await MessageLogger.getCount();
         const userCount = await User.count();
         return res.status(200).json({
             data: {
-                channels: bot.joinedChannels,
+                channels: joinedChannels.map(channel => {
+                    return {
+                        id: channel.id,
+                        display_name: channel.displayName,
+                        username: channel.name,
+                        description: channel.description,
+                        profile_image_url: channel.profilePictureUrl,
+                    }
+                }),
                 live_channels: MemoryVariables.getLiveChannels().map(stream => {
                     return {
                         username: stream.userName,

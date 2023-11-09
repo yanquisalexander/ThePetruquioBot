@@ -94,6 +94,16 @@ class Twitch {
         return liveChannels;
     }
 
+    public static async getUsersByList(userList: string[]): Promise<HelixUser[]> {
+        try {
+            const users = await this.Helix.users.getUsersByNames(userList);
+            return users;
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    }
+
     public static async checkLiveChannels(): Promise<void> {
         try {
             const bot = await Bot.getInstance();
