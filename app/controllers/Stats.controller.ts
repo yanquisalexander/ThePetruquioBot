@@ -14,7 +14,7 @@ class StatsController {
     public static async getStats(req: Request, res: Response): Promise<Response> {
         // Englobe all the stats in a single endpoint
         const bot = await Bot.getInstance();
-        const joinedChannels = await Twitch.getUsersByList(bot.joinedChannels);
+        const joinedChannels = (await Twitch.getUsersByList(bot.joinedChannels)).sort((a, b) => a.name.localeCompare(b.name));
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         const processedMessages = await MessageLogger.getCount();
