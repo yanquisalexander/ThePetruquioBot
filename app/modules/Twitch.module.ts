@@ -134,6 +134,7 @@ class Twitch {
 
 
     public static async initializeLiveMonitor(): Promise<void> {
+        await this.checkLiveChannels(); // Check live channels on startup
         setInterval(async () => {
             console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Checking live channels...'));
             await this.checkLiveChannels();
