@@ -20,13 +20,13 @@ const FromCommand = new Command(
         } else {
 
             if (_args.length === 0) {
-                return _bot.sendMessage(_channel.user.username, `@${_user.displayName}, para actualizar tu ubicación en el mapa, debes escribir !from <ciudad, país> ;)`);
+                return _bot.sendMessage(_channel, `@${_user.displayName}, para actualizar tu ubicación en el mapa, debes escribir !from <ciudad, país> ;)`);
             }
             let userLocation = await SpectatorLocation.findByUserId(user.twitchId);
             if (!userLocation) {
                 let geoData = await Geolocation.getLocalization(_args.join(' '));
                 if (!geoData) {
-                    _bot.sendMessage(_channel.user.username, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
+                    _bot.sendMessage(_channel, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
                     return '';
                 }
                 let location = new SpectatorLocation(user.twitchId, geoData.latitude?.toString(), geoData.longitude?.toString(), geoData?.formattedAddress, geoData?.countryCode);
@@ -39,12 +39,12 @@ const FromCommand = new Command(
                     longitude: geoData.longitude?.toString(),
                 });
 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu ubicación fue actualizada correctamente ;)`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, tu ubicación fue actualizada correctamente ;)`);
                 return;
             } else {
                 let geoData = await Geolocation.getLocalization(_args.join(' '));
                 if (!geoData) {
-                    _bot.sendMessage(_channel.user.username, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
+                    _bot.sendMessage(_channel, `@${_user.displayName}, hubo un problema al obtener tu ubicación BibleThump`);
                     return;
                 }
                 userLocation.latitude = geoData.latitude?.toString();
@@ -59,7 +59,7 @@ const FromCommand = new Command(
                     longitude: userLocation.longitude,
                 });
                 await userLocation.save();
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu ubicación fue actualizada correctamente ;)`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, tu ubicación fue actualizada correctamente ;)`);
                 return;
             }
 

@@ -28,10 +28,10 @@ const MapCommand = new Command(
 
         if(!_channel.preferences.enableCommunityMap?.value) return;
         if (_channel?.preferences?.mapCommandMessage?.value && _channel.preferences.mapCommandMessage?.value.length > 0) {
-            _bot.sendMessage(_channel.user.username, `${_channel.preferences.mapCommandMessage.value?.replace('#map_url', `petruquio.live/c/${_channel.user.username}/map`)}`);
+            _bot.sendMessage(_channel, `${_channel.preferences.mapCommandMessage.value?.replace('#map_url', `petruquio.live/c/${_channel.user.username}/map`)}`);
             return '';
         } else {
-            _bot.sendMessage(_channel.user.username, `${getDefaultMessage().replace('#map_url', `petruquio.live/c/${_channel.user.username}/map`)}`);
+            _bot.sendMessage(_channel, `${getDefaultMessage().replace('#map_url', `petruquio.live/c/${_channel.user.username}/map`)}`);
             return '';
         }
     }

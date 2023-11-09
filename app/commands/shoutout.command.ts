@@ -42,7 +42,7 @@ const ShoutoutCommand = new Command(
                 }
             }
 
-            bot.sendMessage(channel.user.username, shoutoutMessage.replace(/#targetStreamer/g, targetChannelTwitchUser?.displayName || targetChannel));
+            bot.sendMessage(channel, shoutoutMessage.replace(/#targetStreamer/g, targetChannelTwitchUser?.displayName || targetChannel));
         }
     }
 );

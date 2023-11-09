@@ -1,4 +1,4 @@
-import { ApiClient, HelixStream, HelixUser } from '@twurple/api'
+import { ApiClient, HelixChatAnnouncementColor, HelixStream, HelixUser } from '@twurple/api'
 import TwitchAuthenticator from './TwitchAuthenticator.module';
 import chalk from 'chalk';
 import { Bot } from '../../bot';
@@ -196,6 +196,30 @@ class Twitch {
         parsedMessage = parser.parse(parsedMessage, 2);
 
         return parsedMessage;
+    }
+
+    public static async sendAnnouncement(channel: Channel, message: string, color?: string): Promise<void> {
+        try {
+            const moderator = await this.Helix.users.getUserByName(Bot.username);
+            const announcementColor : HelixChatAnnouncementColor = color as HelixChatAnnouncementColor;          
+
+            if (!moderator) {
+                throw new Error(`User ${Bot.username} not found.`);
+            }
+
+            const twitchAnnouncement = this.Helix.asUser(moderator, async api => {
+                const announcement = await api.chat.sendAnnouncement(channel.twitchId, {
+                    color: 'primary',
+                    message,
+                })
+                console.log(announcement);
+                return announcement;
+            });
+
+            await twitchAnnouncement;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
 }

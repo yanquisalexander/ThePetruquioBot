@@ -26,7 +26,7 @@ const JoinCommand = new Command(
 
         if (_channel.user.username === botUsername) {
             if (_bot.joinedChannels.includes(_user.username)) {
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, el bot ya se encuentra en tu canal PopNemo`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, el bot ya se encuentra en tu canal PopNemo`);
             }
         }
 

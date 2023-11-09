@@ -18,7 +18,7 @@ const LanguageCommand = new Command(
     {},
     '', // System commands don't need a response
     async (_user, _args, _channel, _bot) => {
-        _bot.sendMessage(_channel.user.username, `@${_user.displayName}, ${langExpl[Math.floor(Math.random() * langExpl.length)]}`);
+        _bot.sendMessage(_channel, `@${_user.displayName}, ${langExpl[Math.floor(Math.random() * langExpl.length)]}`);
         return;
     }
 );

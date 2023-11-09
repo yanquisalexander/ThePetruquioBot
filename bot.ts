@@ -4,6 +4,7 @@ import Channel from './app/models/Channel.model';
 import chalk from 'chalk';
 import User from './app/models/User.model';
 import UserToken from './app/models/UserToken.model';
+import Twitch from './app/modules/Twitch.module';
 
 const bootedAt = Date.now();
 
@@ -123,7 +124,7 @@ export class Bot {
     return channelArray;
   }
 
-  public sendMessage(channel: Channel | string, message: string, platform: Platform = Platform.Twitch): void {
+  public sendMessage(channel: Channel, message: string, platform: Platform = Platform.Twitch): void {
     if (platform === Platform.Twitch) {
       if(typeof channel === 'string') {
         this.client.say(channel, message);
@@ -133,6 +134,29 @@ export class Bot {
         console.log(chalk.yellow('[BOT]'), chalk.white('Bot muted in channel #'), chalk.green(channel.user.username));
         return;
       }
+      if (message.startsWith('/announce')) {
+        const announcePattern = /\/announce(\w*)\s(.+)/;
+        const match = message.match(announcePattern);
+    
+        if (match) {
+            const announceType = match[1] || 'primary';
+            const announcementMessage = match[2];
+    
+    
+            // Luego, envías el anuncio con el tipo y mensaje correspondientes.
+            Twitch.sendAnnouncement(channel, announcementMessage, announceType).then(() => {
+                console.log(chalk.green('[BOT]'), chalk.white(`Announcement sent in channel #${channel.user.username} (Type: ${announceType}) - Message: ${announcementMessage}`));
+            }).catch((error) => {
+                console.error(chalk.red('[BOT]'), chalk.white(`Error sending announcement in channel #${channel.user.username} (Type: ${announceType}) - Error: ${error}`));
+            });
+        } else {
+            // Mensaje de comando no válido
+            console.log(chalk.yellow('[BOT]'), chalk.white('Invalid announcement command.'));
+        }
+    
+        return;
+    }
+    
       this.client.say(channel.user.username, message);
     } else if (platform === Platform.Kick) {
       console.log({ channel, message, platform });

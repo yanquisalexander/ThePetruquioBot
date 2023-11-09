@@ -23,7 +23,7 @@ class GreetingsManager {
 
     private static knownBotsList: string[] = ["streamelements", "streamlabs", "nightbot", "tangerinebot_"];
 
-    private static greetingStacks: { channel: string, greeting: string, options: string[] }[] = [];
+    private static greetingStacks: { channel: Channel, greeting: string, options: string[] }[] = [];
 
     private static botGreetings = [
         "Hey pal @#username, good to see you around, feel safe now :)",
@@ -191,7 +191,7 @@ class GreetingsManager {
         return greeting.replace("#username", username).replace("#emote", randomEmote);
     }
 
-    public static addToGreetingStack(channel: string, greeting: string, ...options: string[]) {
+    public static addToGreetingStack(channel: Channel, greeting: string, ...options: string[]) {
         console.log(chalk.yellow(`[GREETINGS] Adding to stack: ${greeting} for channel ${channel}, options: ${options.join(', ')}`));
         this.greetingStacks.push({ channel, greeting, options });
     }

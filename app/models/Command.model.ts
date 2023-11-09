@@ -94,7 +94,7 @@ class Command {
             return await this.callback(user, args, channel, bot);
         } else {
             const _user = await User.findByTwitchId(user.id);
-            if(!_user) return ''
+            if(!_user) return
             
             return Utils.replaceVariables(this.response, channel, _user, args);
         }

@@ -21,9 +21,9 @@ const BirthdayCommand = new Command(
                 if (userBirthday) {
                     const day = userBirthday.getDate();
                     const month = userBirthday.toLocaleString('es-ES', { month: 'long' });
-                    _bot.sendMessage(_channel.user.username, `@${_user.displayName}, me has dicho que tu cumpleaños es el ${day} de ${month}.`);
+                    _bot.sendMessage(_channel, `@${_user.displayName}, me has dicho que tu cumpleaños es el ${day} de ${month}.`);
                 } else {
-                    _bot.sendMessage(_channel.user.username, `@${_user.displayName}, aún no has especificado tu fecha de cumpleaños.`);
+                    _bot.sendMessage(_channel, `@${_user.displayName}, aún no has especificado tu fecha de cumpleaños.`);
                 }
                 return;
             }
@@ -34,15 +34,15 @@ const BirthdayCommand = new Command(
                     await user.save();
                 } catch (error) {
                     console.error(error);
-                    _bot.sendMessage(_channel.user.username, `@${_user.displayName}, ha ocurrido un error al eliminar tu fecha de cumpleaños.`);
+                    _bot.sendMessage(_channel, `@${_user.displayName}, ha ocurrido un error al eliminar tu fecha de cumpleaños.`);
                     return;
                 }
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu fecha de cumpleaños fue eliminada correctamente.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, tu fecha de cumpleaños fue eliminada correctamente.`);
                 return;
             }
 
             if(_args.length < 1) {
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
                 return;
             }
 
@@ -53,7 +53,7 @@ const BirthdayCommand = new Command(
             }
 
             if(date.length < 2) {
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
                 return;
             }
 
@@ -61,12 +61,12 @@ const BirthdayCommand = new Command(
             const month = parseInt(date[1]);
 
             if(isNaN(day) || isNaN(month)) {
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, debes especificar tu fecha de cumpleaños.`);
                 return;
             }
 
             if(day < 1 || day > 31 || month < 1 || month > 12) {
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que tu fecha de cumpleaños no es válida.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, parece que tu fecha de cumpleaños no es válida.`);
                 return;
             }
 
@@ -78,11 +78,11 @@ const BirthdayCommand = new Command(
                 await user.save();
             } catch (error) {
                 console.error(error);
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, ha ocurrido un error al actualizar tu fecha de cumpleaños.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, ha ocurrido un error al actualizar tu fecha de cumpleaños.`);
                 return;
             }
 
-            _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu fecha de cumpleaños fue actualizada correctamente a ${user.birthday.getDate()} de ${user.birthday.toLocaleString('es-ES', { month: 'long' })}.`);
+            _bot.sendMessage(_channel, `@${_user.displayName}, tu fecha de cumpleaños fue actualizada correctamente a ${user.birthday.getDate()} de ${user.birthday.toLocaleString('es-ES', { month: 'long' })}.`);
 
         }
     }

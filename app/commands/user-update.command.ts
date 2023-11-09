@@ -25,11 +25,11 @@ const UserUpdateCommand = new Command(
 
         try {
             await user.save();
-            _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tus datos fueron actualizados correctamente VoHiYo`);
+            _bot.sendMessage(_channel, `@${_user.displayName}, tus datos fueron actualizados correctamente VoHiYo`);
 
         } catch (error) {
             console.error(error);
-            _bot.sendMessage(_channel.user.username, `@${_user.username}, ha ocurrido un error al actualizar tus datos BibleThump`);
+            _bot.sendMessage(_channel, `@${_user.username}, ha ocurrido un error al actualizar tus datos BibleThump`);
         }
 
         return;

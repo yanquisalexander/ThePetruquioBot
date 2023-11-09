@@ -25,7 +25,7 @@ const MapEmoteCommand = new Command(
         const userLocation = await SpectatorLocation.findByUserId(user.twitchId);
 
         if(!userLocation) {
-            _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
+            _bot.sendMessage(_channel, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
             return;
         } else {
             let worldmapUser = await WorldMap.find(user.twitchId, _channel.user.twitchId);
@@ -34,11 +34,11 @@ const MapEmoteCommand = new Command(
 
             if(!worldmapUser) {
                 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo cambiar tu pin :(`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo cambiar tu pin :(`);
             }
 
             if(worldmapUser) {
-                if(!_args[0]) return _bot.sendMessage(_channel.user.username, `@${_user.displayName}, debes especificar un emote para tu pin.`);
+                if(!_args[0]) return _bot.sendMessage(_channel, `@${_user.displayName}, debes especificar un emote para tu pin.`);
                 let emote = '!emote ' + _args[0]
                 let emoteUrl = await Twitch.parseEmotes(_channel, emote, _user.raw, true)
                 emoteUrl = emoteUrl.replace('!emote ', '')
@@ -57,7 +57,7 @@ const MapEmoteCommand = new Command(
                     });
                 }
 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu pin personalizado ha sido guardado ;)`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, tu pin personalizado ha sido guardado ;)`);
             }
         }
 

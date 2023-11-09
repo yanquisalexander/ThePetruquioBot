@@ -24,7 +24,7 @@ const RandomMessageCommand = new Command(
     {},
     '', // System commands don't need a response
     async (_user, _args, _channel, _bot) => {
-        _bot.sendMessage(_channel.user.username, `@${_user.displayName}, ${getRandomFact()}`);
+        _bot.sendMessage(_channel, `@${_user.displayName}, ${getRandomFact()}`);
         return;
     }
 );

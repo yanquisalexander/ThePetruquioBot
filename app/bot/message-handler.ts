@@ -65,7 +65,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
     /* If PetruquioBot is mentioned, show a random message (@petruquiobot) */
     if(message.toLowerCase().includes(`@${bot.getBotClient().getUsername().toLowerCase()}`)) {
         if (userData.username === 'tangerinebot_') return // TangerineBot causes infinite loops
-        return bot.sendMessage(channelName, RandomResponses.processRandomResponse(message.toLowerCase(), userstate, channelData, bot));
+        return bot.sendMessage(channelData, RandomResponses.processRandomResponse(message.toLowerCase(), userstate, channelData, bot));
     }
 
 
@@ -109,7 +109,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
                 greeting = await GreetingsManager.getRandomGreeting(user.displayName, user.isBot, lang, userData.isBirthdayToday());
             }
 
-            GreetingsManager.addToGreetingStack(channelName, greeting);
+            GreetingsManager.addToGreetingStack(channelData, greeting);
         }
 
         if (await GreetingsManager.canReceiveShoutoutGreeting(channelData, userData)) {
@@ -117,7 +117,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
             console.log(greeting)
             if (greeting) {
                 console.log(chalk.yellow(`[GREETINGS]`), `${chalk.hex(user.color).bold(user.displayName)} is eligible for a shoutout greeting!`);
-                GreetingsManager.addToGreetingStack(channelName, greeting.messages[Math.floor(Math.random() * greeting.messages.length)]);
+                GreetingsManager.addToGreetingStack(channelData, greeting.messages[Math.floor(Math.random() * greeting.messages.length)]);
                 try {
                     let helixUser = await userData.fromHelix();
                     if(!helixUser) {
@@ -139,7 +139,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
 
         const response = await CommandExecutor.getInstance().executeCommand(user, command, args, channelData, bot);
         if (response) {
-            bot.getBotClient().say(channelName, response);
+            bot.sendMessage(channelData, response);
         }
     }
 

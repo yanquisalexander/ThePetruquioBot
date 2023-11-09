@@ -24,7 +24,7 @@ const MapMessageCommand = new Command(
         const userLocation = await SpectatorLocation.findByUserId(user.twitchId);
 
         if(!userLocation) {
-            _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
+            _bot.sendMessage(_channel, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
             return;
         } else {
             let worldmapUser = await WorldMap.find(user.twitchId, _channel.user.twitchId);
@@ -33,7 +33,7 @@ const MapMessageCommand = new Command(
 
             if(!worldmapUser) {
                 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo cambiar tu mensaje (Ya que no existe PopNemo )`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo cambiar tu mensaje (Ya que no existe PopNemo )`);
             }
 
             if(worldmapUser) {
@@ -45,7 +45,7 @@ const MapMessageCommand = new Command(
                     username: _user.username,
                 });
 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, tu mensaje personalizado ha sido guardado ;)`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, tu mensaje personalizado ha sido guardado ;)`);
             }
         }
 

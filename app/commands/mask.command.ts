@@ -23,7 +23,7 @@ const MaskCommand = new Command(
         const userLocation = await SpectatorLocation.findByUserId(user.twitchId);
 
         if(!userLocation) {
-            _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
+            _bot.sendMessage(_channel, `@${_user.displayName}, parece que no tengo tu ubicación registrada. Puedes registrarla con el comando !from <ciudad, país> PopNemo`);
             return;
         } else {
             let worldmapUser = await WorldMap.find(user.twitchId, _channel.user.twitchId);
@@ -32,7 +32,7 @@ const MaskCommand = new Command(
 
             if(!worldmapUser) {
                 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo ocultar tu ubicación (Porque no es visible PopNemo ).`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo ocultar tu ubicación (Porque no es visible PopNemo ).`);
             }
 
             if(worldmapUser) {
@@ -44,7 +44,7 @@ const MaskCommand = new Command(
                     username: _user.username,
                 });
 
-                _bot.sendMessage(_channel.user.username, `@${_user.displayName}, listo! Tu identidad ha sido ocultada en el mapa de la comunidad.`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, listo! Tu identidad ha sido ocultada en el mapa de la comunidad.`);
             }
         }
 
