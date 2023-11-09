@@ -39,6 +39,7 @@ class StatsController {
                 last_updated: lastUpdated,
                 next_update_in: nextUpdateIn,
                 messages: processedMessages,
+                users: userCount,
                 uptime: Date.now() - new Date(bot.bootedAt()).getTime()
             }
         })
