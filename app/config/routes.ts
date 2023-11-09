@@ -53,6 +53,7 @@ router.get('/worldmap/:channelName', WorldMapController.getWorldMap);
 
 router.get('/rankings/:channelName', ChannelsController.getFirstRanking);
 
+router.get('/stats', StatsController.getStats);
 router.get('/stats/uptime', StatsController.uptime);
 router.get('/stats/live-channels', StatsController.getLiveChannels);
 router.get('/stats/joined-channels', StatsController.getJoinedChannels);

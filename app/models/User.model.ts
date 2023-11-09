@@ -138,6 +138,16 @@ class User {
             return null;
         }
     }
+
+    static async count(): Promise<number> {
+        try {
+            const result = await Database.query('SELECT COUNT(*) FROM users');
+            return parseInt(result.rows[0].count);
+        } catch (error) {
+            console.error(error);
+            return 0;
+        }
+    }
 }
 
 export default User;

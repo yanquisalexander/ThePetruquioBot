@@ -2,11 +2,46 @@ import { Request, Response } from "express";
 import MemoryVariables from "../../lib/MemoryVariables";
 import { Bot } from "../../bot";
 import MessageLogger from "../models/MessageLogger.model";
+import User from "../models/User.model";
 
 
 class StatsController {
     constructor() {
         throw new Error('This class cannot be instantiated');
+    }
+
+    public static async getStats(req: Request, res: Response): Promise<Response> {
+        // Englobe all the stats in a single endpoint
+        const bot = await Bot.getInstance();
+        const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
+        const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
+        const processedMessages = await MessageLogger.getCount();
+        const userCount = await User.count();
+        return res.status(200).json({
+            data: {
+                channels: bot.joinedChannels,
+                live_channels: MemoryVariables.getLiveChannels().map(stream => {
+                    return {
+                        username: stream.userName,
+                        display_name: stream.userDisplayName,
+                        title: stream.title,
+                        viewers: stream.viewers,
+                        thumbnail_url: stream.thumbnailUrl,
+                        started_at: stream.startDate,
+                        language: stream.language,
+                        tags: stream.tags,
+                        game_id: stream.gameId,
+                        game_name: stream.gameName,
+                        type: stream.type,
+                        is_mature: stream.isMature,
+                    }
+                }),
+                last_updated: lastUpdated,
+                next_update_in: nextUpdateIn,
+                messages: processedMessages,
+                uptime: Date.now() - new Date(bot.bootedAt()).getTime()
+            }
+        })
     }
 
     public static async uptime(req: Request, res: Response): Promise<Response> {
