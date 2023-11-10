@@ -27,7 +27,7 @@ class StatsController {
                         display_name: channel.displayName,
                         username: channel.name,
                         description: channel.description,
-                        profile_image_url: channel.profilePictureUrl,
+                        profile_image_url: channel.profilePictureUrl.replace('300x300', '70x70'), // 70x70 is the smallest size
                     }
                 }),
                 live_channels: MemoryVariables.getLiveChannels().map(stream => {
