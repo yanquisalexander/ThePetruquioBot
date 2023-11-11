@@ -93,7 +93,8 @@ class TwitchAuthenticator {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.white(`Refreshing token for user ${userId}`));
                 const userToken = await UserToken.findByUserId(parseInt(userId));
                 if (!userToken) {
-                    throw new Error('User token not found');
+                    console.error(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.red(`User ${userId} not found in database`));
+                    return;
                 }
                 userToken.tokenData = token;
                 await userToken.save();
