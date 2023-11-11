@@ -56,6 +56,16 @@ class WebServer {
             });
         });
 
+        app.post('*', (req, res) => {
+            res.status(404).json({
+                errors: [
+                    "Apparently the requested URL or Resource could not be found 😿."
+                ],
+                error_type: "not_found"
+            });
+        });
+
+
 
         this.app = app;
         console.log(`[WEB SERVER] Finished setting up web server.`);

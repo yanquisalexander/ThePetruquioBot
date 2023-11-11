@@ -8,6 +8,7 @@ import StatsController from "../controllers/Stats.controller";
 import CommandsController from "../controllers/Commands.controller";
 import CommunitiesController from "../controllers/Communities.controller";
 import DashboardController from "../controllers/Dashboard.controller";
+import CommunityBooksController from "../controllers/CommunityBooks.controller";
 
 
 const router = Router();
@@ -50,6 +51,12 @@ router.post('/admin/console', Passport.getPassport().authenticate('jwt', { sessi
 router.get('/worldmap/:channelName/splash.png', WorldMapController.getSplashEmoteset);
 router.get('/worldmap/:channelName/splash.json', WorldMapController.getSplashEmoteset);
 router.get('/worldmap/:channelName', WorldMapController.getWorldMap);
+
+
+
+router.get('/community-books/:channelName', CommunityBooksController.getCommunityBooks);
+router.get('/community-books/:channelName/:communityBookId', CommunityBooksController.getCommunityBook);
+router.post('/community-books/:channelName', CommunityBooksController.createCommunityBook);
 
 router.get('/rankings/:channelName', ChannelsController.getFirstRanking);
 

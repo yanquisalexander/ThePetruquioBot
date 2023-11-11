@@ -1,6 +1,7 @@
 import Database from "../../lib/DatabaseManager";
 import { ChannelPreferences, defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
 import { Command } from "./Command.model";
+import CommunityBook from "./CommunityBook.model";
 import Shoutout from "./Shoutout.model";
 import User from "./User.model";
 import WorldMap from "./WorldMap.model";
@@ -112,6 +113,10 @@ class Channel {
 
     public async getShoutouts(): Promise<any[]> {
         return await Shoutout.getChannelShoutouts(this);
+    }
+
+    public async getCommunityBooks(): Promise<any[]> {
+        return await CommunityBook.getByChannel(this);
     }
 
     public static async findOrCreate(id: number): Promise<Channel> {

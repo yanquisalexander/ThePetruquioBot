@@ -87,7 +87,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
         console.log(chalk.yellow(`[${channelName}]`), `${chalk.hex(user.color).bold(user.displayName)}: ${message}`);
     }
 
-    if (channelData.preferences.enableGreetings?.value) {
+    if (channelData.preferences.enableGreetings && channelData.preferences.enableGreetings.value) {
 
         /* Bots can't register on Community Map, so we pass true to isUserOnMap */
 

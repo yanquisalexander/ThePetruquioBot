@@ -1,6 +1,6 @@
 import axios from "axios";
 import "dotenv/config";
-import { RefreshingAuthProvider, AppTokenAuthProvider, TokenInfoData, AccessToken, exchangeCode } from '@twurple/auth';
+import { RefreshingAuthProvider, AppTokenAuthProvider, TokenInfo, TokenInfoData, AccessToken, exchangeCode } from '@twurple/auth';
 import chalk from "chalk";
 import UserToken from "../models/UserToken.model";
 import Environment from "../../utils/environment";
@@ -89,7 +89,7 @@ class TwitchAuthenticator {
             clientId: this.clientId,
             clientSecret: this.clientSecret,
             // @ts-ignore
-            onRefresh: async (userId: string, token: AccessToken) => {
+            onRefresh: async (userId, token) => {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.white(`Refreshing token for user ${userId}`));
                 const userToken = await UserToken.findByUserId(parseInt(userId));
                 if (!userToken) {
@@ -98,12 +98,11 @@ class TwitchAuthenticator {
                 userToken.tokenData = token;
                 await userToken.save();
             },
-            onRefreshFailure: (userId: string) => {
+            // @ts-ignore
+            onRefreshFailure: (userId) => {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.red(`Failed to refresh token for user ${userId}`));
             }
         });
-
-        this.RefreshingAuthProvider.onRefresh
 
         const userTokens = await UserToken.getAll();
         for (const userToken of userTokens) {

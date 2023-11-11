@@ -1,10 +1,17 @@
 import { HelixStream } from "@twurple/api";
 
+interface BookInfo {
+    id: string;
+}
+
+
 class MemoryVariables {
     private static latency: number = 0;
     private static liveChannels: HelixStream[] | null = [];
     private static logs: string[] = [];
     private static lastLiveStreamsCheck: Date = new Date();
+    private static currentBooks: { [channelId: number]: BookInfo } = {};
+
 
     public static getLatency(): number {
         return this.latency;
@@ -36,6 +43,22 @@ class MemoryVariables {
 
     public static setLastLiveStreamsCheck(date: Date): void {
         this.lastLiveStreamsCheck = date;
+    }
+
+    public static getCurrentBooks(): { [channelId: number]: BookInfo } {
+        return this.currentBooks;
+    }
+
+    public static setCurrentBooks(books: { [channelId: number]: BookInfo }): void {
+        this.currentBooks = books;
+    }
+
+    public static getCurrentBook(channelId: number): BookInfo | null {
+        return this.currentBooks[channelId] || null;
+    }
+
+    public static setCurrentBook(channelId: number, book: BookInfo): void {
+        this.currentBooks[channelId] = book;
     }
 }
 
