@@ -93,6 +93,9 @@ class Command {
         if (this.callback) {
             return await this.callback(user, args, channel, bot);
         } else {
+            if(!this.response) return
+            if(!this.enabled) return
+            
             const _user = await User.findByTwitchId(user.id);
             if(!_user) return
             
