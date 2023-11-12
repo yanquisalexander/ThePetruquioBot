@@ -119,7 +119,8 @@ class Command {
                         description = $4, 
                         preferences = $5, 
                         response = $6
-                    WHERE id = $7;
+                        enabled = $7
+                    WHERE id = $8
                 `;
                 values = [
                     this.name,
@@ -128,19 +129,22 @@ class Command {
                     this.description,
                     JSON.stringify(this.preferences),
                     this.response,
-                    this.id
+                    this.id,
+                    this.enabled
                 ];
             } else {
                 // Si no tienes un ID, inserta un nuevo registro
                 query = `
-                    INSERT INTO commands (name, channel_id, permissions, description, preferences, response)
-                    VALUES ($1, $2, $3, $4, $5, $6)
+                    INSERT INTO commands (name, channel_id, permissions, description, preferences, response, enabled)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7)
                     ON CONFLICT (id, channel_id)
                     DO UPDATE SET
                       permissions = EXCLUDED.permissions,
                       description = EXCLUDED.description,
                       preferences = EXCLUDED.preferences,
-                      response = EXCLUDED.response;
+                      response = EXCLUDED.response,
+                      enabled = EXCLUDED.enabled;
+
                 `;
                 values = [
                     this.name,
@@ -148,7 +152,8 @@ class Command {
                     JSON.stringify(this.permissions),
                     this.description,
                     JSON.stringify(this.preferences),
-                    this.response
+                    this.response,
+                    this.enabled
                 ];
             }
 
@@ -187,7 +192,8 @@ class Command {
                 commandData.preferences,
                 commandData.response,
                 undefined,
-                commandData.id
+                commandData.id,
+                commandData.enabled
             );
         } else {
             return null;
@@ -210,7 +216,8 @@ class Command {
                 commandData.preferences,
                 commandData.response,
                 undefined,
-                commandData.id
+                commandData.id,
+                commandData.enabled
             );
         } else {
             return null;
@@ -232,7 +239,8 @@ class Command {
                     commandData.preferences,
                     commandData.response,
                     undefined,
-                    commandData.id
+                    commandData.id,
+                    commandData.enabled
                 );
             });
         } else {
