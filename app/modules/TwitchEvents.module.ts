@@ -77,7 +77,6 @@ class TwitchEvents {
                         if (channelData.preferences.firstRankingRewardId?.value === event.rewardId) {
                             console.log(`[TWITCH EVENT SUB] First Ranking Reward detected on channel ${event.broadcasterDisplayName} (${event.broadcasterName})`);
                             let redemeedMessage = `@${event.userDisplayName} has redeemed "${event.rewardTitle}" PopNemo`;
-
                             if (channelData.preferences.firstRankingRedeemedMessage?.value && !Utils.emptyString(channelData.preferences.firstRankingRedeemedMessage?.value)) {
                                 redemeedMessage = channelData.preferences.firstRankingRedeemedMessage?.value.replace('#user', `@${event.userDisplayName}`).replace('#reward', event.rewardTitle);
                             }

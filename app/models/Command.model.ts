@@ -93,12 +93,12 @@ class Command {
         if (this.callback) {
             return await this.callback(user, args, channel, bot);
         } else {
-            if(!this.response) return
-            if(!this.enabled) return
-            
+            if (!this.response) return
+            //if(!this.enabled) return
+
             const _user = await User.findByTwitchId(user.id);
-            if(!_user) return
-            
+            if (!_user) return
+
             return Utils.replaceVariables(this.response, channel, _user, args);
         }
     }
@@ -107,7 +107,7 @@ class Command {
         try {
             let query = '';
             let values = [];
-    
+
             if (this.id) {
                 // Si ya tienes un ID, actualiza el registro
                 query = `
@@ -151,7 +151,7 @@ class Command {
                     this.response
                 ];
             }
-    
+
             console.log(values);
             await Database.query(query, values);
         } catch (error) {
@@ -159,7 +159,7 @@ class Command {
             throw new Error('Failed to save command.');
         }
     }
-    
+
 
     async delete(channel: Channel): Promise<void> {
         try {
@@ -193,7 +193,7 @@ class Command {
             return null;
         }
     }
-        
+
 
     static async find(channel: Channel, name: string): Promise<Command | null> {
         const query = 'SELECT * FROM commands WHERE channel_id = $1 AND name = $2';
