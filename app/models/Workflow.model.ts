@@ -10,6 +10,7 @@ export enum EventType {
     OnStreamStarted = 'ON_STREAM_STARTED',
     OnStreamEnded = 'ON_STREAM_ENDED',
     OnChannelFollowed = 'ON_CHANNEL_FOLLOWED',
+    OnCustomRewardRedeemed = 'ON_CUSTOM_REWARD_REDEEMED',
 }
 
 class Workflow {

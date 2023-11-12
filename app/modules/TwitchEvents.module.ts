@@ -66,6 +66,12 @@ class TwitchEvents {
                     console.error(`[TWITCH EVENT SUB] Error while logging redemption: ${(error as Error).message}`);
                 }
 
+                const workflow = await Workflow.find(channelData, EventType.OnCustomRewardRedeemed);
+
+                if (workflow) {
+                    await workflow.execute(event);
+                }
+
                 if (channelData.preferences.enableFirstRanking?.value) {
                     if (!Utils.emptyString(channelData.preferences.firstRankingRewardId?.value)) {
                         if (channelData.preferences.firstRankingRewardId?.value === event.rewardId) {
