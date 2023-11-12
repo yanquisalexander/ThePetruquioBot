@@ -4,6 +4,7 @@ import { Command } from "./Command.model";
 import CommunityBook from "./CommunityBook.model";
 import Shoutout from "./Shoutout.model";
 import User from "./User.model";
+import Workflow from "./Workflow.model";
 import WorldMap from "./WorldMap.model";
 
 
@@ -107,7 +108,7 @@ class Channel {
         return await WorldMap.getChannelWorldMap(this.twitchId);
     }
 
-    public async getCommands(): Promise<any[]> {
+    public async getCommands(): Promise<Command[]> {
         return await Command.getChannelCommands(this);
     }
 
@@ -117,6 +118,10 @@ class Channel {
 
     public async getCommunityBooks(): Promise<any[]> {
         return await CommunityBook.getByChannel(this);
+    }
+
+    public async getWorkflows(): Promise<Workflow[]> {
+        return await Workflow.findAll(this);
     }
 
     public static async findOrCreate(id: number): Promise<Channel> {

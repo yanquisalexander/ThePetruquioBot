@@ -56,7 +56,7 @@ class WebServer {
             });
         });
 
-        app.post('*', (req, res) => {
+        app.post('/v2/*', (req, res) => {
             res.status(404).json({
                 errors: [
                     "Apparently the requested URL or Resource could not be found 😿."

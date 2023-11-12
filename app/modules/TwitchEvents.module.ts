@@ -7,6 +7,7 @@ import Utils from "../../lib/Utils";
 import Redemption from "../models/Redemption.model";
 import User from "../models/User.model";
 import { Bot } from "../../bot";
+import Workflow, { EventType } from "../models/Workflow.model";
 
 type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
 
@@ -89,7 +90,7 @@ class TwitchEvents {
             }
         });
 
-        if(!this.eventSubListeners[channel.twitchId.toString()]) {
+        if (!this.eventSubListeners[channel.twitchId.toString()]) {
             this.eventSubListeners[channel.twitchId.toString()] = {};
         }
 
@@ -150,11 +151,23 @@ class TwitchEvents {
 
                     this.bot.sendMessage(channelData, message);
                 }
+
+                const workflow = await Workflow.find(channel, EventType.OnStreamStarted);
+
+                if (workflow) {
+                    await workflow.execute(event);
+                }
             } else {
                 console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
             }
 
         });
+
+        if (Environment.isDevelopment) {
+            console.log(await listener.getCliTestCommand());
+        }
+
+
 
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
@@ -205,6 +218,27 @@ class TwitchEvents {
         }
     }
 
+    public static async suscribeToStreamEnd(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onStreamOffline(channel.twitchId.toString(), async (event) => {
+            console.log(`[TWITCH EVENT SUB] Stream Offline detected for ${event.broadcasterDisplayName} (${event.broadcasterName})`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.broadcasterDisplayName} (${event.broadcasterName})`);
+
+            const channelData = await Channel.findByTwitchId(parseInt(event.broadcasterId));
+            if (!channelData) {
+                console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
+                return;
+            }
+
+            const workflow = await Workflow.find(channelData, EventType.OnStreamEnded)
+
+            if (workflow) {
+                await workflow.execute(event);
+            }
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['stream-end'] = listener;
+    }
+
     public static async subscribeToFollows(channel: Channel): Promise<void> {
         const listener = this.TwitchEventSub.onChannelFollow(channel.twitchId.toString(), process.env.TWITCH_USER_ID || '', async (event) => {
             console.log(`[TWITCH EVENT SUB] Follow detected for ${event.userName}`);
@@ -231,10 +265,6 @@ class TwitchEvents {
 
         });
 
-        if (Environment.isDevelopment) {
-            console.log(await listener.getCliTestCommand());
-        }
-
         this.eventSubListeners[channel.twitchId.toString()]['follows'] = listener;
     }
 
@@ -244,6 +274,7 @@ class TwitchEvents {
         await this.subscribeToLiveStream(channel);
         await this.suscribeToUserUpdate(channel);
         await this.subscribeToFollows(channel);
+        await this.suscribeToStreamEnd(channel);
     }
 
     public static async unsubscribeChannel(channel: Channel): Promise<void> {

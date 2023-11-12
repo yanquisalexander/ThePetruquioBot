@@ -9,6 +9,7 @@ import CommandsController from "../controllers/Commands.controller";
 import CommunitiesController from "../controllers/Communities.controller";
 import DashboardController from "../controllers/Dashboard.controller";
 import CommunityBooksController from "../controllers/CommunityBooks.controller";
+import WorkflowsController from "../controllers/Workflows.controller";
 
 
 const router = Router();
@@ -35,6 +36,12 @@ router.put('/channel/commands/:commandId', Passport.getPassport().authenticate('
 router.post('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.createCommand);
 router.delete('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.deleteCommand);
 router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getTwitchChannelsPoints);
+
+router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
+router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
+router.put('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.updateWorkflow);
+router.delete('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteWorkflow);
+
 
 router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts);
 router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout);

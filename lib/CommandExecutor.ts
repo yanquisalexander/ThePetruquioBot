@@ -2,14 +2,24 @@ import chalk from 'chalk';
 import Channel from '../app/models/Channel.model';
 import { Command, CommandPermission } from '../app/models/Command.model';
 import ChatUser from '../utils/chat-user';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { Bot } from '../bot';
 import TranslatorModule from '../app/modules/Translator.module';
 import Environment from '../utils/environment';
 // @ts-ignore
-import * as SystemCommands from '../app/commands/*.command.ts';
-const { default: systemCommandsArray, filenames } = SystemCommands;
-
+async function importCommandModules() {
+    const commandFiles = await fs.readdir('./app/commands');
+    const commandModules = [];
+  
+    for (const file of commandFiles) {
+      if (file.endsWith('.command.ts')) {
+        const module = await import(`../app/commands/${file}`);
+        commandModules.push(module.default);
+      }
+    }
+  
+    return commandModules;
+  }
 
 
 const cooldowns = new Map();
@@ -38,14 +48,15 @@ class CommandExecutor {
 
 
     async loadCommands(): Promise<Command[]> {
+        const systemCommandsArray = await importCommandModules();
         const commands = [];
     
         if (!Array.isArray(systemCommandsArray)) {
             throw new Error('systemCommandsArray debe ser una matriz');
         }
+
     
         for (let command of systemCommandsArray) {
-            command = command.default;
             if (!command || !command.name || !command.execute) {
                 console.log(`[COMMAND EXECUTOR] ${chalk.red('ERROR:')} Command ${command.name} is invalid.`);
             }
