@@ -61,7 +61,7 @@ class Workflow {
         const vm = new VM({
             timeout: 10000,
             sandbox: {
-                event: data,
+                data,
                 channel: this.channel,
                 axios,
                 console,
