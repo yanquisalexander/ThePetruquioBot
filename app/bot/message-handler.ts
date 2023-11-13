@@ -13,6 +13,7 @@ import Twitch from "../modules/Twitch.module";
 import { CountrieLocales } from "../constants/CountrieLocales.constants";
 import Shoutout from "../models/Shoutout.model";
 import RandomResponses from "../modules/RandomResponses.module";
+import Workflow, { EventType } from "../models/Workflow.model";
 
 export const handleChatMessage = async (channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
     const bot = await Bot.getInstance();
@@ -45,7 +46,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
 
         */
 
-            const twitchUser = await Twitch.Helix.users.getUserByName(user.username);
+        const twitchUser = await Twitch.Helix.users.getUserByName(user.username);
 
 
         try {
@@ -63,7 +64,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
 
 
     /* If PetruquioBot is mentioned, show a random message (@petruquiobot) */
-    if(message.toLowerCase().includes(`@${bot.getBotClient().getUsername().toLowerCase()}`)) {
+    if (message.toLowerCase().includes(`@${bot.getBotClient().getUsername().toLowerCase()}`)) {
         if (userData.username === 'tangerinebot_') return // TangerineBot causes infinite loops
         return bot.sendMessage(channelData, RandomResponses.processRandomResponse(message.toLowerCase(), userstate, channelData, bot));
     }
@@ -99,9 +100,9 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
 
             if (userOnMap && userOnMap instanceof SpectatorLocation) {
                 if (userOnMap.countryCode && userOnMap.countryCode in CountrieLocales) {
-                  lang = CountrieLocales[userOnMap.countryCode as CountryCode] || 'en';
+                    lang = CountrieLocales[userOnMap.countryCode as CountryCode] || 'en';
                 }
-              }
+            }
 
             if (user.isBroadcaster) {
                 greeting = GreetingsManager.getRandomBroadcasterGreeting(user.displayName);
@@ -120,7 +121,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
                 GreetingsManager.addToGreetingStack(channelData, greeting.messages[Math.floor(Math.random() * greeting.messages.length)]);
                 try {
                     let helixUser = await userData.fromHelix();
-                    if(!helixUser) {
+                    if (!helixUser) {
                         return;
                     }
                     await Twitch.shoutout(channelData, helixUser)
@@ -129,6 +130,22 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
                 }
             }
         }
+    }
+
+    try {
+        const workflow = await Workflow.find(channelData, EventType.OnChatMessage);
+        if (workflow) {
+            workflow.execute({
+                channel: channelData,
+                user: userData,
+                message: message,
+                isCommand: message.startsWith('!'),
+                isBot: user.isBot,
+                command: message.split(' ')[0].replace('!', '') || null,
+            });
+        }
+    } catch (error) {
+        console.error(chalk.red(`[ERROR]`), `Error executing workflow for channel ${chalk.bold(channelData.user.displayName)}: ${error}`);
     }
 
 

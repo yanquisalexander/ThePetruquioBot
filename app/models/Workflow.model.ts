@@ -11,6 +11,8 @@ export enum EventType {
     OnStreamEnded = 'ON_STREAM_ENDED',
     OnChannelFollowed = 'ON_CHANNEL_FOLLOWED',
     OnCustomRewardRedeemed = 'ON_CUSTOM_REWARD_REDEEMED',
+    OnChatMessage = 'ON_CHAT_MESSAGE',
+    OnWebhook = 'ON_WEBHOOK',
 }
 
 class Workflow {
