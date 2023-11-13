@@ -192,7 +192,7 @@ class GreetingsManager {
     }
 
     public static addToGreetingStack(channel: Channel, greeting: string, ...options: string[]) {
-        console.log(chalk.yellow(`[GREETINGS] Adding to stack: ${greeting} for channel ${channel}, options: ${options.join(', ')}`));
+        console.log(chalk.yellow(`[GREETINGS] Adding to stack: ${greeting} for channel #${channel.user.displayName}, options: ${options.join(', ')}`));
         this.greetingStacks.push({ channel, greeting, options });
     }
 
