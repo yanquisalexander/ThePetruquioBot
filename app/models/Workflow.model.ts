@@ -5,6 +5,7 @@ import Database from '../../lib/DatabaseManager';
 import Channel from './Channel.model';
 import chalk from 'chalk';
 import { Bot } from '../../bot';
+import WorkflowLog from './WorkflowLog.model';
 
 export enum EventType {
     OnStreamStarted = 'ON_STREAM_STARTED',
@@ -60,15 +61,31 @@ class Workflow {
 
     async execute(data: any): Promise<void> {
         const bot = await Bot.getInstance();
+
+        let executionLog: string[] = [];
+        let executionSuccess = true;
         const vm = new VM({
             timeout: 10000,
             sandbox: {
                 data,
                 channel: this.channel,
                 axios,
-                console,
+                console: {
+                    log: (...args: any[]) => {
+                        const logMessage = args.map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg))).join(' ');
+                        executionLog.push(logMessage);
+                        console.log(chalk.green('[WORKFLOW]'), ...args);
+                    },
+                    error: (...args: any[]) => {
+                        executionSuccess = false;
+                        const errorMessage = args.map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg))).join(' ');
+                        executionLog.push(chalk.red(errorMessage));
+                        console.error(chalk.red(errorMessage));
+                    }
+                },
+
                 sendMessage: (message: string) => {
-                    if(typeof message !== 'string') {
+                    if (typeof message !== 'string') {
                         console.error(chalk.red('[WORKFLOW]'), chalk.white('Message must be a string.'));
                         console.error(chalk.red('[WORKFLOW]'), chalk.white('Passed message:'), message);
                         return;
@@ -77,17 +94,29 @@ class Workflow {
                 }
             },
         });
-    
+
         try {
             console.log(`[Workflow] Executing workflow ${this.eventType} for channel ${this.channel.user.displayName}`);
             console.log(`[Workflow] Script: ${this.script}`);
-            
+
             vm.run(this.script);
-    
+
+
             console.log(`[Workflow] Workflow ${this.eventType} for channel ${this.channel.user.displayName} executed successfully.`);
         } catch (error) {
+            executionSuccess = false;
             console.error(error);
             console.error(`[Workflow] Workflow ${this.eventType} for channel ${this.channel.user.displayName} failed to execute.`);
+        } finally {
+            console.log('[Workflow] Execution Log:', executionLog);
+            console.log('[Workflow] Execution Status:', executionSuccess ? 'Success' : 'Failure');
+
+            try {
+                await WorkflowLog.create(this.eventType, this.script, executionSuccess, this.channel)
+            } catch (error) {
+                console.error(error);
+                console.error(`[Workflow] Failed to create workflow log for workflow ${this.eventType} for channel ${this.channel.user.displayName}.`);
+            }
         }
     }
 

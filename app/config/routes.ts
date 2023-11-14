@@ -10,6 +10,8 @@ import CommunitiesController from "../controllers/Communities.controller";
 import DashboardController from "../controllers/Dashboard.controller";
 import CommunityBooksController from "../controllers/CommunityBooks.controller";
 import WorkflowsController from "../controllers/Workflows.controller";
+import Twitch from "../modules/Twitch.module";
+import { Bot } from "../../bot";
 
 
 const router = Router();

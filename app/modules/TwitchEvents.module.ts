@@ -8,6 +8,7 @@ import Redemption from "../models/Redemption.model";
 import User from "../models/User.model";
 import { Bot } from "../../bot";
 import Workflow, { EventType } from "../models/Workflow.model";
+import chalk from "chalk";
 
 type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
 
@@ -294,6 +295,10 @@ class TwitchEvents {
     }
 
     public static async subscribeAllChannels(): Promise<void> {
+        if(Environment.isDevelopment) {
+            console.log(chalk.bgYellow('[TWITCH EVENT SUB]'), chalk.yellow('Development mode enabled. Skipping subscriptions.'));
+            return;
+        }
         const channels = await Channel.getAutoJoinChannels();
         for (const channel of channels) {
             if (!this.eventSubListeners[channel.twitchId.toString()]) {
