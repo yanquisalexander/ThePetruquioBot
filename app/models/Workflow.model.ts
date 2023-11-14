@@ -68,6 +68,11 @@ class Workflow {
                 axios,
                 console,
                 sendMessage: (message: string) => {
+                    if(typeof message !== 'string') {
+                        console.error(chalk.red('[WORKFLOW]'), chalk.white('Message must be a string.'));
+                        console.error(chalk.red('[WORKFLOW]'), chalk.white('Passed message:'), message);
+                        return;
+                    }
                     bot.sendMessage(this.channel, message);
                 }
             },
