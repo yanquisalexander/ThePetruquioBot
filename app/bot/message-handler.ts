@@ -22,7 +22,6 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
         /* Double check to avoid infinite loops (Maybe because running on multiple instances) */
         return;
     }
-
     const channelName = channel.replace('#', '');
 
     const channelData = await Channel.findByUsername(channelName);
@@ -139,9 +138,9 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
                 channel: channelData,
                 user: userData,
                 message: message,
-                isCommand: message.startsWith('!'),
+                isCommand: message ? message.startsWith('!') : false,
                 isBot: user.isBot,
-                command: message.split(' ')[0].replace('!', '') || null,
+                command: message ? message.split(' ')[0].replace('!', '') : '',
             });
         }
     } catch (error) {
