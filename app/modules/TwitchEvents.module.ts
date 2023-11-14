@@ -118,7 +118,11 @@ class TwitchEvents {
             if (user) {
                 const channel = await user.getChannel();
                 if (channel) {
-                    await this.unsubscribeChannel(channel);
+                    try {
+                        await this.unsubscribeChannel(channel);
+                    } catch (error) {
+                        console.error(`[TWITCH EVENT SUB] Error while unsubscribing channel ${channel.twitchId} (${channel.user.username}): ${(error as Error).message}`);
+                    }
                     channel.autoJoin = false;
                     await channel.save();
                     console.log(`[TWITCH EVENT SUB] Channel ${channel.twitchId} (${channel.user.username}) unsubscribed from all events.`);
@@ -302,7 +306,11 @@ class TwitchEvents {
     public static async unsubscribeAllChannels(): Promise<void> {
         const channels = await Channel.getAutoJoinChannels();
         for (const channel of channels) {
-            await this.unsubscribeChannel(channel);
+            try {
+                await this.unsubscribeChannel(channel);
+            } catch (error) {
+                console.error(`[TWITCH EVENT SUB] Error while unsubscribing channel ${channel.twitchId} (${channel.user.username}): ${(error as Error).message}`);
+            }
         }
 
         this.eventSubListeners = {};
