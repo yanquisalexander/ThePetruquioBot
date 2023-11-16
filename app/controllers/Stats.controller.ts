@@ -18,6 +18,7 @@ class StatsController {
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         const processedMessages = await MessageLogger.getCount();
+        const last30DaysMessageCount = await MessageLogger.getLast30Days();
         const userCount = await User.count();
         return res.status(200).json({
             data: {
@@ -49,6 +50,7 @@ class StatsController {
                 last_updated: lastUpdated,
                 next_update_in: nextUpdateIn,
                 messages: processedMessages,
+                last_30_days_messages: last30DaysMessageCount,
                 users: userCount,
                 uptime: Date.now() - new Date(bot.bootedAt()).getTime(),
                 booted_at: bot.bootedAt()

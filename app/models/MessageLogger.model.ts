@@ -55,6 +55,31 @@ class MessageLogger {
             return 0;
         }
     }
+
+    public static async getLast30Days(): Promise<any[]> {
+        try {
+            const query = `
+            SELECT
+                    DATE_TRUNC('day', timestamp) AS day,
+                    COUNT(*) AS message_count
+                FROM
+                    messages
+                WHERE
+                    timestamp >= NOW() - INTERVAL '30 days'
+                GROUP BY
+                    day
+                ORDER BY
+                    day;
+            `;
+
+            const result = await Database.query(query);
+            return result.rows;
+
+        } catch (error) {
+            console.error('Error al obtener cantidad de mensajes en los últimos 30 días:', error);
+            return [];
+        }
+    }
 }
 
 export default MessageLogger;
