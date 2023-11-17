@@ -31,7 +31,7 @@ const JoinCommand = new Command(
         }
 
 
-        return '';
+        return;
     }
 );
 
