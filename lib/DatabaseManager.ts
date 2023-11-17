@@ -31,7 +31,20 @@ class Database {
         const client = await Database.pool.connect();
     
         try {
+            console.log(chalk.green('[DATABASE MANAGER]'), chalk.white(`Executing query`));
+            const startTime = Date.now();
             const result = await client.query(text, params);
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            console.log(chalk.grey(`>>> QUERY ${text.replace(/\$[0-9]+/g, (match) => {
+                const index = parseInt(match.replace('$', ''));
+                return params[index - 1];
+            })}`));
+            console.log(chalk.grey(`>>> PARAMS ${JSON.stringify(params)}`));
+            console.log(chalk.grey(`>>> ROWS AFFECTED ${result.rowCount}`));
+            console.log(chalk.grey(`>>> TIME TAKEN ${duration}ms`));
+
+
             return result;
         } finally {
             client.release();
