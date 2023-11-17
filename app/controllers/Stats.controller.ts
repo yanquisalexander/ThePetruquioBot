@@ -12,13 +12,14 @@ class StatsController {
     }
 
     public static async getStats(req: Request, res: Response): Promise<Response> {
-        // Englobe all the stats in a single endpoint
+        // Englobe all the stats in a single endpoint        
+        const timezone = req.query.tz as string || 'UTC';
         const bot = await Bot.getInstance();
         const joinedChannels = (await Twitch.getUsersByList(bot.joinedChannels)).sort((a, b) => a.name.localeCompare(b.name));
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         const processedMessages = await MessageLogger.getCount();
-        const last30DaysMessageCount = await MessageLogger.getLast30Days(req.query.tz as string || 'UTC');
+        const last30DaysMessageCount = await MessageLogger.getLast30Days(timezone);
         const averageMessagesPerDay = last30DaysMessageCount.map(day => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length;
         const userCount = await User.count();
         return res.status(200).json({
@@ -55,7 +56,8 @@ class StatsController {
                 average_messages_per_day: averageMessagesPerDay,
                 users: userCount,
                 uptime: Date.now() - new Date(bot.bootedAt()).getTime(),
-                booted_at: bot.bootedAt()
+                booted_at: bot.bootedAt(),
+                timezone: timezone
             }
         })
     }

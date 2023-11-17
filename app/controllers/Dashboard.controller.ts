@@ -29,8 +29,8 @@ class DashboardController {
         }
 
         const bot = await Bot.getInstance();
-
-        const last30DaysMessageCount = await MessageLogger.getLast30DaysByChannel(channel, req.query.tz as string || 'UTC');
+        const timezone = req.query.tz as string || 'UTC';
+        const last30DaysMessageCount = await MessageLogger.getLast30DaysByChannel(channel, timezone);
 
         const stats = {
             top_chatters: await MessageLogger.getTop10ByChannel(channel),
@@ -47,7 +47,8 @@ class DashboardController {
                     joined: isBotJoined,
                     muted: isBotMuted
                 },
-                stats
+                stats,
+                timezone
             }
         })
 
