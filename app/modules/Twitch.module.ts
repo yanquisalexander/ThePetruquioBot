@@ -18,6 +18,7 @@ class Twitch {
     public static HelixApp: ApiClient;
     // @ts-ignore
     public static EmoteFetcher: EmoteFetcher;
+    public static firstCheck: boolean = true;
 
 
     public static async initialize(): Promise<void> {
@@ -107,7 +108,12 @@ class Twitch {
     public static async checkLiveChannels(): Promise<void> {
         try {
             const bot = await Bot.getInstance();
-            const channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
+            let channels;
+            if(this.firstCheck) {
+                channels = (await Channel.getAutoJoinChannels()).map(channel => channel.user.username);
+            } else {
+                channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
+            }
             const currentLive = await this.getLiveChannels(channels);
 
             const currentLiveChannels: HelixStream[] = [];
