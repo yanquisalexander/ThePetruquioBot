@@ -53,7 +53,7 @@ router.delete('/channel/community/shoutouts/:targetStreamerId', Passport.getPass
 router.get('/admin/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.dashboardIndex);
 router.get('/admin/users', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.getUsers);
 router.post('/admin/users/:userId/impersonate', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.impersonateUser);
-
+router.delete('/admin/users/impersonate', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.stopImpersonatingUser);
 
 router.post('/admin/console', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.remoteConsole);
 

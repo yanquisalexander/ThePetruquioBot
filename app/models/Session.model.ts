@@ -51,7 +51,7 @@ class Session {
         }
     }
 
-    async setImpersonate(impersonatedUserId: number): Promise<Session> {
+    async setImpersonate(impersonatedUserId: number | null): Promise<Session> {
         const query = `
             UPDATE sessions
             SET impersonated_user_id = $1

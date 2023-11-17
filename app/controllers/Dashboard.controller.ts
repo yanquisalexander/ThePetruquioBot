@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { ExpressUser } from "../interfaces/ExpressUser.interface";
 import User from '../models/User.model';
 import { Bot } from '../../bot';
+import CurrentUser from '../../lib/CurrentUser';
+import MessageLogger from '../models/MessageLogger.model';
 
 
 class DashboardController {
@@ -11,12 +13,11 @@ class DashboardController {
 
 
     static async index(req: Request, res: Response) {
-        const currentUser = req.user as ExpressUser;
-
         // Here we return bot status (Joined, muted, etc) and recommendations
 
-        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+        const currentUser = new CurrentUser(req.user as ExpressUser);
 
+        const user = await currentUser.getCurrentUser();
         if (!user) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
@@ -29,6 +30,11 @@ class DashboardController {
 
         const bot = await Bot.getInstance();
 
+        const stats = {
+            top_chatters: await MessageLogger.getTop10ByChannel(channel),
+            last_30_days_messages: await MessageLogger.getLast30DaysByChannel(channel),
+        }
+
         const isBotJoined = bot.joinedChannels.includes(channel.user.username);
         const isBotMuted = channel.preferences.botMuted?.value;
 
@@ -37,16 +43,17 @@ class DashboardController {
                 bot: {
                     joined: isBotJoined,
                     muted: isBotMuted
-                }
+                },
+                stats
             }
         })
 
     }
 
     static async join(req: Request, res: Response) {
-        const currentUser = req.user as ExpressUser;
+        const currentUser = new CurrentUser(req.user as ExpressUser);
 
-        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+        const user = await currentUser.getCurrentUser();
 
         if (!user) {
             return res.status(401).json({ error: 'Unauthorized' });
@@ -79,9 +86,9 @@ class DashboardController {
     }
 
     static async part(req: Request, res: Response) {
-        const currentUser = req.user as ExpressUser;
+        const currentUser = new CurrentUser(req.user as ExpressUser);
 
-        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+        const user = await currentUser.getCurrentUser();
 
         if (!user) {
             return res.status(401).json({ error: 'Unauthorized' });

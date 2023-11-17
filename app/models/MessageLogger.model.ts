@@ -21,18 +21,18 @@ class MessageLogger {
                 WHERE m.sender_id = $1 ORDER BY m.timestamp DESC
             `;
             const values = [user.twitchId];
-            
+
             const result = await Database.query(query, values);
             return result.rows;
         } catch (error) {
             return [];
         }
     }
-    
+
     public static async logMessage(messageData: MessageData): Promise<void> {
         const { sender, channel, content, timestamp } = messageData;
 
-        if(Environment.isDevelopment) {
+        if (Environment.isDevelopment) {
             console.log(chalk.green('[MESSAGE LOGGER]'), chalk.white(`Registrando mensaje de ${sender.username} en ${channel.user.username}: ${content}`));
         }
 
@@ -77,6 +77,111 @@ class MessageLogger {
 
         } catch (error) {
             console.error('Error al obtener cantidad de mensajes en los últimos 30 días:', error);
+            return [];
+        }
+    }
+
+    public static async getTop10(): Promise<any[]> {
+        try {
+            const query = `
+                SELECT
+                    u.username,
+                    COUNT(*) AS message_count
+                FROM
+                    messages m
+                JOIN
+                    users u ON m.sender_id = u.twitch_id
+                GROUP BY
+                    u.username
+                ORDER BY
+                    message_count DESC
+                LIMIT 10;
+            `;
+
+            const result = await Database.query(query);
+            return result.rows;
+
+        } catch (error) {
+            console.error('Error al obtener top 10 de usuarios con más mensajes:', error);
+            return [];
+        }
+    }
+
+    public static async getTop10Channels(): Promise<any[]> {
+        try {
+            const query = `
+                SELECT
+                    c.username,
+                    COUNT(*) AS message_count
+                FROM
+                    messages m
+                JOIN
+                    channels c ON m.channel_id = c.twitch_id
+                GROUP BY
+                    c.username
+                ORDER BY
+                    message_count DESC
+                LIMIT 10;
+            `;
+
+            const result = await Database.query(query);
+            return result.rows;
+
+        } catch (error) {
+            console.error('Error al obtener top 10 de canales con más mensajes:', error);
+            return [];
+        }
+    }
+
+    public static async getLast30DaysByChannel(channel: Channel): Promise<any[]> {
+        try {
+            const query = `
+            SELECT
+                    DATE_TRUNC('day', timestamp) AS day,
+                    COUNT(*) AS message_count
+                FROM
+                    messages
+                WHERE
+                    timestamp >= NOW() - INTERVAL '30 days' AND channel_id = $1
+                GROUP BY
+                    day
+                ORDER BY
+                    day;
+            `;
+
+            const result = await Database.query(query, [channel.twitchId]);
+            return result.rows;
+
+        } catch (error) {
+            console.error('Error al obtener cantidad de mensajes en los últimos 30 días:', error);
+            return [];
+        }
+    }
+
+    public static async getTop10ByChannel(channel: Channel): Promise<any[]> {
+        try {
+            const query = `
+                SELECT
+                    u.username,
+                    COUNT(*) AS message_count
+                FROM
+                    messages m
+                JOIN
+                    users u ON m.sender_id = u.twitch_id
+                WHERE
+                    m.channel_id = $1
+                GROUP BY
+                    u.username
+                ORDER BY
+                    message_count DESC
+                LIMIT 10;
+            `;
+
+            const result = await Database.query(query, [channel.twitchId]);
+            return result.rows;
+
+        } catch (error) {
+            console.error('Error al obtener top 10 de usuarios con más mensajes:', error);
             return [];
         }
     }

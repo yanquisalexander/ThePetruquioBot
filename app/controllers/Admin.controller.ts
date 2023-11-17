@@ -173,6 +173,32 @@ class AdminController {
             sucess: true
         });
     }
+
+    static async stopImpersonatingUser(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.admin) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        if(!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        await session.setImpersonate(null);
+
+        return res.json({
+            sucess: true
+        });
+    }
 }
 
 export default AdminController;
