@@ -30,9 +30,12 @@ class DashboardController {
 
         const bot = await Bot.getInstance();
 
+        const last30DaysMessageCount = await MessageLogger.getLast30DaysByChannel(channel, req.query.tz as string || 'UTC');
+
         const stats = {
             top_chatters: await MessageLogger.getTop10ByChannel(channel),
-            last_30_days_messages: await MessageLogger.getLast30DaysByChannel(channel, req.query.tz as string || 'UTC'),
+            last_30_days_messages: last30DaysMessageCount,
+            average_messages_per_day: last30DaysMessageCount.map((day) => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length,
         }
 
         const isBotJoined = bot.joinedChannels.includes(channel.user.username);
