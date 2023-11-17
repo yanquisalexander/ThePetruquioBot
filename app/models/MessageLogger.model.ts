@@ -57,11 +57,14 @@ class MessageLogger {
         }
     }
 
-    public static async getLast30Days(): Promise<any[]> {
+    public static async getLast30Days(timezone?: string): Promise<any[]> {
+        if(!timezone || Utils.emptyString(timezone)) {
+            timezone = 'UTC';
+        }
         try {
             const query = `
             SELECT
-                    DATE_TRUNC('day', timestamp) AS day,
+                    DATE_TRUNC('day', timestamp AT TIME ZONE $1) AS day,
                     COUNT(*) AS message_count
                 FROM
                     messages
@@ -73,7 +76,7 @@ class MessageLogger {
                     day;
             `;
 
-            const result = await Database.query(query);
+            const result = await Database.query(query, [timezone]);
             return result.rows;
 
         } catch (error) {

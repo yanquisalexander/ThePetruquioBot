@@ -18,7 +18,7 @@ class StatsController {
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
         const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
         const processedMessages = await MessageLogger.getCount();
-        const last30DaysMessageCount = await MessageLogger.getLast30Days();
+        const last30DaysMessageCount = await MessageLogger.getLast30Days(req.query.tz as string || 'UTC');
         const userCount = await User.count();
         return res.status(200).json({
             data: {
