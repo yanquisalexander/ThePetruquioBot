@@ -65,7 +65,7 @@ class MessageLogger {
             const query = `
             SELECT
                     DATE_TRUNC('day', timestamp AT TIME ZONE $1) AS day,
-                    COUNT(*) AS message_count
+                    CAST(COUNT(*) AS INT) AS message_count
                 FROM
                     messages
                 WHERE
@@ -78,7 +78,6 @@ class MessageLogger {
 
             const result = await Database.query(query, [timezone]);
             return result.rows;
-
         } catch (error) {
             console.error('Error al obtener cantidad de mensajes en los últimos 30 días:', error);
             return [];
@@ -90,7 +89,7 @@ class MessageLogger {
             const query = `
                 SELECT
                     u.username,
-                    COUNT(*) AS message_count
+                    CAST(COUNT(*) AS INT) AS message_count
                 FROM
                     messages m
                 JOIN
@@ -116,7 +115,7 @@ class MessageLogger {
             const query = `
                 SELECT
                     c.username,
-                    COUNT(*) AS message_count
+                    CAST(COUNT(*) AS INT) AS message_count
                 FROM
                     messages m
                 JOIN
@@ -145,7 +144,7 @@ class MessageLogger {
             const query = `
             SELECT
                     DATE_TRUNC('day', timestamp AT TIME ZONE $2) AS day,
-                    COUNT(*) AS message_count
+                    CAST(COUNT(*) AS INT) AS message_count
                 FROM
                     messages
                 WHERE
@@ -171,7 +170,7 @@ class MessageLogger {
             const query = `
                 SELECT
                     u.username,
-                    COUNT(*) AS message_count
+                    CAST(COUNT(*) AS INT) AS message_count
                 FROM
                     messages m
                 JOIN
