@@ -133,7 +133,8 @@ class MessageLogger {
         }
     }
 
-    public static async getLast30DaysByChannel(channel: Channel): Promise<any[]> {
+    public static async getLast30DaysByChannel(channel: Channel, timezone?: String): Promise<any[]> {
+        if(!timezone) timezone = 'UTC';
         try {
             const query = `
             SELECT
@@ -142,14 +143,14 @@ class MessageLogger {
                 FROM
                     messages
                 WHERE
-                    timestamp >= NOW() - INTERVAL '30 days' AND channel_id = $1
+                    timestamp >= CURRENT_TIMESTAMP AT TIME ZONE $2 - INTERVAL '30 days' AND channel_id = $1
                 GROUP BY
                     day
                 ORDER BY
                     day;
             `;
 
-            const result = await Database.query(query, [channel.twitchId]);
+            const result = await Database.query(query, [channel.twitchId, timezone]);
             return result.rows;
 
         } catch (error) {
