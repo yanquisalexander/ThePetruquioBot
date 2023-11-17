@@ -111,6 +111,7 @@ class Twitch {
             let channels;
             if(this.firstCheck) {
                 channels = (await Channel.getAutoJoinChannels()).map(channel => channel.user.username);
+                this.firstCheck = false;
             } else {
                 channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
             }
