@@ -3,6 +3,7 @@ import Database from "../../lib/DatabaseManager";
 import Environment from "../../utils/environment";
 import Channel from "./Channel.model";
 import User from "./User.model";
+import Utils from "../../lib/Utils";
 
 interface MessageData {
     sender: User;
@@ -133,12 +134,14 @@ class MessageLogger {
         }
     }
 
-    public static async getLast30DaysByChannel(channel: Channel, timezone?: String): Promise<any[]> {
-        if(!timezone) timezone = 'UTC';
+    public static async getLast30DaysByChannel(channel: Channel, timezone?: string): Promise<any[]> {
+        if(!timezone || Utils.emptyString(timezone)) {
+            timezone = 'UTC';
+        }
         try {
             const query = `
             SELECT
-                    DATE_TRUNC('day', timestamp) AS day,
+                    DATE_TRUNC('day', timestamp AT TIME ZONE $2) AS day,
                     COUNT(*) AS message_count
                 FROM
                     messages
@@ -149,6 +152,7 @@ class MessageLogger {
                 ORDER BY
                     day;
             `;
+
 
             const result = await Database.query(query, [channel.twitchId, timezone]);
             return result.rows;
