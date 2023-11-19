@@ -685,6 +685,11 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.6.tgz#7cb33992049fd7340d5b10c0098e104184dfcd2a"
   integrity sha512-+0autS93xyXizIYiyL02FCY8N+KkKPhILhcUSA276HxzreZ16kl+cmwvV2qAM/PuCCwPXzOXOWhiPcw20uSFcA==
 
+"@types/readline-sync@^1.4.7":
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/@types/readline-sync/-/readline-sync-1.4.7.tgz#2a1c3ba6b45724bda68d0dfbac6ed32afccb8e46"
+  integrity sha512-tPPerBmYwWX66KcZFYPjCuJfF8ykGD0GtPx6r33KYm0v4g4x68VK33/v4kLEoDwnnkYwcY2s9oYgMfTKMr3krg==
+
 "@types/send@*":
   version "0.17.3"
   resolved "https://registry.yarnpkg.com/@types/send/-/send-0.17.3.tgz#81b2ea5a3a18aad357405af2d643ccbe5a09020b"
@@ -3523,6 +3528,11 @@ readdirp@~3.6.0:
   integrity sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==
   dependencies:
     picomatch "^2.2.1"
+
+readline-sync@^1.4.10:
+  version "1.4.10"
+  resolved "https://registry.yarnpkg.com/readline-sync/-/readline-sync-1.4.10.tgz#41df7fbb4b6312d673011594145705bf56d8873b"
+  integrity sha512-gNva8/6UAe8QYepIQH/jQ2qn91Qj0B9sYjMBBs3QOB8F2CXcKgLxQaJRP76sWVRQt+QU+8fAkCbCvjjMFu7Ycw==
 
 redis-errors@^1.0.0, redis-errors@^1.2.0:
   version "1.2.0"

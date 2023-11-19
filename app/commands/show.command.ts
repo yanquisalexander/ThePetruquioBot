@@ -45,6 +45,14 @@ const ShowCommand = new Command(
                 SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {
                     type: 'show',
                     username: _user.username,
+                    user_id: user.twitchId,
+                    latitude: userLocation.latitude,
+                    longitude: userLocation.longitude,
+                    user_username: user.username,
+                    user_display_name: user.displayName,
+                    masked: false,
+                    pin_message: null,
+                    pin_emote: null
                 });
 
                 _bot.sendMessage(_channel, `@${_user.displayName}, listo! Tu ubicación se mostrará en el mapa de la comunidad PopNemo`);
@@ -58,6 +66,14 @@ const ShowCommand = new Command(
                 SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {
                     type: 'show',
                     username: _user.username,
+                    user_id: user.twitchId,
+                    latitude: userLocation.latitude,
+                    longitude: userLocation.longitude,
+                    user_username: user.username,
+                    user_display_name: user.displayName,
+                    masked: false,
+                    pin_message: worldmapUser.pinMessage,
+                    pin_emote: worldmapUser.pinEmote
                 });
 
                 _bot.sendMessage(_channel, `@${_user.displayName}, listo! Tu ubicación se mostrará en el mapa de la comunidad PopNemo`);

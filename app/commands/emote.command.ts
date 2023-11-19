@@ -52,8 +52,9 @@ const MapEmoteCommand = new Command(
                     await worldmapUser.save();
 
                     SocketIO.getInstance().emitEvent(`map:${_channel.user.username}`, 'user-updated', {
-                        type: 'message',
+                        type: 'emote',
                         username: _user.username,
+                        emote: imgSrc
                     });
                 }
 
