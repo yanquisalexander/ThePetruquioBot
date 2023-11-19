@@ -32,7 +32,7 @@ const MaskCommand = new Command(
 
             if(!worldmapUser) {
                 
-                _bot.sendMessage(_channel, `@${_user.displayName}, parece que no haz utilizado el comando !show, por lo que no puedo ocultar tu ubicación (Porque no es visible PopNemo ).`);
+                _bot.sendMessage(_channel, `@${_user.displayName}, parece que no has utilizado el comando !show, por lo que no puedo ocultar tu ubicación (Porque no es visible PopNemo ).`);
             }
 
             if(worldmapUser) {
