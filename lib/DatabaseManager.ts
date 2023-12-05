@@ -27,30 +27,40 @@ class Database {
         }
     }
 
-    static async query(text: string, params: any[] = []): Promise<QueryResult> {
+    static async query(text: string, params: any[] = [], skipLog: boolean = false): Promise<QueryResult> {
         const client = await Database.pool.connect();
-    
+
         try {
-            console.log(chalk.green('[DATABASE MANAGER]'), chalk.white(`Executing query`));
-            const startTime = Date.now();
-            const result = await client.query(text, params);
-            const endTime = Date.now();
-            const duration = endTime - startTime;
-            console.log(chalk.grey(`>>> QUERY ${text.replace(/\$[0-9]+/g, (match) => {
-                const index = parseInt(match.replace('$', ''));
-                return params[index - 1];
-            })}`));
-            console.log(chalk.grey(`>>> PARAMS ${JSON.stringify(params)}`));
-            console.log(chalk.grey(`>>> ROWS AFFECTED ${result.rowCount}`));
-            console.log(chalk.grey(`>>> TIME TAKEN ${duration}ms`));
+            if (!skipLog) {
+                console.log(chalk.green('[DATABASE MANAGER]'), chalk.white(`Executing query`));
+                const startTime = Date.now();
+                const result = await client.query(text, params);
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                console.log(chalk.grey(`>>> QUERY ${text.replace(/\$[0-9]+/g, (match) => {
+                    const index = parseInt(match.replace('$', ''));
+                    return params[index - 1];
+                })}`));
+                console.log(chalk.grey(`>>> PARAMS ${JSON.stringify(params)}`));
+                console.log(chalk.grey(`>>> ROWS AFFECTED ${result.rowCount}`));
+                console.log(chalk.grey(`>>> TIME TAKEN ${duration}ms`));
 
 
-            return result;
+                return result;
+            } else {
+                return client.query(text, params);
+            }
+
+        } catch (error) {
+            console.error(chalk.red('[DATABASE MANAGER]'), error);
+            throw error;
+
+
         } finally {
             client.release();
         }
     }
-    
+
 
     static async runMigration(sql: string, name: string): Promise<void> {
         const client = await Database.pool.connect();
