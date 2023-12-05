@@ -1,6 +1,7 @@
-enum FieldTypes {
+export enum FieldTypes {
     BOOLEAN = "boolean",
     TEXT = "text",
+    INPUT = "input",
     CHANNEL_POINT = "channel_point",
     NUMBER = "number",
     LIST = "list",
@@ -88,6 +89,10 @@ export class ChannelPreferences {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
     };
+    canvasSize?: {
+        value: string;
+        field_type: FieldTypes.INPUT;
+    };
     values?: any;
 };
 
@@ -172,5 +177,9 @@ export const defaultChannelPreferences: ChannelPreferences = {
     showSongRequestsOnMap: {
         value: false,
         field_type: FieldTypes.BOOLEAN,
+    },
+    canvasSize: {
+        value: '600x800',
+        field_type: FieldTypes.INPUT,
     },
 };
