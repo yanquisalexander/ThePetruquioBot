@@ -6,7 +6,6 @@ import UserToken from "../models/UserToken.model";
 import Environment from "../../utils/environment";
 
 const TWITCH_SCOPES = [
-    'analytics:read:extensions',
     'user:edit',
     'user:read:email',
     'clips:edit',
@@ -24,8 +23,6 @@ const TWITCH_SCOPES = [
     'channel:read:redemptions',
     'channel:edit:commercial',
     'channel:read:hype_train',
-    'channel:read:stream_key',
-    'channel:manage:extensions',
     'channel:manage:broadcast',
     'user:edit:follows',
     'channel:manage:redemptions',
@@ -57,7 +54,6 @@ const TWITCH_SCOPES = [
     'channel:read:vips',
     'channel:manage:vips',
     'user:manage:whispers',
-    'channel:read:charity',
     'moderator:read:chatters',
     'moderator:read:shield_mode',
     'moderator:manage:shield_mode',
@@ -136,6 +132,10 @@ class TwitchAuthenticator {
             console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.red('Failed to validate token'));
             throw error;
         }
+    }
+
+    public static getAuthorizationUrl(redirectUrl: string): string {
+        return `https://id.twitch.tv/oauth2/authorize?client_id=${this.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${TWITCH_SCOPES.join(' ')}&force_verify=${!Environment.isDevelopment}`;
     }
 
     public static async getUserInfo(token: AccessToken): Promise<any> {
