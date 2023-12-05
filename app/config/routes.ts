@@ -12,6 +12,7 @@ import CommunityBooksController from "../controllers/CommunityBooks.controller";
 import WorkflowsController from "../controllers/Workflows.controller";
 import Twitch from "../modules/Twitch.module";
 import { Bot } from "../../bot";
+import CommunityWallController from "../controllers/CommunityWall.controller";
 
 
 const router = Router();
@@ -21,7 +22,7 @@ router.post('/accounts/getToken', AccountsController.getToken);
 router.get('/accounts/me', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentUser);
 
 router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentSession);
-
+router.get('/accounts/login',  AccountsController.startLoginFlow);
 router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
 
 router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
@@ -30,6 +31,8 @@ router.get('/account/messages', Passport.getPassport().authenticate('jwt', { ses
 router.get('/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.index);
 router.post('/dashboard/join', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.join);
 router.post('/dashboard/part', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.part);
+router.post('/dashboard/send-message', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.sendMessageAsBot);
+router.post('/dashboard/toggle-mute', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.toggleMute);
 
 router.get('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getPreferences);
 router.put('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.updatePreferences);
@@ -60,12 +63,15 @@ router.post('/admin/console', Passport.getPassport().authenticate('jwt', { sessi
 router.get('/worldmap/:channelName/splash.png', WorldMapController.getSplashEmoteset);
 router.get('/worldmap/:channelName/splash.json', WorldMapController.getSplashEmoteset);
 router.get('/worldmap/:channelName', WorldMapController.getWorldMap);
+router.get('/worldmap/:channelName/user-card/:username', WorldMapController.getUserCard);
 
 
 
 router.get('/community-books/:channelName', CommunityBooksController.getCommunityBooks);
 router.get('/community-books/:channelName/:communityBookId', CommunityBooksController.getCommunityBook);
 router.post('/community-books/:channelName', CommunityBooksController.createCommunityBook);
+
+router.get('/community-walls/:channelName', CommunityWallController.findByChannel);
 
 router.get('/rankings/:channelName', ChannelsController.getFirstRanking);
 

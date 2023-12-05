@@ -206,6 +206,19 @@ class AccountsController {
             }
         });
     }
+
+    static startLoginFlow(req: Request, res: Response) {
+        console.log(req.query);
+        const { redirect_uri } = req.query;
+
+        if (!redirect_uri) {
+            return res.status(400).json({ error: 'Invalid redirect_uri' })
+        }
+
+        const url = TwitchAuthenticator.getAuthorizationUrl(redirect_uri.toString());
+
+        res.redirect(url);
+    }
 }
 
 export default AccountsController;

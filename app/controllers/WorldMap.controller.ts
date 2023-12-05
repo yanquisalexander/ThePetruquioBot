@@ -3,6 +3,7 @@ import Twitch from '../modules/Twitch.module';
 import ImageProcessor from '../../lib/ImageProcessor';
 import Channel from '../models/Channel.model';
 import StreamerSonglist from '../modules/StreamerSonglist.module';
+import Geolocation from '../modules/Geolocation.module';
 
 class WorldMapController {
     constructor() {
@@ -98,6 +99,64 @@ class WorldMapController {
             return res.status(200).json({
                 data: {
                     worldMap
+                }
+            })
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+
+    public static async getUserCard(req: Request, res: Response): Promise<Response> {
+        try {
+            const channelName = req.params.channelName;
+            const username = req.params.username;
+
+
+            const twitchUser = await Twitch.Helix.users.getUserByName(username);
+
+            let songRequests: any[] = [];
+
+            if (!twitchUser) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const channel = await Channel.findByUsername(channelName);
+
+            if (!channel) {
+                return res.status(404).json({ error: 'Channel not found' });
+            }
+
+            if (channel.preferences.showSongRequestsOnMap?.value) {
+                const sl = await StreamerSonglist.getChannel(channel.user.username);
+                if (!sl) {
+                    console.log(`Channel ${channel.user.username} does not have a songlist`);
+                } else {
+                    songRequests = await sl.getQueue()
+                }
+            }
+
+            const userCard = {
+                public_profile: {
+                    cover: twitchUser.offlinePlaceholderUrl,
+                },
+                song_requests: songRequests
+                    .filter((songRequest) =>
+                        songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
+                    )
+                    .map((songRequest) => ({
+                        id: songRequest.song.id,
+                        title: songRequest.song.title,
+                        artist: songRequest.song.artist,
+                    })),
+            };
+            
+
+           
+
+            return res.status(200).json({
+                data: {
+                    user_card: userCard
                 }
             })
         } catch (error) {

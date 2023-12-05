@@ -16,6 +16,14 @@ class Geolocation {
         }
         return result[0];
     }
+
+    public static async getLocalizationFromCoordinates(latitude: number, longitude: number): Promise<NodeGeocoder.Entry | null> {
+        const result = await this.geocoder.reverse({ lat: latitude, lon: longitude });
+        if (result.length === 0) {
+            return null;
+        }
+        return result[0];
+    }
 }
 
 export default Geolocation;

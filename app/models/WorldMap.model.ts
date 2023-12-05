@@ -85,6 +85,8 @@ class WorldMap {
         COALESCE(w.pin_message, null) AS pin_message,
         COALESCE(sl.latitude, null) AS latitude,
         COALESCE(sl.longitude, null) AS longitude,
+        COALESCE(sl.country_code, null) AS country_code,
+        COALESCE(sl.location, null) AS location,
         COALESCE(g.last_seen, null) AS last_seen,
         CASE 
             WHEN w.masked = false THEN COALESCE(u.avatar, null)

@@ -18,7 +18,7 @@ class Channel {
     constructor(twitchId: number, autoJoin: boolean, preferences: ChannelPreferences, user: User) {
         this.twitchId = twitchId;
         this.autoJoin = autoJoin;
-        this.preferences = preferences;
+        this.preferences = mergePreferences(defaultChannelPreferences, preferences);
         this.user = user;
     }
 
@@ -49,7 +49,7 @@ class Channel {
         const query = 'SELECT * FROM channels WHERE twitch_id = $1';
         const values = [twitchId];
         const result = await Database.query(query, values);
-    
+
         if (result.rows.length > 0) {
             const channelData = result.rows[0];
             const user = await User.findByTwitchId(channelData.twitch_id);
@@ -60,7 +60,7 @@ class Channel {
             return new Channel(
                 channelData.twitch_id,
                 channelData.auto_join,
-                {...defaultChannelPreferences, ...channelData.preferences},
+                mergePreferences(defaultChannelPreferences, channelData.preferences),
                 user
             );
         } else {
@@ -69,29 +69,29 @@ class Channel {
     }
 
     public static async findByUsername(username: string): Promise<Channel | null> {
-        const user = await User.findByUsername(username);        
+        const user = await User.findByUsername(username);
         if (!user) {
             console.error(`User with username ${username} not found`);
             return null;
         }
-    
+
         const query = 'SELECT * FROM channels WHERE twitch_id = $1';
         const values = [user.twitchId];
         const result = await Database.query(query, values);
-    
+
         if (result.rows.length > 0) {
             const channelData = result.rows[0];
             return new Channel(
                 channelData.twitch_id,
                 channelData.auto_join,
-                {...defaultChannelPreferences, ...channelData.preferences},
+                mergePreferences(defaultChannelPreferences, channelData.preferences),
                 user
             );
         } else {
             return null;
         }
     }
-    
+
 
     public async save(): Promise<void> {
         try {
@@ -138,18 +138,55 @@ class Channel {
             return channel;
         }
     }
-    
+
 
     async updatePreferences(preferences: ChannelPreferences): Promise<void> {
-       try {
-         const query = 'UPDATE channels SET preferences = $1::jsonb WHERE twitch_id = $2';
-         const values = [preferences, this.user.twitchId];
-         await Database.query(query, values);
-       } catch (error) {
+        try {
+            const query = 'UPDATE channels SET preferences = $1::jsonb WHERE twitch_id = $2';
+            const values = [preferences, this.user.twitchId];
+            await Database.query(query, values);
+        } catch (error) {
             console.error(error);
             throw new Error('Failed to update channel preferences.');
-       }
+        }
     }
 }
 
 export default Channel;
+
+function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
+    const mergedPrefs: any = { ...channelPrefs }; // Inicia con las preferencias del canal
+  
+    // Itera sobre todas las claves de defaultPrefs
+    for (const key in defaultPrefs) {
+      if (Object.prototype.hasOwnProperty.call(defaultPrefs, key)) {
+        // Verifica si la clave existe en channelPrefs
+        if (channelPrefs[key] !== undefined) {
+          // Si la clave es un objeto y contiene field_type
+          if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object' && 'field_type' in defaultPrefs[key]) {
+            // Realiza la fusión del campo field_type sin reemplazar el valor de value
+            mergedPrefs[key] = {
+              ...channelPrefs[key],
+              field_type: mergeFieldType(defaultPrefs[key].field_type, channelPrefs[key].field_type),
+            };
+          } else {
+            // En otros casos, asigna el valor de defaultPrefs[key]
+            mergedPrefs[key] = defaultPrefs[key];
+          }
+        }
+      }
+    }
+  
+    return mergedPrefs;
+  }
+  
+
+function mergeFieldType(defaultFieldType: any, channelFieldType: any): any {
+    // Si channelFieldType es undefined o es del mismo tipo que defaultFieldType, devuelve defaultFieldType
+    if (channelFieldType === undefined || typeof channelFieldType === typeof defaultFieldType) {
+        return defaultFieldType;
+    }
+
+    // En caso contrario, devuelve defaultFieldType
+    return defaultFieldType;
+}

@@ -40,7 +40,7 @@ class MessageLogger {
         try {
             const query = 'INSERT INTO messages (sender_id, channel_id, content, timestamp) VALUES ($1, $2, $3, $4)';
             const values = [sender.twitchId, channel.twitchId, content, timestamp];
-            await Database.query(query, values);
+            await Database.query(query, values, !Environment.isDevelopment);
         } catch (error) {
             console.error('Error al registrar mensaje:', error);
         }

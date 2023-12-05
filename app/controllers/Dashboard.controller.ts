@@ -4,6 +4,7 @@ import User from '../models/User.model';
 import { Bot } from '../../bot';
 import CurrentUser from '../../lib/CurrentUser';
 import MessageLogger from '../models/MessageLogger.model';
+import { FieldTypes } from '../../utils/ChannelPreferences.class';
 
 
 class DashboardController {
@@ -52,6 +53,76 @@ class DashboardController {
             }
         })
 
+    }
+
+    static async sendMessageAsBot(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+
+        const user = await currentUser.getCurrentUser();
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const channel = await user.getChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'CHANNEL_NOT_FOUND' });
+        }
+
+        const bot = await Bot.getInstance();
+
+        if (!bot.joinedChannels.includes(channel.user.username)) {
+            return res.status(400).json({ error: 'BOT_NOT_JOINED' });
+        }
+
+        if (channel.preferences.botMuted?.value) {
+            return res.status(400).json({ error: 'BOT_MUTED' });
+        }
+
+        try {
+            bot.sendMessage(channel, req.body.message);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        return res.json({ data: { success: true } });
+    }
+
+    static async toggleMute(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+
+        const user = await currentUser.getCurrentUser();
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const channel = await user.getChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' });
+        }
+
+        channel.preferences.botMuted = {
+            ...channel.preferences.botMuted,
+            field_type: FieldTypes.BOOLEAN,
+            value: !channel.preferences.botMuted?.value ?? true
+        };
+        await channel.save();
+
+        const bot = await Bot.getInstance();
+
+        if (!bot.joinedChannels.includes(channel.user.username)) {
+            return res.status(400).json({ error: 'Bot not joined' });
+        }
+
+        if (!channel.preferences.botMuted?.value) {
+            bot.sendMessage(channel, 'Hey! I\'m back! DinoDance (petruquiobot unmuted)');
+        }
+
+        return res.json({ data: { success: true } });
     }
 
     static async join(req: Request, res: Response) {
