@@ -13,6 +13,7 @@ export class SocketIO {
 
   public static initialize(server: HttpServer): void {
     this.io = new SocketServer(server, {
+      connectionStateRecovery: {},
       cors: {
         origin: '*',
       },
