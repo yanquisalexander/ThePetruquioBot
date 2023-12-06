@@ -59,6 +59,22 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
         }
     }
 
+    if(userData.username !== user.username && userData.twitchId === user.id) {
+        /* Update user's display name if it changed */
+        userData.displayName = user.displayName;
+        userData.username = user.username;
+        console.warn(chalk.yellow(`[WARNING]`), `User ${chalk.bold(user.username)} changed their username or display name. Updating database...`);
+        try {
+            await userData.save();
+            console.log(chalk.green(`[SUCCESS]`), `User ${chalk.bold(user.username)} updated successfully!`);
+        } catch (error) {
+            console.error(chalk.red(`[ERROR]`), `Error updating user ${chalk.bold(user.username)}: ${error}`);
+            /* 
+                Execution can continue because we use the id to identify the user
+            */
+        }
+    }
+
     const userOnMap = await SpectatorLocation.findByUserId(userData.twitchId);
 
 
