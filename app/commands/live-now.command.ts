@@ -18,11 +18,11 @@ const LiveNowCommand = new Command(
 
             if (liveChannels.length === 0 || (currentChannel && liveChannels.length === 1)) {
                 if(!currentChannel) {
-                    return _bot.sendMessage(_channel, `@${_user.username}, no hay canales en vivo en este momento`);
+                    return _bot.sendMessage(_channel, `@${_user.displayName}, no hay canales en vivo en este momento`);
                 }
-                return _bot.sendMessage(_channel, `@${_user.username}, no hay canales en vivo en este momento (Excepto @${currentChannel.userDisplayName}, por supuesto KonCha )`);
+                return _bot.sendMessage(_channel, `@${_user.displayName}, no hay canales en vivo en este momento (Excepto @${currentChannel.userDisplayName}, por supuesto KonCha )`);
             }
-            return _bot.sendMessage(_channel, `@${_user.username}, los canales en vivo son: ${liveChannels.map(channel => channel.userDisplayName).join(', ')}`);
+            return _bot.sendMessage(_channel, `@${_user.displayName}, los canales en vivo son: ${liveChannels.map(channel => channel.userDisplayName).join(', ')}`);
         }
         else {
             const targetUsername = _args[0].replace('@', '').toLowerCase();
@@ -31,13 +31,13 @@ const LiveNowCommand = new Command(
                 const isLive = await Twitch.isChannelLive(targetUsername)
 
                 if (isLive) {
-                    return _bot.sendMessage(_channel, `@${_user.username}, sí, ${targetUsername} está en vivo ;)`);
+                    return _bot.sendMessage(_channel, `@${_user.displayName}, sí, ${targetUsername} está en vivo ;)`);
                 }
                 else {
-                    return _bot.sendMessage(_channel, `@${_user.username}, parece que ${targetUsername} no está en vivo en este momento :(`);
+                    return _bot.sendMessage(_channel, `@${_user.displayName}, parece que ${targetUsername} no está en vivo en este momento :(`);
                 }
             } catch (error) {
-                return _bot.sendMessage(_channel, `@${_user.username}, an error ocurred while checking if ${targetUsername} is live (Maybe the channel doesn't exist?) :(`);
+                return _bot.sendMessage(_channel, `@${_user.displayName}, an error ocurred while checking if ${targetUsername} is live (Maybe the channel doesn't exist?) :(`);
             }
 
             
