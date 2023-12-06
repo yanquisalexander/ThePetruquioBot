@@ -27,14 +27,20 @@ const LiveNowCommand = new Command(
         else {
             const targetUsername = _args[0].replace('@', '').toLowerCase();
 
-            const isLive = await Twitch.isChannelLive(targetUsername)
+            try {
+                const isLive = await Twitch.isChannelLive(targetUsername)
 
-            if (isLive) {
-                return _bot.sendMessage(_channel, `@${_user.username}, sí, ${targetUsername} está en vivo ;)`);
+                if (isLive) {
+                    return _bot.sendMessage(_channel, `@${_user.username}, sí, ${targetUsername} está en vivo ;)`);
+                }
+                else {
+                    return _bot.sendMessage(_channel, `@${_user.username}, parece que ${targetUsername} no está en vivo en este momento :(`);
+                }
+            } catch (error) {
+                return _bot.sendMessage(_channel, `@${_user.username}, an error ocurred while checking if ${targetUsername} is live (Maybe the channel doesn't exist?) :(`);
             }
-            else {
-                return _bot.sendMessage(_channel, `@${_user.username}, parece que ${targetUsername} no está en vivo en este momento :(`);
-            }
+
+            
         }
     }
 );
