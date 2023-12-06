@@ -30,7 +30,7 @@ class Workflow {
     }
 
     static async find(channel: Channel, eventType: EventType): Promise<Workflow | undefined> {
-        const result = await Database.query('SELECT * FROM workflows WHERE channel_id = $1 AND event_type = $2', [channel.twitchId, eventType]);
+        const result = await Database.query('SELECT * FROM workflows WHERE channel_id = $1 AND event_type = $2', [channel.twitchId, eventType], eventType === EventType.OnChatMessage);
         if (result.rows.length > 0) {
             return new Workflow(result.rows[0].id, channel, result.rows[0].event_type, result.rows[0].script);
         }
