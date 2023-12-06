@@ -14,8 +14,13 @@ const LiveNowCommand = new Command(
         if (_args.length === 0) {
             const liveChannels = MemoryVariables.getLiveChannels();
 
-            if (liveChannels.length === 0) {
-                return _bot.sendMessage(_channel, `@${_user.username}, no hay canales en vivo en este momento :(`);
+            const currentChannel = MemoryVariables.getLiveChannels().find(channel => channel.userName === _channel.user.username);
+
+            if (liveChannels.length === 0 || (currentChannel && liveChannels.length === 1)) {
+                if(!currentChannel) {
+                    return _bot.sendMessage(_channel, `@${_user.username}, no hay canales en vivo en este momento`);
+                }
+                return _bot.sendMessage(_channel, `@${_user.username}, no hay canales en vivo en este momento (Excepto @${currentChannel.userDisplayName}, por supuesto KonCha )`);
             }
             return _bot.sendMessage(_channel, `@${_user.username}, los canales en vivo son: ${liveChannels.map(channel => channel.userDisplayName).join(', ')}`);
         }
