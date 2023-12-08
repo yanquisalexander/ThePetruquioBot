@@ -60,7 +60,7 @@ class ExtrasController {
             return res.status(404).json({ error: 'Channel not found' })
         }
 
-        if(!req.body.twitchId) {
+        if (!req.body.twitchId) {
             return res.status(400).json({ error: 'twitchId is required' })
         }
 
@@ -147,6 +147,35 @@ class ExtrasController {
         }
     }
 
+    static async updateJudgeName(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as any);
+
+        const channel = await currentUser.getCurrentChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' })
+        }
+
+        if (!req.body.twitchId) {
+            return res.status(400).json({ error: 'twitchId is required' })
+        }
+
+        const user = await User.findByTwitchId(parseInt(req.body.twitchId));
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' })
+        }
+
+        try {
+            await GotTalentJudge.updateName(channel, user, req.body.name);
+            res.json({ message: 'Judge updated' });
+        } catch (error) {
+            return res.status(500).json({ error: (error as Error).message });
+        }
+    }
+
+
+
     static async clearGotTalentCrosses(req: Request, res: Response) {
         const currentUser = new CurrentUser(req.user as any);
         const user = await currentUser.getCurrentUser();
@@ -175,18 +204,40 @@ class ExtrasController {
             return res.status(404).json({ error: 'Channel not found' })
         }
 
-        res.json({ data: {
-            judges: await GotTalentJudge.getJudges(channel),
-            channel: channel.user
-        } });
+        res.json({
+            data: {
+                judges: await GotTalentJudge.getJudges(channel),
+                channel: channel.user
+            }
+        });
     }
 
+    static async clearGotTalentCross(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as any);
+        const user = await currentUser.getCurrentUser();
 
+        const channel = await user?.getChannel();
 
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' })
+        }
 
+        const judge = await User.findByTwitchId(parseInt(req.body.twitchId));
 
+        if (!judge) {
+            return res.status(404).json({ error: 'Judge not found' })
+        }
 
+        try {
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'clear-cross', { twitchId: judge.twitchId });
+            res.json({
+                success: true,
+            });
 
+        } catch (error) {
+            return res.status(500).json({ error: (error as Error).message });
+        }
+    }
 }
 
 export default ExtrasController;

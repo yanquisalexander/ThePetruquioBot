@@ -6,16 +6,20 @@ import User from "./User.model";
 class GotTalentJudge {
     public user: User;
     public channel: Channel;
+    public judge_name: string | null;
 
-    constructor(user: User, channel: Channel) {
+    constructor(user: User, channel: Channel, judge_name: string | null = null) {
         this.user = user;
         this.channel = channel;
+        this.judge_name = judge_name;
     }
+
+
 
     static async addJudge(channel: Channel, user: User): Promise<GotTalentJudge> {
         try {
-            const query = `SELECT insert_judge($1, $2)`;
-            const values = [channel.twitchId, user.twitchId];
+            const query = `INSERT INTO got_talent_judges (channel_id, judge_id, judge_name) VALUES ($1, $2, $3) RETURNING *`;
+            const values = [channel.twitchId, user.twitchId, user.username];
 
             await Database.query(query, values);
 
@@ -43,7 +47,7 @@ class GotTalentJudge {
     static async getJudges(channel: Channel): Promise<any[]> {
         try {
             const query = `
-            SELECT users.username, users.display_name, users.avatar, users.twitch_id
+            SELECT users.username, users.display_name, users.avatar, users.twitch_id, judges.judge_name
             FROM got_talent_judges AS judges
             JOIN users ON judges.judge_id = users.twitch_id
             WHERE judges.channel_id = $1;
@@ -69,6 +73,18 @@ class GotTalentJudge {
         } catch (error) {
             console.error('Error checking if user is judge:', (error as Error).message);
             throw new Error('Error checking if user is judge.');
+        }
+    }
+
+    static async updateName(channel: Channel, user: User, name: string): Promise<void> {
+        try {
+            const query = `UPDATE got_talent_judges SET judge_name = $3 WHERE channel_id = $1 AND judge_id = $2`;
+            const values = [channel.twitchId, user.twitchId, name];
+
+            await Database.query(query, values);
+        } catch (error) {
+            console.error('Error updating judge name:', (error as Error).message);
+            throw new Error('Error updating judge name.');
         }
     }
 }
