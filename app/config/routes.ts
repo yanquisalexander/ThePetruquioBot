@@ -46,6 +46,7 @@ router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate
 router.get('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.getGotTalentJudges);
 router.post('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.addGotTalentJudge);
 router.delete('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.removeGotTalentJudge);
+router.post('/channel/extras/got-talent/clear-crosses', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.clearGotTalentCrosses);
 
 router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
 router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);

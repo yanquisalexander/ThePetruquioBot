@@ -147,6 +147,27 @@ class ExtrasController {
         }
     }
 
+    static async clearGotTalentCrosses(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as any);
+        const user = await currentUser.getCurrentUser();
+
+        const channel = await user?.getChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' })
+        }
+
+        try {
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'clear-crosses', {});
+            res.json({
+                success: true,
+            });
+
+        } catch (error) {
+            return res.status(500).json({ error: (error as Error).message });
+        }
+    }
+
     static async getGotTalentConfig(req: Request, res: Response) {
         const channel = await Channel.findByUsername(req.params.channelName);
 
