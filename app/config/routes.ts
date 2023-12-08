@@ -13,6 +13,7 @@ import WorkflowsController from "../controllers/Workflows.controller";
 import Twitch from "../modules/Twitch.module";
 import { Bot } from "../../bot";
 import CommunityWallController from "../controllers/CommunityWall.controller";
+import ExtrasController from "../controllers/Extras.controller";
 
 
 const router = Router();
@@ -41,6 +42,10 @@ router.put('/channel/commands/:commandId', Passport.getPassport().authenticate('
 router.post('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.createCommand);
 router.delete('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.deleteCommand);
 router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getTwitchChannelsPoints);
+
+router.get('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.getGotTalentJudges);
+router.post('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.addGotTalentJudge);
+router.delete('/channel/extras/got-talent/judges', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.removeGotTalentJudge);
 
 router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
 router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
@@ -80,6 +85,10 @@ router.get('/stats/uptime', StatsController.uptime);
 router.get('/stats/live-channels', StatsController.getLiveChannels);
 router.get('/stats/joined-channels', StatsController.getJoinedChannels);
 router.get('/stats/processed-messages', StatsController.getProcessedMessages);
+
+router.get('/extras/:channelName/got-talent', ExtrasController.getGotTalentConfig);
+router.post('/extras/:channelName/got-talent/red-button', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.addCrossTalentJudge);
+router.post('/extras/:channelName/got-talent/golden-buzzer', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.goldenBuzzerTalentJudge);
 
 
 
