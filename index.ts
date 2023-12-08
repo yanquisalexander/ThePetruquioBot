@@ -62,8 +62,7 @@ const initializeApp = async () => {
         } catch (error) {
             console.warn(chalk.yellow('[APP ERROR]'), error);
         }
-        
-        await bot.joinInitialChannels();
+
         bot.getBotClient().join(bot.getBotClient().getUsername());  // Join the bot's own channel for self-user settings
 
         /* Twitch Events should be initialized before the web server */

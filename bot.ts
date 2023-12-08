@@ -50,6 +50,7 @@ export class Bot {
         username: process.env.BOT_NAME,
         password: process.env.BOT_PASSWORD,
       },
+      channels: this.channels, // Utiliza los canales almacenados
     });
   }
 
@@ -68,11 +69,9 @@ export class Bot {
         username: process.env.BOT_NAME,
         password: process.env.BOT_PASSWORD,
       },
+      channels: this.channels,
     });
 
-    for (const channel of this.channels) {
-      await this.joinChannel(channel);
-    }
     await this.initializeBotAccount();
   }
 
@@ -109,12 +108,6 @@ export class Bot {
       }
     }
 
-  }
-
-  public async joinInitialChannels(): Promise<void> {
-    for (const channel of this.channels) {
-      await this.joinChannel(channel);
-    }
   }
 
   private async autoJoinChannels(): Promise<string[]> {
