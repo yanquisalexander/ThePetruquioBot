@@ -7,11 +7,13 @@ class GotTalentJudge {
     public user: User;
     public channel: Channel;
     public judge_name: string | null;
+    public position: number | null;
 
-    constructor(user: User, channel: Channel, judge_name: string | null = null) {
+    constructor(user: User, channel: Channel, judge_name: string | null = null, position: number | null = null) {
         this.user = user;
         this.channel = channel;
         this.judge_name = judge_name;
+        this.position = position;
     }
 
 
@@ -47,10 +49,10 @@ class GotTalentJudge {
     static async getJudges(channel: Channel): Promise<any[]> {
         try {
             const query = `
-            SELECT users.username, users.display_name, users.avatar, users.twitch_id, judges.judge_name
+            SELECT users.username, users.display_name, users.avatar, users.twitch_id, judges.judge_name, judges.position
             FROM got_talent_judges AS judges
             JOIN users ON judges.judge_id = users.twitch_id
-            WHERE judges.channel_id = $1;
+            WHERE judges.channel_id = $1 ORDER BY judges.position ASC
           `;
 
             const result = await Database.query(query, [channel.twitchId]);
@@ -85,6 +87,18 @@ class GotTalentJudge {
         } catch (error) {
             console.error('Error updating judge name:', (error as Error).message);
             throw new Error('Error updating judge name.');
+        }
+    }
+
+    static async updatePosition(channel: Channel, user: User, position: number): Promise<void> {
+        try {
+            const query = `UPDATE got_talent_judges SET position = $3 WHERE channel_id = $1 AND judge_id = $2`;
+            const values = [channel.twitchId, user.twitchId, position];
+
+            await Database.query(query, values);
+        } catch (error) {
+            console.error('Error updating judge position:', (error as Error).message);
+            throw new Error('Error updating judge position.');
         }
     }
 }

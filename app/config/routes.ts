@@ -50,6 +50,7 @@ router.post('/channel/extras/got-talent/clear-crosses', Passport.getPassport().a
 router.put('/channel/extras/got-talent/update-name', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.updateJudgeName);
 router.put('/channel/extras/got-talent/clear-cross', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.clearGotTalentCross);
 router.post('/channel/extras/got-talent/reload-overlay', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.reloadGotTalentOverlay);
+router.put('/channel/extras/got-talent/update-position', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.updateJudgePosition);
 
 router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
 router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
