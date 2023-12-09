@@ -168,7 +168,29 @@ class ExtrasController {
 
         try {
             await GotTalentJudge.updateName(channel, user, req.body.name);
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'update-judge-name', { twitchId: user.twitchId, name: req.body.name });
             res.json({ message: 'Judge updated' });
+        } catch (error) {
+            return res.status(500).json({ error: (error as Error).message });
+        }
+    }
+
+    static async reloadGotTalentOverlay(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as any);
+        const user = await currentUser.getCurrentUser();
+
+        const channel = await user?.getChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' })
+        }
+
+        try {
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'reload-overlay', {});
+            res.json({
+                success: true,
+            });
+
         } catch (error) {
             return res.status(500).json({ error: (error as Error).message });
         }

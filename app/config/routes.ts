@@ -49,6 +49,7 @@ router.delete('/channel/extras/got-talent/judges', Passport.getPassport().authen
 router.post('/channel/extras/got-talent/clear-crosses', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.clearGotTalentCrosses);
 router.put('/channel/extras/got-talent/update-name', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.updateJudgeName);
 router.put('/channel/extras/got-talent/clear-cross', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.clearGotTalentCross);
+router.post('/channel/extras/got-talent/reload-overlay', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.reloadGotTalentOverlay);
 
 router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
 router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
