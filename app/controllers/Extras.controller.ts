@@ -45,6 +45,8 @@ class ExtrasController {
         try {
             judge = await GotTalentJudge.addJudge(channel, user);
 
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'update-judges', { });
+
         } catch (error) {
             return res.status(500).json({ error: (error as Error).message });
         }
@@ -72,6 +74,7 @@ class ExtrasController {
 
         try {
             await GotTalentJudge.removeJudge(channel, user);
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'update-judges', { });
 
         } catch (error) {
             return res.status(500).json({ error: (error as Error).message });
