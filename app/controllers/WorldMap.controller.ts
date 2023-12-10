@@ -144,7 +144,7 @@ class WorldMapController {
                     songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
                 )
                 .map((songRequest) => ({
-                    id: songRequest.song.id,
+                    id: songRequest.song.id || null,
                     title: songRequest.song.title,
                     artist: songRequest.song.artist,
                 }))
