@@ -25,7 +25,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
     const channelName = channel.replace('#', '');
 
     const channelData = await Channel.findByUsername(channelName);
-    let userData = await User.findByUsername(user.username);
+    let userData = await User.findByTwitchId(user.id);
 
     if (!channelData) {
         console.error(chalk.red(`[ERROR]`), `Channel ${chalk.bold(channelName)} not found on database. To join a channel, use the command ${chalk.bold('!join')} on the bot's channel. Disconnecting from channel.`);
