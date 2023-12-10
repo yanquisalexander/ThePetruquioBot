@@ -136,19 +136,28 @@ class WorldMapController {
                 }
             }
 
+            let song_requests: { id: any; title: any; artist: any; }[]
+
+            try {
+                song_requests = songRequests
+                .filter((songRequest) =>
+                    songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
+                )
+                .map((songRequest) => ({
+                    id: songRequest.song.id,
+                    title: songRequest.song.title,
+                    artist: songRequest.song.artist,
+                }))
+            } catch (error) {
+                console.error(error);
+                song_requests = [];
+            }
+
             const userCard = {
                 public_profile: {
                     cover: twitchUser.offlinePlaceholderUrl,
                 },
-                song_requests: songRequests
-                    .filter((songRequest) =>
-                        songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
-                    )
-                    .map((songRequest) => ({
-                        id: songRequest.song.id,
-                        title: songRequest.song.title,
-                        artist: songRequest.song.artist,
-                    })),
+                song_requests: song_requests,
             };
             
 
