@@ -102,7 +102,7 @@ class ChannelsController {
             for (const preferenceKey of preferencesKeys) {
                 // @ts-ignore
                 if (impersonatedChannel.preferences[preferenceKey] === undefined) {
-                    return res.status(400).json({ error: `Preference ${preferenceKey} does not exist` });
+                    delete (preferences as any)[preferenceKey];
                 } else {
                     // @ts-ignore
                     impersonatedChannel.preferences[preferenceKey].value = preferences[preferenceKey].value;
@@ -141,7 +141,7 @@ class ChannelsController {
         for (const preferenceKey of preferencesKeys) {
             // @ts-ignore
             if (channel.preferences[preferenceKey] === undefined) {
-                return res.status(400).json({ error: `Preference ${preferenceKey} does not exist` });
+                delete (preferences as any)[preferenceKey];
             } else {
                 // @ts-ignore
                 channel.preferences[preferenceKey].value = preferences[preferenceKey].value;

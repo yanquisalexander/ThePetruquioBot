@@ -92,7 +92,11 @@ class GotTalentJudge {
 
     static async updatePosition(channel: Channel, user: User, position: number): Promise<void> {
         try {
-            const query = `UPDATE got_talent_judges SET position = $3 WHERE channel_id = $1 AND judge_id = $2`;
+            const query = `
+            UPDATE got_talent_judges
+            SET position = $3
+            WHERE channel_id = $1 AND judge_id = $2
+            `;
             const values = [channel.twitchId, user.twitchId, position];
 
             await Database.query(query, values);
