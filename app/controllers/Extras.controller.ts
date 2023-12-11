@@ -178,29 +178,36 @@ class ExtrasController {
         }
     }
 
-    static async updateJudgePosition(req: Request, res: Response) {
+    static async updateJudgesOrder(req: Request, res: Response) {
         const currentUser = new CurrentUser(req.user as any);
-
+    
         const channel = await currentUser.getCurrentChannel();
-
+    
         if (!channel) {
-            return res.status(404).json({ error: 'Channel not found' })
+            return res.status(404).json({ error: 'Channel not found' });
         }
-
-        if (!req.body.twitchId) {
-            return res.status(400).json({ error: 'twitchId is required' })
+    
+        if (!req.body.judgesOrder) {
+            return res.status(400).json({ error: 'judgesOrder is required' });
         }
-
-        const user = await User.findByTwitchId(parseInt(req.body.twitchId));
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' })
-        }
-
+    
         try {
-            await GotTalentJudge.updatePosition(channel, user, req.body.position);
-            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'update-judges', { });
-            res.json({ message: 'Judge updated' });
+            const judgesOrder: number[] = req.body.judgesOrder;
+    
+            // Iterar sobre el orden de los jueces y actualizar la posición
+            for (let index = 0; index < judgesOrder.length; index++) {
+                const twitchId = judgesOrder[index];
+                const user = await User.findByTwitchId(twitchId);
+    
+                if (user) {
+                    await GotTalentJudge.updatePosition(channel, user, index);
+                }
+            }
+    
+            // Emitir evento de actualización a través de Socket.IO
+            SocketIO.getInstance().emitEvent(`got-talent:${channel.user.username}`, 'update-judges', {});
+    
+            res.json({ message: 'Judges order updated successfully' });
         } catch (error) {
             return res.status(500).json({ error: (error as Error).message });
         }
