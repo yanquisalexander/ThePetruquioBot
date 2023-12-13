@@ -20,6 +20,7 @@ import Environment from "./utils/environment";
 import Passport from "./lib/Passport";
 import SocketIO from "./app/modules/SocketIO.module";
 import Shoutout from "./app/models/Shoutout.model";
+import EmailManager from "./app/modules/EmailManager.module";
 
 MonkeyPatches.apply();
 
@@ -44,6 +45,7 @@ const initializeApp = async () => {
         CommandExecutor.initialize();
 
         await Passport.setup();
+        EmailManager.initialize(process.env.BREVO_API_KEY as string);
 
         await TwitchAuthenticator.initialize();
         await Twitch.initialize();

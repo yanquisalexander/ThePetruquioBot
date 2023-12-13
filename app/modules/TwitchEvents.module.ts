@@ -9,6 +9,7 @@ import User from "../models/User.model";
 import { Bot } from "../../bot";
 import Workflow, { EventType } from "../models/Workflow.model";
 import chalk from "chalk";
+import EmailManager from "./EmailManager.module";
 
 type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
 
@@ -129,6 +130,27 @@ class TwitchEvents {
                     console.log(`[TWITCH EVENT SUB] Channel ${channel.twitchId} (${channel.user.username}) unsubscribed from all events.`);
                     console.log(`[TWITCH EVENT SUB] Disconnecting from channel ${channel.twitchId} (${channel.user.username})`);
                     this.bot.getBotClient().part(channel.user.username);
+                    console.log(`[TWITCH EVENT SUB] Sending notification via email to ${channel.user.email}`);
+                    if(!channel.user.email || !channel.user.displayName) {
+                        console.log(`[TWITCH EVENT SUB] User ${channel.user.username} doesn't have an email configured. Skipping...`);
+                        return;
+                    }
+                    try {
+                        EmailManager.getInstance().sendTransactionalEmail({
+                            to: [{ email: channel.user.email, name: channel.user.displayName }],
+                            headers: {},
+                            params: {
+                                TWITCH_USERNAME: channel.user.username,
+                            },
+                            htmlContent: '',
+                            templateId: 1,
+                            subject: 'Tu cuenta de Twitch ha sido desconectada',
+                            replyTo: { email: '', name: '' },
+                            sender: { email: 'notificaciones@petruquio.live', name: 'Petruquio.LIVE' },
+                        });
+                    } catch (error) {
+                        console.error(`[TWITCH EVENT SUB] Error while sending email to ${channel.user.email}: ${(error as Error).message}`);
+                    }
                 }
             } else {
                 console.log(`[TWITCH EVENT SUB] User ${event.userDisplayName} (${event.userName}) not found on database. Skipping...`);
@@ -137,6 +159,7 @@ class TwitchEvents {
         });
 
         this.eventSubListeners[channel.twitchId.toString()]['app-revocation'] = listener;
+        console.log(await listener.getCliTestCommand());
     }
 
     public static async subscribeToLiveStream(channel: Channel): Promise<void> {
