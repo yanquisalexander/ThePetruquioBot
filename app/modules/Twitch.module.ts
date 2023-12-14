@@ -131,25 +131,26 @@ class Twitch {
                 })
             );
 
-            const newLiveChannels = currentLiveChannels.filter(channel => !MemoryVariables.getLiveChannels().includes(channel));
-            const offlineChannels = MemoryVariables.getLiveChannels().filter(channel => !currentLiveChannels.includes(channel));
+            const previousLiveChannels = MemoryVariables.getLiveChannels();
+
+            const newLiveChannels = currentLiveChannels.filter(channel => !previousLiveChannels.some(prevChannel => prevChannel.userName === channel.userName));
+            const offlineChannels = previousLiveChannels.filter(prevChannel => !currentLiveChannels.some(channel => channel.userName === prevChannel.userName));
 
             if (newLiveChannels.length > 0) {
                 console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
             }
 
             if (offlineChannels.length > 0) {
-                offlineChannels.forEach(channel => {
-                    const index = MemoryVariables.getLiveChannels().indexOf(channel);
-                    MemoryVariables.getLiveChannels().splice(index, 1);
-                });
+                // Actualizar la lista de canales en vivo eliminando los canales que están offline
+                MemoryVariables.setLiveChannels(currentLiveChannels);
             }
+
             MemoryVariables.setLastLiveStreamsCheck(new Date());
-            MemoryVariables.setLiveChannels(currentLiveChannels);
         } catch (error) {
             console.error(error);
         }
     }
+
 
 
 
