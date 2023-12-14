@@ -142,8 +142,8 @@ class Twitch {
                 });
             }
 
-            MemoryVariables.setLiveChannels(currentLiveChannels);
             MemoryVariables.setLastLiveStreamsCheck(new Date());
+            MemoryVariables.setLiveChannels(currentLiveChannels);
         } catch (error) {
             console.error(error);
         }

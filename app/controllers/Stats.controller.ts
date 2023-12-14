@@ -17,7 +17,7 @@ class StatsController {
         const bot = await Bot.getInstance();
         const joinedChannels = (await Twitch.getUsersByList(bot.joinedChannels)).sort((a, b) => a.name.localeCompare(b.name));
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
-        const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
+        const nextUpdateIn = lastUpdated.getTime() + 120000 - Date.now();
         const processedMessages = await MessageLogger.getCount();
         const last30DaysMessageCount = await MessageLogger.getLast30Days(timezone);
         const averageMessagesPerDay = last30DaysMessageCount.map(day => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length;
@@ -73,7 +73,7 @@ class StatsController {
 
     public static async getLiveChannels(req: Request, res: Response): Promise<Response> {
         const lastUpdated = MemoryVariables.getLastLiveStreamsCheck();
-        const nextUpdateIn = 120000 - (Date.now() - lastUpdated.getTime());
+        const nextUpdateIn = lastUpdated.getTime() + 120000 - Date.now();
         return res.status(200).json({
             data: {
                 channels: MemoryVariables.getLiveChannels().map(stream => {
