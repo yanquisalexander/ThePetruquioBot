@@ -109,7 +109,7 @@ class Twitch {
         try {
             const bot = await Bot.getInstance();
             let channels;
-            if(this.firstCheck) {
+            if (this.firstCheck) {
                 channels = (await Channel.getAutoJoinChannels()).map(channel => channel.user.username);
                 this.firstCheck = false;
             } else {
@@ -119,14 +119,17 @@ class Twitch {
 
             const currentLiveChannels: HelixStream[] = [];
 
-            currentLive.map(async user => {
-                let liveStream = await user.getStream();
-                if (liveStream) {
-                    currentLiveChannels.push(liveStream);
-                } else {
-                    console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`User ${user.name} is not live.`));
-                }
-            })
+            // Utiliza Promise.all para esperar a que todas las solicitudes asíncronas se completen
+            await Promise.all(
+                currentLive.map(async user => {
+                    let liveStream = await user.getStream();
+                    if (liveStream) {
+                        currentLiveChannels.push(liveStream);
+                    } else {
+                        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`User ${user.name} is not live.`));
+                    }
+                })
+            );
 
             const newLiveChannels = currentLiveChannels.filter(channel => !MemoryVariables.getLiveChannels().includes(channel));
             const offlineChannels = MemoryVariables.getLiveChannels().filter(channel => !currentLiveChannels.includes(channel));
@@ -141,13 +144,13 @@ class Twitch {
                     MemoryVariables.getLiveChannels().splice(index, 1);
                 });
             }
-
             MemoryVariables.setLastLiveStreamsCheck(new Date());
             MemoryVariables.setLiveChannels(currentLiveChannels);
         } catch (error) {
             console.error(error);
         }
     }
+
 
 
     public static async initializeLiveMonitor(): Promise<void> {
@@ -219,7 +222,7 @@ class Twitch {
     public static async sendAnnouncement(channel: Channel, message: string, color?: string): Promise<void> {
         try {
             const moderator = await this.Helix.users.getUserByName(Bot.username);
-            const announcementColor : HelixChatAnnouncementColor = color as HelixChatAnnouncementColor;          
+            const announcementColor: HelixChatAnnouncementColor = color as HelixChatAnnouncementColor;
 
             if (!moderator) {
                 throw new Error(`User ${Bot.username} not found.`);
