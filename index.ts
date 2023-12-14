@@ -45,13 +45,13 @@ const initializeApp = async () => {
         CommandExecutor.initialize();
 
         await Passport.setup();
-        EmailManager.initialize(process.env.BREVO_API_KEY as string);
 
         await TwitchAuthenticator.initialize();
         await Twitch.initialize();
         await Twitch.initializeLiveMonitor();
 
         GreetingsManager.initialize();
+        EmailManager.initialize(process.env.BREVO_API_KEY as string);
 
 
         for (const event of Object.keys(EventHandlers) as (keyof typeof EventHandlers)[]) {
