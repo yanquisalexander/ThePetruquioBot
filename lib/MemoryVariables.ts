@@ -4,50 +4,62 @@ interface BookInfo {
     id: string;
 }
 
-namespace MemoryVariables {
-    let latency: number = 0;
-    let liveChannels: HelixStream[] | null = [];
-    let logs: string[] = [];
-    let lastLiveStreamsCheck: Date = new Date();
-    let currentBooks: { [channelId: number]: BookInfo } = {};
 
-    export const getLatency = (): number => latency;
+class MemoryVariables {
+    private static latency: number = 0;
+    private static liveChannels: HelixStream[] | null = [];
+    private static logs: string[] = [];
+    private static lastLiveStreamsCheck: Date = new Date();
+    private static currentBooks: { [channelId: number]: BookInfo } = {};
 
-    export const setLatency = (newLatency: number): void => {
-        latency = newLatency;
-    };
 
-    export const getLiveChannels = (): HelixStream[] => liveChannels || [];
+    public static getLatency(): number {
+        return this.latency;
+    }
 
-    export const setLiveChannels = (channels: HelixStream[]): void => {
-        liveChannels = channels;
-    };
+    public static setLatency(latency: number): void {
+        this.latency = latency;
+    }
 
-    export const getLogs = (): string[] => logs;
+    public static getLiveChannels(): HelixStream[] {
+        return this.liveChannels || [];
+    }
 
-    export const setLogs = (newLogs: string[]): void => {
-        logs = newLogs;
-    };
+    public static setLiveChannels(channels: HelixStream[]): void {
+        this.liveChannels = channels;
+    }
 
-    export const getLastLiveStreamsCheck = (): Date => lastLiveStreamsCheck;
+    public static getLogs(): string[] {
+        return this.logs;
+    }
 
-    export const setLastLiveStreamsCheck = (date: Date): void => {
-        lastLiveStreamsCheck = date;
-    };
+    public static setLogs(logs: string[]): void {
+        this.logs = logs;
+    }
 
-    export const getCurrentBooks = (): { [channelId: number]: BookInfo } => currentBooks;
+    public static getLastLiveStreamsCheck(): Date {
+        return this.lastLiveStreamsCheck;
+    }
 
-    export const setCurrentBooks = (books: { [channelId: number]: BookInfo }): void => {
-        currentBooks = books;
-    };
+    public static setLastLiveStreamsCheck(date: Date): void {
+        this.lastLiveStreamsCheck = date;
+    }
 
-    export const getCurrentBook = (channelId: number): BookInfo | null => {
-        return currentBooks[channelId] || null;
-    };
+    public static getCurrentBooks(): { [channelId: number]: BookInfo } {
+        return this.currentBooks;
+    }
 
-    export const setCurrentBook = (channelId: number, book: BookInfo): void => {
-        currentBooks[channelId] = book;
-    };
+    public static setCurrentBooks(books: { [channelId: number]: BookInfo }): void {
+        this.currentBooks = books;
+    }
+
+    public static getCurrentBook(channelId: number): BookInfo | null {
+        return this.currentBooks[channelId] || null;
+    }
+
+    public static setCurrentBook(channelId: number, book: BookInfo): void {
+        this.currentBooks[channelId] = book;
+    }
 }
 
 export default MemoryVariables;
