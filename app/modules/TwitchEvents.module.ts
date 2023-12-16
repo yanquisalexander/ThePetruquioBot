@@ -131,23 +131,20 @@ class TwitchEvents {
                     console.log(`[TWITCH EVENT SUB] Disconnecting from channel ${channel.twitchId} (${channel.user.username})`);
                     this.bot.getBotClient().part(channel.user.username);
                     console.log(`[TWITCH EVENT SUB] Sending notification via email to ${channel.user.email}`);
-                    if(!channel.user.email || !channel.user.displayName) {
+                    if (!channel.user.email || !channel.user.displayName) {
                         console.log(`[TWITCH EVENT SUB] User ${channel.user.username} doesn't have an email configured. Skipping...`);
                         return;
                     }
                     try {
-                        EmailManager.getInstance().sendTransactionalEmail({
+                        EmailManager.getInstance().sendEmail({
                             to: [{ email: channel.user.email, name: channel.user.displayName }],
-                            headers: {},
                             params: {
-                                TWITCH_USERNAME: channel.user.username,
+                                'TWITCH_USERNAME': channel.user.username,
                             },
-                            htmlContent: '',
                             templateId: 1,
                             subject: 'Tu cuenta de Twitch ha sido desconectada',
-                            replyTo: { email: '', name: '' },
-                            sender: { email: 'notificaciones@petruquio.live', name: 'Petruquio.LIVE' },
                         });
+                        console.log(`[TWITCH EVENT SUB] Email sent to ${channel.user.email}`);
                     } catch (error) {
                         console.error(`[TWITCH EVENT SUB] Error while sending email to ${channel.user.email}: ${(error as Error).message}`);
                     }
@@ -318,7 +315,7 @@ class TwitchEvents {
     }
 
     public static async subscribeAllChannels(): Promise<void> {
-        if(Environment.isDevelopment) {
+        if (Environment.isDevelopment) {
             console.log(chalk.bgYellow('[TWITCH EVENT SUB]'), chalk.yellow('Development mode enabled. Skipping subscriptions.'));
             return;
         }

@@ -51,7 +51,7 @@ const initializeApp = async () => {
         await Twitch.initializeLiveMonitor();
 
         GreetingsManager.initialize();
-        EmailManager.initialize(process.env.BREVO_API_KEY as string);
+        EmailManager.initialize();
 
 
         for (const event of Object.keys(EventHandlers) as (keyof typeof EventHandlers)[]) {
