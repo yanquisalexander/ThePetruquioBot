@@ -169,7 +169,6 @@ class TwitchEvents {
         });
 
         this.eventSubListeners[channel.twitchId.toString()]['app-revocation'] = listener;
-        console.log(await listener.getCliTestCommand());
     }
 
     public static async subscribeToLiveStream(channel: Channel): Promise<void> {
