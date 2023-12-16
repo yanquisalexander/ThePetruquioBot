@@ -66,11 +66,12 @@ const updateUser = async (username: string) => {
 const testEmail = async () => {
     try {
         const email = readlineSync.question('Email: ');
+        const username = readlineSync.question('Username: ');
         console.log('Sending email...');
         await EmailManager.getInstance().sendEmail({
             to: [{ email, name: 'Test' }],
             params: {
-                'TWITCH_USERNAME': 'Test',
+                'TWITCH_USERNAME': username || 'Test',
             },
             templateId: 1,
             subject: 'Test',
