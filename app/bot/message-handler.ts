@@ -14,6 +14,7 @@ import { CountrieLocales } from "../constants/CountrieLocales.constants";
 import Shoutout from "../models/Shoutout.model";
 import RandomResponses from "../modules/RandomResponses.module";
 import Workflow, { EventType } from "../models/Workflow.model";
+import os from "os";
 
 export const handleChatMessage = async (channel: string, userstate: ChatUserstate, message: string, self: boolean) => {
     const bot = await Bot.getInstance();
@@ -81,6 +82,10 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
     /* If PetruquioBot is mentioned, show a random message (@petruquiobot) */
     if (message.toLowerCase().includes(`@${bot.getBotClient().getUsername().toLowerCase()}`)) {
         if (userData.username === 'tangerinebot_') return // TangerineBot causes infinite loops
+        if(message.toLowerCase().includes('are you alive') && user.isBotOwner) {
+            return bot.sendMessage(channelData, `@${user.displayName}, looks like I'm alive! Running on ${Environment.isDevelopment ? 'development' : 'production'} mode (On ${os.hostname()})`);
+        }
+
         return bot.sendMessage(channelData, RandomResponses.processRandomResponse(message.toLowerCase(), userstate, channelData, bot));
     }
 
