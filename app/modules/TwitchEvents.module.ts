@@ -152,7 +152,7 @@ class TwitchEvents {
                         EmailManager.getInstance().sendEmail({
                             to: [{ email: channel.user.email, name: channel.user.displayName }],
                             params: {
-                                'TWITCH_USERNAME': channel.user.username,
+                                'TWITCH_USERNAME': channel.user.displayName,
                             },
                             templateId: 1,
                             subject: 'Tu cuenta de Twitch ha sido desconectada',
