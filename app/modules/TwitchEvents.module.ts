@@ -10,6 +10,8 @@ import { Bot } from "../../bot";
 import Workflow, { EventType } from "../models/Workflow.model";
 import chalk from "chalk";
 import EmailManager from "./EmailManager.module";
+import TwitchAuthenticator from "./TwitchAuthenticator.module";
+import UserToken from "../models/UserToken.model";
 
 type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
 
@@ -130,12 +132,23 @@ class TwitchEvents {
                     console.log(`[TWITCH EVENT SUB] Channel ${channel.twitchId} (${channel.user.username}) unsubscribed from all events.`);
                     console.log(`[TWITCH EVENT SUB] Disconnecting from channel ${channel.twitchId} (${channel.user.username})`);
                     this.bot.getBotClient().part(channel.user.username);
-                    console.log(`[TWITCH EVENT SUB] Sending notification via email to ${channel.user.email}`);
+                    try {
+                        console.log(`[TWITCH EVENT SUB] Deleting user token for ${channel.user.username}`);
+                        await UserToken.findByUserId(user.twitchId).then(async (token) => {
+                            if (token) {
+                                await token.delete();
+                            }
+                        });
+                        TwitchAuthenticator.RefreshingAuthProvider.removeUser(user.twitchId);
+                    } catch (error) {
+                        console.error(`[TWITCH EVENT SUB] Error while deleting user token for ${channel.user.username}: ${(error as Error).message}`);
+                    }
                     if (!channel.user.email || !channel.user.displayName) {
                         console.log(`[TWITCH EVENT SUB] User ${channel.user.username} doesn't have an email configured. Skipping...`);
                         return;
                     }
                     try {
+                        console.log(`[TWITCH EVENT SUB] Sending notification via email to ${channel.user.email}`);
                         EmailManager.getInstance().sendEmail({
                             to: [{ email: channel.user.email, name: channel.user.displayName }],
                             params: {
