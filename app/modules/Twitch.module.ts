@@ -143,12 +143,8 @@ class Twitch {
                 console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
             }
 
-            if (offlineChannels.length > 0) {
-                // Actualizar la lista de canales en vivo eliminando los canales que están offline
-                MemoryVariables.setLiveChannels(currentLiveChannels);
-            }
-
             MemoryVariables.setLastLiveStreamsCheck(new Date());
+            MemoryVariables.setLiveChannels(currentLiveChannels);
         } catch (error) {
             console.error(error);
         }
