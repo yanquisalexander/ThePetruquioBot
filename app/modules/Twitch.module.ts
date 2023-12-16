@@ -83,7 +83,10 @@ class Twitch {
         const liveChannels: HelixUser[] = [];
 
         for (const channelGroup of channelGroups) {
-            const users = await this.Helix.users.getUsersByNames(channelGroup);
+            const users = await this.Helix.asUser(process.env.TWITCH_USER_ID as string, async api => {
+                return await api.users.getUsersByNames(channelGroup);
+            });
+
             for (const user of users) {
                 const stream = await user.getStream();
                 if (stream) {
