@@ -125,11 +125,13 @@ class Twitch {
             // Utiliza Promise.all para esperar a que todas las solicitudes asíncronas se completen
             await Promise.all(
                 currentLive.map(async user => {
-                    let liveStream = await user.getStream();
-                    if (liveStream) {
-                        currentLiveChannels.push(liveStream);
-                    } else {
-                        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`User ${user.name} is not live.`));
+                    try {
+                        let liveStream = await user.getStream();
+                        if (liveStream) {
+                            currentLiveChannels.push(liveStream);
+                        }
+                    } catch (error) {
+                        console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${error}`));
                     }
                 })
             );
