@@ -107,7 +107,7 @@ class Command {
         try {
             let query = '';
             let values = [];
-
+    
             if (this.id) {
                 // Si ya tienes un ID, actualiza el registro
                 query = `
@@ -118,7 +118,7 @@ class Command {
                         permissions = $3, 
                         description = $4, 
                         preferences = $5, 
-                        response = $6
+                        response = $6,
                         enabled = $7
                     WHERE id = $8
                 `;
@@ -129,8 +129,8 @@ class Command {
                     this.description,
                     JSON.stringify(this.preferences),
                     this.response,
+                    this.enabled,
                     this.id,
-                    this.enabled
                 ];
             } else {
                 // Si no tienes un ID, inserta un nuevo registro
@@ -139,12 +139,11 @@ class Command {
                     VALUES ($1, $2, $3, $4, $5, $6, $7)
                     ON CONFLICT (id, channel_id)
                     DO UPDATE SET
-                      permissions = EXCLUDED.permissions,
-                      description = EXCLUDED.description,
-                      preferences = EXCLUDED.preferences,
-                      response = EXCLUDED.response,
-                      enabled = EXCLUDED.enabled;
-
+                        permissions = EXCLUDED.permissions,
+                        description = EXCLUDED.description,
+                        preferences = EXCLUDED.preferences,
+                        response = EXCLUDED.response,
+                        enabled = EXCLUDED.enabled;
                 `;
                 values = [
                     this.name,
@@ -153,10 +152,10 @@ class Command {
                     this.description,
                     JSON.stringify(this.preferences),
                     this.response,
-                    this.enabled
+                    this.enabled,
                 ];
             }
-
+    
             console.log(values);
             await Database.query(query, values);
         } catch (error) {
@@ -164,7 +163,7 @@ class Command {
             throw new Error('Failed to save command.');
         }
     }
-
+    
 
     async delete(channel: Channel): Promise<void> {
         try {

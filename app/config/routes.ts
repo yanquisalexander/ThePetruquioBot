@@ -28,6 +28,8 @@ router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { 
 
 router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
 router.get('/account/messages', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getMessages);
+router.get('/external-accounts/:provider/link', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.linkExternalAccount);
+router.get('/external-accounts/:provider/callback', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.linkExternalAccountCallback);
 
 router.get('/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.index);
 router.post('/dashboard/join', Passport.getPassport().authenticate('jwt', { session: false }), DashboardController.join);

@@ -5,6 +5,8 @@ import Channel from "./Channel.model";
 import Greeting from "./Greeting.model";
 import MessageLogger from "./MessageLogger.model";
 import Twitch from "../modules/Twitch.module";
+import ExternalAccount, { ExternalAccountProvider } from "./ExternalAccount.model";
+
 
 class User {
     username: string;
@@ -147,6 +149,14 @@ class User {
             console.error(error);
             return 0;
         }
+    }
+
+    async getLinkedAccounts(): Promise<ExternalAccount[]> {
+        return await ExternalAccount.findByUser(this);
+    }
+
+    async getLinkedAccount(provider: ExternalAccountProvider): Promise<ExternalAccount | null> {
+        return await ExternalAccount.findByProviderAndUser(provider, this);
     }
 }
 

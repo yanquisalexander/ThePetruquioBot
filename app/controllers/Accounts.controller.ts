@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import TwitchAuthenticator from '../modules/TwitchAuthenticator.module';
 import User from '../models/User.model';
 import UserToken from '../models/UserToken.model';
@@ -6,6 +6,9 @@ import Session from '../models/Session.model';
 import jwt from 'jsonwebtoken';
 import { ExpressUser } from '../interfaces/ExpressUser.interface';
 import TwitchEvents from '../modules/TwitchEvents.module';
+import ExternalAccount, { ExternalAccountProvider } from "../models/ExternalAccount.model";
+import Passport from "../../lib/Passport";
+import CurrentUser from "../../lib/CurrentUser";
 
 
 class AccountsController {
@@ -102,25 +105,25 @@ class AccountsController {
     static async currentSession(req: Request, res: Response) {
         let user = req.user as ExpressUser;
 
-        if(!user) {
+        if (!user) {
             return res.status(401).json({ error: 'Unauthorized' })
         }
-        
+
         const session = await Session.findBySessionId(user.session.sessionId);
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' })
         }
 
-        if(session.impersonatedUserId) {
+        if (session.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'Impersonated user not found' })
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
 
@@ -135,7 +138,7 @@ class AccountsController {
                 channel: impersonatedChannel
             }
 
-            if(!user) {
+            if (!user) {
                 return res.status(401).json({ error: 'Unauthorized' })
             }
 
@@ -219,6 +222,122 @@ class AccountsController {
 
         res.redirect(url);
     }
+
+    static linkExternalAccount(req: Request, res: Response, next: NextFunction) {
+        const user = req.user as ExpressUser;
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const { provider } = req.params;
+
+        if (!provider) {
+            return res.status(400).json({ error: 'Invalid provider' });
+        }
+
+        let redirectUrl: string | number | string[] | undefined;
+
+        // Guardar la función original de res.end
+        const originalEnd = res.end;
+
+        // Sustituir la función res.end para capturar la URL de redirección, y luego enviar la respuesta
+        // @ts-ignore
+        res.end = function (data: any, encoding: string, callback?: Function) {
+            if (!redirectUrl) {
+                redirectUrl = this.getHeader('Location');
+                this.setHeader('Location', ''); // Limpiar la cabecera para que no se envíe en la respuesta
+            }
+        };
+            
+
+        switch (provider) {
+            case ExternalAccountProvider.SPOTIFY:
+                // Invocar authenticate con la estrategia 'spotify'
+                // @ts-ignore
+                Passport.getPassport().authenticate('spotify', { showDialog: true })(req, res, next);
+                break;
+            default:
+                return res.status(400).json({ error: `Provider ${provider} not supported` });
+        }
+
+
+        // Si no se ha establecido una URL de redirección, devolver un error
+        if (!redirectUrl) {
+            return res.status(500).json({ error: 'Failed to link account' });
+        }
+
+        console.log('Redirecting to', redirectUrl);
+        res.end = originalEnd;
+        return res.status(200).json({ redirectUrl });
+
+    }
+
+
+
+
+
+    static async linkExternalAccountCallback(req: Request, res: Response) {
+        try {
+            const user = new CurrentUser(req.user as ExpressUser);
+    
+            if (!user) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+    
+            const { provider } = req.params;
+    
+            if (!provider) {
+                return res.status(400).json({ error: 'Invalid provider' });
+            }
+    
+            const userAccount = await user.getCurrentUser();
+    
+            if (!userAccount) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+    
+            switch (provider) {
+                case ExternalAccountProvider.SPOTIFY:
+                    Passport.getPassport().authorize('spotify', { session: false }, async (err: any, profile: { id: string; }, info: { accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; }) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({ error: 'Failed to link account' });
+                        }
+    
+                        if (!profile) {
+                            return res.status(400).json({ error: 'Failed to link account' });
+                        }
+    
+                        const externalAccount = await ExternalAccount.findByProviderAndUser(ExternalAccountProvider.SPOTIFY, userAccount);
+    
+                        console.log('PROFILE', profile);
+                        console.log('INFO', info);
+
+                        if (externalAccount) {
+                            externalAccount.accountId = profile.id;
+                            externalAccount.accessToken = info.accessToken;
+                            externalAccount.refreshToken = info.refreshToken;
+                            externalAccount.expiresAt = new Date(Date.now() + ((info.expiresAt || 0) as number) * 1000);
+                            externalAccount.metadata = profile;
+                            await externalAccount.save();
+                        } else {
+                            await ExternalAccount.create(userAccount, ExternalAccountProvider.SPOTIFY, profile.id, info.accessToken, info.refreshToken, info.expiresAt, profile);
+                        }
+    
+                        return res.status(200).json({ message: 'Account linked successfully' });
+                    })(req, res);
+                    break;
+    
+                default:
+                    return res.status(400).json({ error: 'Invalid provider' });
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Failed to link account' });
+        }
+    }
+    
 }
 
 export default AccountsController;
