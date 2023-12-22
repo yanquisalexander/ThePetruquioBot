@@ -4,6 +4,9 @@ import ImageProcessor from '../../lib/ImageProcessor';
 import Channel from '../models/Channel.model';
 import StreamerSonglist from '../modules/StreamerSonglist.module';
 import Geolocation from '../modules/Geolocation.module';
+import User from "../models/User.model";
+import { ExternalAccountProvider } from "../models/ExternalAccount.model";
+import axios from "axios";
 
 class WorldMapController {
     constructor() {
@@ -140,17 +143,41 @@ class WorldMapController {
 
             try {
                 song_requests = songRequests
-                .filter((songRequest) =>
-                    songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
-                )
-                .map((songRequest) => ({
-                    id: songRequest.song.id || null,
-                    title: songRequest.song.title,
-                    artist: songRequest.song.artist,
-                }))
+                    .filter((songRequest) =>
+                        songRequest.requests.some((request: { name: string; }) => request.name.toLowerCase() === username)
+                    )
+                    .map((songRequest) => ({
+                        id: songRequest.song.id || null,
+                        title: songRequest.song.title,
+                        artist: songRequest.song.artist,
+                    }))
             } catch (error) {
                 console.error(error);
                 song_requests = [];
+            }
+
+            const user = await User.findByUsername(username);
+
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const spotifyAccount = await user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
+            let spotify = null;
+            if (!spotifyAccount) {
+                spotify = null;
+            } else {
+                try {
+                    const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
+                        headers: {
+                            'Authorization': `Bearer ${spotifyAccount.accessToken}`
+                        }
+                    });
+                    spotify = response.data
+                } catch (error) {
+                    console.error(error);
+                    spotify = null;
+                }
             }
 
             const userCard = {
@@ -158,19 +185,17 @@ class WorldMapController {
                     cover: twitchUser.offlinePlaceholderUrl,
                 },
                 song_requests: song_requests,
+                spotify
             };
-            
 
-           
-
-            return res.status(200).json({
+            return res.json({
                 data: {
                     user_card: userCard
                 }
             })
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.json({ error: 'Internal server error' });
         }
     }
 }
