@@ -59,12 +59,20 @@ class Passport {
                 }
 
                 const linkedAccounts = await user.getLinkedAccounts();
+                let accounts = linkedAccounts.map((account) => {
+                    return {
+                        account_id: account.accountId,
+                        provider: account.provider,
+                        metadata: account.metadata,
+                        expires_at: account.expiresAt,
+                    }
+                })
 
                 let userData = {
                     ...user,
                     session,
                     channel: await user.getChannel(),
-                    linkedAccounts,
+                    linkedAccounts: accounts
                 }
 
                 return done(null, userData);
