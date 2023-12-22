@@ -2,6 +2,7 @@ import axios from "axios";
 import Channel from "../app/models/Channel.model";
 import User from "../app/models/User.model";
 import { ExternalAccountProvider } from "../app/models/ExternalAccount.model";
+import chalk from "chalk";
 
 const getSpotifyCurrentlyPlayingSong = async (channel: Channel): Promise<any> => {
     const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
@@ -24,16 +25,21 @@ const replaceSpotifyVariables = async (command: string, channel: Channel): Promi
         const spotifySong = await getSpotifyCurrentlyPlayingSong(channel);
         console.log('spotifySong:', spotifySong);
 
-        function formatPosition(positionInMilliseconds : number) {
+        if (!spotifySong) {
+            console.log('spotifySong is null');
+            return command.replace(spotifySongRegex, '');
+        }
+
+        function formatPosition(positionInMilliseconds: number) {
             const seconds = Math.floor(positionInMilliseconds / 1000);
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = seconds % 60;
-        
+
             const formattedPosition = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-        
+
             return formattedPosition;
         }
-    
+
         for (const match of spotifyMatches) {
             if (match === "${spotify.song}") {
                 console.log('Replacing ${spotify.song}');
@@ -99,8 +105,12 @@ class Utils {
         command = command.replace(/\${toUser}/g, toUser);
 
         // Replace Spotify variables
-        command = await replaceSpotifyVariables(command, channel);
+        try {
+            command = await replaceSpotifyVariables(command, channel);
 
+        } catch (error) {
+            console.error(chalk.red('Error replacing Spotify variables:'), error);
+        }
         // Reemplazar ${randomNum VALOR_MIN-VALOR_MAX} con un número aleatorio dentro del rango especificado
         const randomNumRegex = /\${randomNum(?:\s+(\d+)\s*-\s*(\d+))?}/g;
         const randomNumMatches = command.match(randomNumRegex);
