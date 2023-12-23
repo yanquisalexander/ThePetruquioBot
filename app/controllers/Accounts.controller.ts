@@ -223,6 +223,40 @@ class AccountsController {
         res.redirect(url);
     }
 
+    private static async handleLinkAccount(
+        userAccount: User,
+        provider: ExternalAccountProvider,
+        strategy: string,
+        req: Request,
+        res: Response
+    ) {
+        Passport.getPassport().authorize(strategy, { session: false }, async (err: any, profile: { id: string; }, info: { accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; }) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to link account' });
+            }
+
+            if (!profile) {
+                return res.status(400).json({ error: 'Failed to link account' });
+            }
+
+            const externalAccount = await ExternalAccount.findByProviderAndUser(provider, userAccount);
+
+            if (externalAccount) {
+                externalAccount.accountId = profile.id;
+                externalAccount.accessToken = info.accessToken;
+                externalAccount.refreshToken = info.refreshToken;
+                externalAccount.expiresAt = new Date(Date.now() + ((info.expiresAt || 0) as number) * 1000);
+                externalAccount.metadata = profile;
+                await externalAccount.save();
+            } else {
+                await ExternalAccount.create(userAccount, provider, profile.id, info.accessToken, info.refreshToken, info.expiresAt, profile);
+            }
+
+            return res.status(200).json({ message: 'Account linked successfully' });
+        })(req, res);
+    }
+
     static linkExternalAccount(req: Request, res: Response, next: NextFunction) {
         const user = req.user as ExpressUser;
 
@@ -249,13 +283,18 @@ class AccountsController {
                 this.setHeader('Location', ''); // Limpiar la cabecera para que no se envíe en la respuesta
             }
         };
-            
+
 
         switch (provider) {
             case ExternalAccountProvider.SPOTIFY:
                 // Invocar authenticate con la estrategia 'spotify'
                 // @ts-ignore
                 Passport.getPassport().authenticate('spotify', { showDialog: true })(req, res, next);
+                break;
+            case ExternalAccountProvider.DISCORD:
+                // Invocar authenticate con la estrategia 'discord'
+                // @ts-ignore
+                Passport.getPassport().authenticate('discord', { prompt: true })(req, res, next);
                 break;
             default:
                 return res.status(400).json({ error: `Provider ${provider} not supported` });
@@ -280,55 +319,30 @@ class AccountsController {
     static async linkExternalAccountCallback(req: Request, res: Response) {
         try {
             const user = new CurrentUser(req.user as ExpressUser);
-    
+
             if (!user) {
                 return res.status(401).json({ error: 'Unauthorized' });
             }
-    
+
             const { provider } = req.params;
-    
+
             if (!provider) {
                 return res.status(400).json({ error: 'Invalid provider' });
             }
-    
+
             const userAccount = await user.getCurrentUser();
-    
+
             if (!userAccount) {
                 return res.status(404).json({ error: 'User not found' });
             }
-    
+
             switch (provider) {
                 case ExternalAccountProvider.SPOTIFY:
-                    Passport.getPassport().authorize('spotify', { session: false }, async (err: any, profile: { id: string; }, info: { accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; }) => {
-                        if (err) {
-                            console.error(err);
-                            return res.status(500).json({ error: 'Failed to link account' });
-                        }
-    
-                        if (!profile) {
-                            return res.status(400).json({ error: 'Failed to link account' });
-                        }
-    
-                        const externalAccount = await ExternalAccount.findByProviderAndUser(ExternalAccountProvider.SPOTIFY, userAccount);
-    
-                        console.log('PROFILE', profile);
-                        console.log('INFO', info);
-
-                        if (externalAccount) {
-                            externalAccount.accountId = profile.id;
-                            externalAccount.accessToken = info.accessToken;
-                            externalAccount.refreshToken = info.refreshToken;
-                            externalAccount.expiresAt = new Date(Date.now() + ((info.expiresAt || 0) as number) * 1000);
-                            externalAccount.metadata = profile;
-                            await externalAccount.save();
-                        } else {
-                            await ExternalAccount.create(userAccount, ExternalAccountProvider.SPOTIFY, profile.id, info.accessToken, info.refreshToken, info.expiresAt, profile);
-                        }
-    
-                        return res.status(200).json({ message: 'Account linked successfully' });
-                    })(req, res);
+                    AccountsController.handleLinkAccount(userAccount, ExternalAccountProvider.SPOTIFY, 'spotify', req, res);
                     break;
-    
+                case ExternalAccountProvider.DISCORD:
+                    AccountsController.handleLinkAccount(userAccount, ExternalAccountProvider.DISCORD, 'discord', req, res);
+                    break;
                 default:
                     return res.status(400).json({ error: 'Invalid provider' });
             }
@@ -337,7 +351,7 @@ class AccountsController {
             return res.status(500).json({ error: 'Failed to link account' });
         }
     }
-    
+
 }
 
 export default AccountsController;

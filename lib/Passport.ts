@@ -2,11 +2,13 @@ import passport from 'passport';
 import "dotenv/config";
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 const SpotifyStrategy = require('passport-spotify').Strategy;
+const DiscordStrategy = require('@soerenmetje/passport-discord').Strategy;
 
 import User from '../app/models/User.model';
 import Session from '../app/models/Session.model';
 import chalk from "chalk";
 import Environment from "../utils/environment";
+import AdminDashboardProblems, { ProblemSeverity } from "../app/models/admin/DashboardProblems.model";
 
 const Scopes = {
     DISCORD: ["identify", "email", "connections", "guilds", "guilds.join"],
@@ -27,6 +29,12 @@ const strategyCanBeConfigured = (strategy: string) => {
 
     if (!process.env[`${strategy.toUpperCase()}_CLIENT_ID`] || !process.env[`${strategy.toUpperCase()}_CLIENT_SECRET`] || !process.env[`${strategy.toUpperCase()}_CALLBACK_URL`]) {
         console.warn(chalk.yellow('[PASSPORT]'), chalk.white(`Cannot setup ${strategy} strategy`));
+        AdminDashboardProblems.addProblem({
+            id: `passport-${strategy}-strategy`,
+            title: `Cannot setup ${strategy} strategy`,
+            description: `Looks like you are missing some environment variables to setup the ${strategy} strategy. Please check the logs for more information.`,
+            severity: ProblemSeverity.WARNING,
+        });
         return false;
     }
 
@@ -102,6 +110,28 @@ class Passport {
                     }
                 }));
             console.log('[PASSPORT] Spotify strategy configured.');
+        }
+
+        if (strategyCanBeConfigured('discord')) {
+            console.log('[PASSPORT] Configuring Discord strategy...');
+
+            passport.use('discord', new DiscordStrategy({
+                clientID: process.env.DISCORD_CLIENT_ID,
+                clientSecret: process.env.DISCORD_CLIENT_SECRET,
+                callbackURL: process.env.DISCORD_CALLBACK_URL,
+                scope: Scopes.DISCORD,
+                prompt: 'consent',
+            },
+                // @ts-ignore
+                async (accessToken, refreshToken, profile, done) => {
+                    try {
+                        return done(null, profile, { accessToken, refreshToken });
+                    } catch (error) {
+                        console.error(error);
+                        return done(error, false, { message: 'Internal server error' });
+                    }
+                }));
+            console.log('[PASSPORT] Discord strategy configured.');
         }
 
         console.log('[PASSPORT] Finished setting up passport.');

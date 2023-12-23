@@ -5,6 +5,7 @@ import MemoryVariables from "../../lib/MemoryVariables";
 import { promisify } from "util";
 import { exec } from "child_process";
 import Session from "../models/Session.model";
+import AdminDashboardProblems from "../models/admin/DashboardProblems.model";
 
 const removeAnsiColors = (str: string) => str.replace(/\u001b\[[0-9]{1,2}m/g, '');
 
@@ -28,7 +29,8 @@ class AdminController {
             data: {
                 system: {
                     logs: cleanedLogs
-                }
+                },
+                problems: AdminDashboardProblems.getProblems() || []
             }
         })
     }
