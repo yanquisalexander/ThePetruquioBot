@@ -352,6 +352,42 @@ class AccountsController {
         }
     }
 
+    static async unlinkExternalAccount(req: Request, res: Response) {
+        try {
+            const user = new CurrentUser(req.user as ExpressUser);
+
+            if (!user) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const { provider } = req.params as { provider: ExternalAccountProvider };
+
+            if (!provider) {
+                return res.status(400).json({ error: 'Invalid provider' });
+            }
+
+            const userAccount = await user.getCurrentUser();
+
+            if (!userAccount) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+
+            const externalAccount = await ExternalAccount.findByProviderAndUser(provider, userAccount);
+
+            if (!externalAccount) {
+                return res.status(404).json({ error: 'External account not found' });
+            }
+
+            await externalAccount.delete();
+
+            return res.status(200).json({ message: 'Account unlinked successfully' });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Failed to unlink account' });
+        }
+    }
+
 }
 
 export default AccountsController;
