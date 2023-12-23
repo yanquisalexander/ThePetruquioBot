@@ -27,7 +27,8 @@ const replaceSpotifyVariables = async (command: string, channel: Channel): Promi
 
         if (!spotifySong) {
             console.log('spotifySong is null');
-            return command.replace(spotifySongRegex, '');
+            command = `Looks like ${channel.user.displayName} is not listening to Spotify right now`;
+            return command;
         }
 
         function formatPosition(positionInMilliseconds: number) {
