@@ -4,23 +4,33 @@ import User from "../app/models/User.model";
 import { ExternalAccountProvider } from "../app/models/ExternalAccount.model";
 import chalk from "chalk";
 
-const getSpotifyCurrentlyPlayingSong = async (channel: Channel): Promise<any> => {
+const getSpotifyCurrentlyPlayingSong = async (channel: Channel, retryAttempts = 3): Promise<any> => {
     try {
-        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
+        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY);
         if (!spotifyAccount) return null;
-    
+
         const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
             headers: {
                 'Authorization': `Bearer ${spotifyAccount.accessToken}`
             }
         });
-    
+
+        if (response.status === 401 && retryAttempts > 0) {
+            console.log(chalk.yellow(`Spotify access token expired. Refreshing token. Attempts left: ${retryAttempts}`));
+            await Utils.refreshSpotifyToken(channel);
+            return await getSpotifyCurrentlyPlayingSong(channel, retryAttempts - 1);
+        } else if (response.status === 401 && retryAttempts === 0) {
+            console.log(chalk.red('Spotify access token expired. Could not refresh token'));
+            return null;
+        }
+
         return response.data;
     } catch (error) {
         console.error(chalk.red('Error getting Spotify currently playing song:'), error);
         return null;
     }
-}
+};
+
 
 const replaceSpotifyVariables = async (command: string, channel: Channel): Promise<string> => {
     const spotifySongRegex = /\${spotify\.song}|\${spotify\.artist}|\${spotify\.url}|\${spotify\.currentPosition}/g;
@@ -147,6 +157,28 @@ class Utils {
         }
 
         return command;
+    }
+
+    public static async refreshSpotifyToken(channel: Channel): Promise<void> {
+        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
+        if (!spotifyAccount) return;
+
+        const response = await axios.post('https://accounts.spotify.com/api/token', {
+            grant_type: 'refresh_token',
+            refresh_token: spotifyAccount.refreshToken,
+            client_id: process.env.SPOTIFY_CLIENT_ID,
+            client_secret: process.env.SPOTIFY_CLIENT_SECRET,
+        });
+
+        if (response.status !== 200) {
+            console.error(chalk.red('Error refreshing Spotify access token:'), response.data);
+            return;
+        }
+
+        const newAccessToken = response.data.access_token;
+        const newRefreshToken = response.data.refresh_token;
+
+        await spotifyAccount.update(newAccessToken, newRefreshToken);
     }
 }
 
