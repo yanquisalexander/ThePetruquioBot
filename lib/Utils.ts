@@ -5,16 +5,21 @@ import { ExternalAccountProvider } from "../app/models/ExternalAccount.model";
 import chalk from "chalk";
 
 const getSpotifyCurrentlyPlayingSong = async (channel: Channel): Promise<any> => {
-    const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
-    if (!spotifyAccount) return null;
-
-    const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
-        headers: {
-            'Authorization': `Bearer ${spotifyAccount.accessToken}`
-        }
-    });
-
-    return response.data;
+    try {
+        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
+        if (!spotifyAccount) return null;
+    
+        const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
+            headers: {
+                'Authorization': `Bearer ${spotifyAccount.accessToken}`
+            }
+        });
+    
+        return response.data;
+    } catch (error) {
+        console.error(chalk.red('Error getting Spotify currently playing song:'), error);
+        return null;
+    }
 }
 
 const replaceSpotifyVariables = async (command: string, channel: Channel): Promise<string> => {
