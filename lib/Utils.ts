@@ -166,9 +166,13 @@ class Utils {
         const response = await axios.post('https://accounts.spotify.com/api/token', {
             grant_type: 'refresh_token',
             refresh_token: spotifyAccount.refreshToken,
-            client_id: process.env.SPOTIFY_CLIENT_ID,
-            client_secret: process.env.SPOTIFY_CLIENT_SECRET,
+        }, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + Buffer.from(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64'),
+            }
         });
+
 
         if (response.status !== 200) {
             console.error(chalk.red('Error refreshing Spotify access token:'), response.data);
