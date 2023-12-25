@@ -6,6 +6,7 @@ import Twitch from '../modules/Twitch.module';
 import { ChannelPreferences, defaultChannelPreferences } from '../../utils/ChannelPreferences.class';
 import Redemption from '../models/Redemption.model';
 import Session from '../models/Session.model';
+import TwitchAuthenticator from "../modules/TwitchAuthenticator.module";
 
 class ChannelsController {
     static async getPreferences(req: Request, res: Response) {
@@ -15,7 +16,7 @@ class ChannelsController {
 
         console.log(session);
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' })
         }
 
@@ -109,6 +110,16 @@ class ChannelsController {
                 }
             }
 
+            if (preferencesKeys.includes('useStreamerAccount')) {
+                let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(impersonatedChannel.twitchId)
+                if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
+                    {
+                        return res.status(400).json({ error: 'INSUFFICIENT_SCOPES', message: 'The user does not have the required scopes to use this feature' });
+                    }
+                }
+            }
+
+
             await impersonatedChannel.save();
 
             return res.json({
@@ -145,6 +156,15 @@ class ChannelsController {
             } else {
                 // @ts-ignore
                 channel.preferences[preferenceKey].value = preferences[preferenceKey].value;
+            }
+        }
+
+        if (preferencesKeys.includes('useStreamerAccount')) {
+            let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(channel.twitchId)
+            if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
+                {
+                    return res.status(400).json({ error: 'INSUFFICIENT_SCOPES', message: 'The user does not have the required scopes to use this feature' });
+                }
             }
         }
 
@@ -222,11 +242,11 @@ class ChannelsController {
 
         try {
             const channelsPoints = await Twitch.Helix.channelPoints.getCustomRewards(channel.twitchId);
-    
+
             if (!channelsPoints) {
                 return res.status(404).json({ error: 'Channel does not have any custom rewards or channel is not affiliate/partner' });
             }
-    
+
             const response = channelsPoints.map((channelPoint) => {
                 return {
                     id: channelPoint.id,
@@ -236,7 +256,7 @@ class ChannelsController {
                     icon: channelPoint.getImageUrl(2),
                 }
             })
-    
+
             return res.json({
                 data: {
                     channelPoints: response,
