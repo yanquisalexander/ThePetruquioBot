@@ -230,7 +230,9 @@ class AccountsController {
         req: Request,
         res: Response
     ) {
-        Passport.getPassport().authorize(strategy, { session: false }, async (err: any, profile: { id: string; }, info: { accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; }) => {
+        Passport.getPassport().authorize(strategy, { session: false }, async (err: any, profile: { id: string; }, info: {
+            expires_in: number; accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; 
+}) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ error: 'Failed to link account' });
@@ -240,13 +242,21 @@ class AccountsController {
                 return res.status(400).json({ error: 'Failed to link account' });
             }
 
+            console.log(info)
+            console.log(profile)
+
             const externalAccount = await ExternalAccount.findByProviderAndUser(provider, userAccount);
 
             if (externalAccount) {
                 externalAccount.accountId = profile.id;
                 externalAccount.accessToken = info.accessToken;
                 externalAccount.refreshToken = info.refreshToken;
-                externalAccount.expiresAt = new Date(Date.now() + ((info.expiresAt || 0) as number) * 1000);
+                // Si contiene expires_in, calcular la fecha de expiración, de lo contrario, dejarla como está
+                let expiresAt = info.expiresAt;
+                if (info.expiresAt === undefined && info.expires_in !== undefined) {
+                    expiresAt = new Date(Date.now() + (info.expires_in * 1000));
+                }
+                externalAccount.expiresAt = expiresAt;
                 externalAccount.metadata = profile;
                 await externalAccount.save();
             } else {

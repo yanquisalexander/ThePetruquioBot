@@ -12,6 +12,10 @@ export class ChannelPreferences {
         value: boolean;
         field_type: FieldTypes.BOOLEAN;
     };
+    useStreamerAccount?: {
+        value: boolean;
+        field_type: FieldTypes.BOOLEAN;
+    };
     shoutoutPresentation?: {
         value: string;
         field_type: FieldTypes.TEXT;
@@ -99,6 +103,10 @@ export class ChannelPreferences {
 
 export const defaultChannelPreferences: ChannelPreferences = {
     botMuted: {
+        value: false,
+        field_type: FieldTypes.BOOLEAN,
+    },
+    useStreamerAccount: {
         value: false,
         field_type: FieldTypes.BOOLEAN,
     },

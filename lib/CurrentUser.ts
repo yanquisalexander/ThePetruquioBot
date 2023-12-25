@@ -44,7 +44,7 @@ class CurrentUser {
             return null;
         }
 
-        return { ...defaultChannelPreferences, ...channel.preferences };
+        return channel.preferences
     }
 }
 

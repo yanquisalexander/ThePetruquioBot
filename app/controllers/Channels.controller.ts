@@ -36,7 +36,7 @@ class ChannelsController {
 
             return res.json({
                 data: {
-                    preferences: { ...defaultChannelPreferences, ...impersonatedChannel.preferences },
+                    preferences: impersonatedChannel.preferences,
                 },
             })
         }
@@ -68,7 +68,7 @@ class ChannelsController {
 
         return res.json({
             data: {
-                preferences: { ...defaultChannelPreferences, ...channel.preferences },
+                preferences: channel.preferences,
             },
         })
     }
@@ -113,7 +113,7 @@ class ChannelsController {
 
             return res.json({
                 data: {
-                    preferences: { ...defaultChannelPreferences, ...impersonatedChannel.preferences },
+                    success: true,
                 },
             })
         }
@@ -155,7 +155,7 @@ class ChannelsController {
 
         return res.json({
             data: {
-                preferences: { ...defaultChannelPreferences, ...channel.preferences },
+                success: true,
             },
         });
     }

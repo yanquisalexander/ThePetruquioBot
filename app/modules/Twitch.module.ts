@@ -244,7 +244,6 @@ class Twitch {
             console.error(error);
         }
     }
-
 }
 
 export default Twitch;
