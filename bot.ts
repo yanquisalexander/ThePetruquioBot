@@ -16,18 +16,24 @@ class ChannelBotInstance {
     this.channel = channel;
   }
 
-  public async initialize(): Promise<void> {
+  public async initializeBot(): Promise<void> {
     const token = await UserToken.findByUserId(this.channel.twitchId);
     if (!token) {
       throw new Error('User token not found');
     }
 
+    console.log(chalk.green('[BOT]'), chalk.white('Initializing bot instance for channel #'), chalk.green(this.channel.user.username));
+    console.log(token.tokenData)
     this.bot = new tmi.Client({
       identity: {
         username: this.channel.user.username,
         password: `oauth:${token.tokenData.accessToken}`,
       },
       channels: [this.channel.user.username],
+    });
+
+    this.bot.connect().catch((error) => {
+      console.error(chalk.red('[BOT]'), chalk.white('Error connecting bot:'), error);
     });
   }
 }
@@ -92,7 +98,7 @@ export class Bot {
       const token = await UserToken.findByUserId(channel.twitchId);
       if (token) {
         const newInstance = new ChannelBotInstance(channel);
-        await newInstance.initialize();
+        await newInstance.initializeBot();
         if (newInstance.bot) {
           this.initializeBotInstance(newInstance);
         }
@@ -149,22 +155,28 @@ export class Bot {
         return;
       }
 
-      const instance = Bot.getStreamerBotInstance(channel);
-      if (instance) {
-        instance.bot?.say(channel.user.username, message);
-        return;
+      if (channel.preferences.useStreamerAccount?.value) {
+
+        const instance = Bot.getStreamerBotInstance(channel);
+        if (instance) {
+          instance.bot?.say(channel.user.username, message);
+          return;
+        }
+
+        console.log(chalk.yellow('[BOT]'), chalk.white('Bot instance not found for channel #'), chalk.green(channel.user.username));
+        const newInstance = new ChannelBotInstance(channel);
+        this.initializeBotInstance(newInstance);
+        try {
+          newInstance.bot?.say(channel.user.username, message);
+        } catch (error) {
+          console.error(chalk.red('[BOT]'), chalk.white('Error sending message:'), error);
+          this.client.say(channel.user.username, message);
+          return
+        }
       }
 
-      console.log(chalk.yellow('[BOT]'), chalk.white('Bot instance not found for channel #'), chalk.green(channel.user.username));
-      const newInstance = new ChannelBotInstance(channel);
-      this.initializeBotInstance(newInstance);
-      try {
-        newInstance.bot?.say(channel.user.username, message);
-      } catch (error) {
-        console.error(chalk.red('[BOT]'), chalk.white('Error sending message:'), error);
-        this.client.say(channel.user.username, message);
-      } 
-      return;
+      this.client.say(channel.user.username, message);
+      return
     }
 
     if (platform === Platform.Kick) {
@@ -195,7 +207,7 @@ export class Bot {
 
   private initializeBotInstance(instance: ChannelBotInstance): void {
     Bot.channelInstances.set(instance.channel.twitchId, instance);
-    instance.initialize().catch((error) => {
+    instance.initializeBot().catch((error) => {
       console.error(chalk.red('[BOT]'), chalk.white('Error initializing bot instance:'), error);
     });
   }

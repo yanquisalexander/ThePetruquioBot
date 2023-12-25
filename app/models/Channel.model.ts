@@ -164,20 +164,31 @@ function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
         if (channelPrefs[key] !== undefined) {
           // Si la clave es un objeto y contiene field_type
           if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object' && 'field_type' in defaultPrefs[key]) {
-            // Realiza la fusión del campo field_type sin reemplazar el valor de value
+            // Realiza la fusión recursiva del campo field_type sin reemplazar el valor de value
             mergedPrefs[key] = {
               ...channelPrefs[key],
               field_type: mergeFieldType(defaultPrefs[key].field_type, channelPrefs[key].field_type),
             };
+          } else if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object') {
+            // En caso de objetos anidados, realiza la fusión recursiva
+            mergedPrefs[key] = mergePreferences(defaultPrefs[key], channelPrefs[key]);
           } else {
-            // En otros casos, asigna el valor de defaultPrefs[key]
-            mergedPrefs[key] = defaultPrefs[key];
+            // En otros casos, asigna el valor de channelPrefs[key]
+            mergedPrefs[key] = channelPrefs[key];
           }
+        } else {
+          // Si la clave no existe en channelPrefs, asigna el valor de defaultPrefs[key]
+          mergedPrefs[key] = defaultPrefs[key];
         }
       }
     }
   
-    return mergedPrefs;
+    const orderedPrefs: any = {};
+    Object.keys(mergedPrefs).sort().forEach(function (key) {
+      orderedPrefs[key] = mergedPrefs[key];
+    });
+  
+    return orderedPrefs;
   }
   
 

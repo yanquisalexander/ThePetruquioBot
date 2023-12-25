@@ -59,7 +59,10 @@ const TWITCH_SCOPES = [
     'moderator:manage:shield_mode',
     'moderator:read:shoutouts',
     'moderator:manage:shoutouts',
-    'moderator:read:followers'
+    'moderator:read:followers',
+    'channel:bot',
+    'chat:edit',
+    'user:bot'
 ];
 
 class TwitchAuthenticator {
