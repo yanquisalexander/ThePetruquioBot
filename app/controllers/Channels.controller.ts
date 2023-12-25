@@ -112,7 +112,7 @@ class ChannelsController {
 
             if (preferencesKeys.includes('useStreamerAccount') && preferences.useStreamerAccount?.value) {
                 if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(impersonatedChannel.twitchId)) {
-                    return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
+                    return res.status(400).json({ error: 'TWITCH_TOKEN_NOT_FOUND', message: 'Your Twitch account session has expired, please authorize again' });
                 }
                 let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(impersonatedChannel.twitchId)
                 if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
@@ -164,7 +164,7 @@ class ChannelsController {
 
         if (preferencesKeys.includes('useStreamerAccount') && preferences.useStreamerAccount?.value) {
             if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(channel.twitchId)) {
-                return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
+                return res.status(400).json({ error: 'TWITCH_TOKEN_NOT_FOUND', message: 'Your Twitch account session has expired, please authorize again' });
             }
             let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(channel.twitchId)
             if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
