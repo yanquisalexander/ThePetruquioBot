@@ -33,6 +33,7 @@ class ChannelBotInstance {
 
     this.bot.connect().catch((error) => {
       console.error(chalk.red('[BOT]'), chalk.white('Error connecting bot:'), error);
+      this.bot = null; // Reset bot instance
     });
   }
 }
@@ -157,9 +158,11 @@ export class Bot {
       if (channel.preferences.useStreamerAccount?.value) {
 
         const instance = Bot.getStreamerBotInstance(channel);
-        if (instance) {
+        if (instance && instance.bot) {
           instance.bot?.say(channel.user.username, message);
           return;
+        } else {
+          Bot.channelInstances.delete(channel.twitchId);
         }
 
         console.log(chalk.yellow('[BOT]'), chalk.white('Bot instance not found for channel #'), chalk.green(channel.user.username));
