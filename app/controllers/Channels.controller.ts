@@ -111,6 +111,9 @@ class ChannelsController {
             }
 
             if (preferencesKeys.includes('useStreamerAccount')) {
+                if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(impersonatedChannel.twitchId)) {
+                    return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
+                }
                 let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(impersonatedChannel.twitchId)
                 if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
                     {
@@ -160,6 +163,9 @@ class ChannelsController {
         }
 
         if (preferencesKeys.includes('useStreamerAccount')) {
+            if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(channel.twitchId)) {
+                return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
+            }
             let scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(channel.twitchId)
             if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
                 {
