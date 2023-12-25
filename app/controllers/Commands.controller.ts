@@ -3,6 +3,7 @@ import User from "../models/User.model";
 import { ExpressUser } from "../interfaces/ExpressUser.interface";
 import { Command, CommandPermission } from "../models/Command.model";
 import Session from "../models/Session.model";
+import CurrentUser from "../../lib/CurrentUser";
 
 class CommandsController {
     constructor() {
@@ -11,27 +12,27 @@ class CommandsController {
 
     public static async getCommands(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
-        
-        if(!currentUser) {
+
+        if (!currentUser) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
-        if(session.impersonatedUserId) {
+        if (session.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'User not found' });
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Channel not found' });
             }
 
@@ -46,13 +47,13 @@ class CommandsController {
 
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
-        if(!user) {
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         const channel = await user.getChannel();
 
-        if(!channel) {
+        if (!channel) {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
@@ -66,84 +67,30 @@ class CommandsController {
     }
 
     public static async editCommand(req: Request, res: Response) {
-        const currentUser = req.user as ExpressUser;
-        
-        if(!currentUser) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+
+        if (!currentUser) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        const session = await Session.findBySessionId(currentUser.session.sessionId);
+        const user = await currentUser.getCurrentUser();
 
-        if(!session) {
-            return res.status(404).json({ error: 'Session not found' });
-        }
-
-        if(session.impersonatedUserId) {
-            const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
-
-            if(!impersonatedUser) {
-                return res.status(404).json({ error: 'User not found' });
-            }
-
-            const impersonatedChannel = await impersonatedUser.getChannel();
-
-            if(!impersonatedChannel) {
-                return res.status(404).json({ error: 'Channel not found' });
-            }
-
-            const { commandId } = req.params as unknown as { commandId: number };
-
-            const { response, name } = req.body;
-
-            if(!commandId || !response) {
-                return res.status(400).json({ error: 'Command and response are required' });
-            }
-
-            const command = await Command.findByIdAndChannel(commandId, impersonatedChannel);
-
-            console.log(command);
-
-            if(!command) {
-                return res.status(404).json({ error: 'Command not found' });
-            }
-
-            if(name) {
-                command.name = name.toLowerCase().replace('!', '').replace(/ /g, '-');
-            }
-
-            if(response) {
-                command.response = response;
-            }
-
-            await command.save(impersonatedChannel);
-
-            return res.json({
-                success: true,
-                data: {
-                    command,
-                    response,
-                },
-            });
-        }
-
-
-        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
-
-        if(!user) {
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const channel = await user.getChannel();
+        const channel = await currentUser.getCurrentChannel();
 
-        if(!channel) {
+        if (!channel) {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
+
         const { commandId } = req.params as unknown as { commandId: number };
 
-        const { response, name } = req.body;
+        const { response, name, aliases, permissions, enabled } = req.body;
 
-        if(!commandId || !response) {
+        if (!commandId || !response) {
             return res.status(400).json({ error: 'Command and response are required' });
         }
 
@@ -151,16 +98,28 @@ class CommandsController {
 
         console.log(command);
 
-        if(!command) {
+        if (!command) {
             return res.status(404).json({ error: 'Command not found' });
         }
 
-        if(name) {
+        if (name) {
             command.name = name.toLowerCase().replace('!', '').replace(/ /g, '-');
         }
 
-        if(response) {
+        if (response) {
             command.response = response;
+        }
+
+        if(aliases) {
+            command.preferences.aliases = aliases;
+        }
+
+        if(permissions) {
+            command.permissions = permissions;
+        }
+
+        if(enabled !== undefined) {
+            command.enabled = enabled;
         }
 
         await command.save(channel);
@@ -174,16 +133,17 @@ class CommandsController {
         });
     }
 
+
     public static async deleteCommand(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
-        
-        if(!currentUser) {
+
+        if (!currentUser) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
@@ -191,25 +151,25 @@ class CommandsController {
 
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
-        if(!user) {
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         const channel = await user.getChannel();
 
-        if(!channel) {
+        if (!channel) {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
         const { commandId } = req.params as unknown as { commandId: number };
 
-        if(!commandId) {
+        if (!commandId) {
             return res.status(400).json({ error: 'Command is required' });
         }
 
         const command = await Command.findByIdAndChannel(commandId, channel);
 
-        if(!command) {
+        if (!command) {
             return res.status(404).json({ error: 'Command not found' });
         }
 
@@ -222,44 +182,44 @@ class CommandsController {
 
     public static async createCommand(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
-        
-        if(!currentUser) {
+
+        if (!currentUser) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
-        if(session.impersonatedUserId) {
+        if (session.impersonatedUserId) {
             const impersonatedUser = await User.findByTwitchId(session.impersonatedUserId);
 
-            if(!impersonatedUser) {
+            if (!impersonatedUser) {
                 return res.status(404).json({ error: 'User not found' });
             }
 
             const impersonatedChannel = await impersonatedUser.getChannel();
 
-            if(!impersonatedChannel) {
+            if (!impersonatedChannel) {
                 return res.status(404).json({ error: 'Channel not found' });
             }
 
             const { name, response } = req.body;
 
-            if(!name || !response) {
+            if (!name || !response) {
                 return res.status(400).json({ error: 'Command and response are required' });
             }
 
             const command = await Command.find(impersonatedChannel, name);
 
-            if(command) {
+            if (command) {
                 return res.status(400).json({ error: 'Command already exists' });
             }
 
-            const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), impersonatedChannel.user.username, [ CommandPermission.VIEWER ], '', {}, response);
-
+            const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), impersonatedChannel.user.username, [CommandPermission.VIEWER], '', {}, response);
+            newCommand.enabled = true; // By default, commands are enabled
             await newCommand.save(impersonatedChannel);
 
             return res.json({
@@ -273,30 +233,30 @@ class CommandsController {
 
         const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
 
-        if(!user) {
+        if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         const channel = await user.getChannel();
 
-        if(!channel) {
+        if (!channel) {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
         const { name, response } = req.body;
 
-        if(!name || !response) {
+        if (!name || !response) {
             return res.status(400).json({ error: 'Command and response are required' });
         }
 
         const command = await Command.find(channel, name);
 
-        if(command) {
+        if (command) {
             return res.status(400).json({ error: 'Command already exists' });
         }
 
-        const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [ CommandPermission.VIEWER ], '', {}, response);
-
+        const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [CommandPermission.VIEWER], '', {}, response);
+        newCommand.enabled = true; // By default, commands are enabled
         await newCommand.save(channel);
 
         return res.json({

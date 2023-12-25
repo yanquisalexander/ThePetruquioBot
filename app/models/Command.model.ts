@@ -224,7 +224,7 @@ class Command {
     }
 
     static async getChannelCommands(channel: Channel): Promise<Command[]> {
-        const query = 'SELECT * FROM commands WHERE channel_id = $1';
+        const query = 'SELECT * FROM commands WHERE channel_id = $1 ORDER BY id ASC';
         const values = [channel.twitchId];
         const result = await Database.query(query, values);
 

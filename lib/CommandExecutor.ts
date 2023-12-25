@@ -38,14 +38,15 @@ class CommandExecutor {
 
 
     async loadCommands(): Promise<Command[]> {
+        const systemCommandsArray = await importCommandModules();
         const commands = [];
     
         if (!Array.isArray(systemCommandsArray)) {
             throw new Error('systemCommandsArray debe ser una matriz');
         }
+
     
         for (let command of systemCommandsArray) {
-            command = command.default;
             if (!command || !command.name || !command.execute) {
                 console.log(`[COMMAND EXECUTOR] ${chalk.red('ERROR:')} Command ${command.name} is invalid.`);
             }
@@ -81,12 +82,32 @@ class CommandExecutor {
         }
         else {
             let command = await Command.find(channelData, commandName);
+            if(!command) {
+                try {
+                    let channelCommands = await Command.getChannelCommands(channelData);
+                    if(channelCommands) {
+                        for(let channelCommand of channelCommands) {
+                            if(channelCommand.preferences.aliases?.includes(commandName)) {
+                                command = channelCommand;
+                                break;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.log(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Error while getting channel commands: ${error}`));
+                }
+            }
+
             if (command) {
                 if (!this.checkUserPermissions(user, command)) {
                     return;
                 }
 
                 if (!this.checkCooldowns(user, command, channelData)) {
+                    return;
+                }
+
+                if(!command.enabled) {
                     return;
                 }
 
