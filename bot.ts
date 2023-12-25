@@ -23,7 +23,6 @@ class ChannelBotInstance {
     }
 
     console.log(chalk.green('[BOT]'), chalk.white('Initializing bot instance for channel #'), chalk.green(this.channel.user.username));
-    console.log(token.tokenData)
     this.bot = new tmi.Client({
       identity: {
         username: this.channel.user.username,
