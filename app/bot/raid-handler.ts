@@ -33,6 +33,8 @@ export const handleRaid = async (channel: string, username: string, viewers: num
 
             if (!shoutout) {
                 shoutoutMessage = raider.preferences.shoutoutPresentation?.value || defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
+            } else {
+                shoutoutMessage = shoutout.messages[Math.floor(Math.random() * shoutout.messages.length)];
             }
 
             GreetingsManager.addToGreetingStack(channelData, shoutoutMessage.replace(/#targetStreamer/g, raider.user.username));

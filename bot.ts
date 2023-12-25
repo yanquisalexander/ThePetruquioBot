@@ -90,19 +90,9 @@ export class Bot {
       if (!channel) {
         await user.createChannelWithPreferences();
         channel = await user.getChannel();
-
         if (!channel) {
           throw new Error('Error creating channel');
         }
-      }
-      const token = await UserToken.findByUserId(channel.twitchId);
-      if (token) {
-        const newInstance = new ChannelBotInstance(channel);
-        await newInstance.initializeBot();
-        if (newInstance.bot) {
-          this.initializeBotInstance(newInstance);
-        }
-        Bot.channelInstances.set(channel.twitchId, newInstance);
       }
     }
   }
