@@ -110,7 +110,7 @@ class ChannelsController {
                 }
             }
 
-            if (preferencesKeys.includes('useStreamerAccount')) {
+            if (preferencesKeys.includes('useStreamerAccount') && preferences.useStreamerAccount?.value) {
                 if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(impersonatedChannel.twitchId)) {
                     return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
                 }
@@ -162,7 +162,7 @@ class ChannelsController {
             }
         }
 
-        if (preferencesKeys.includes('useStreamerAccount')) {
+        if (preferencesKeys.includes('useStreamerAccount') && preferences.useStreamerAccount?.value) {
             if(!TwitchAuthenticator.RefreshingAuthProvider.hasUser(channel.twitchId)) {
                 return res.status(400).json({ error: 'USER_NOT_AUTHENTICATED', message: 'The user is not authenticated' });
             }
