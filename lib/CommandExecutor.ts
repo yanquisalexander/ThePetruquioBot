@@ -133,27 +133,28 @@ class CommandExecutor {
     }
 
     private checkUserPermissions(user: ChatUser, command: Command): boolean {
-
+        if (!user) {
+            return false;
+        }
+    
         const commandPermissions = command.getPermissions();
-
-        if (commandPermissions.includes(CommandPermission.BROADCASTER)) {
-            return user.isBroadcaster;
+    
+        for (const permission of commandPermissions) {
+            switch (permission) {
+                case CommandPermission.BROADCASTER:
+                    if (user.isBroadcaster) return true;
+                case CommandPermission.MODERATOR:
+                    if (user.isModerator) return true;
+                case CommandPermission.SUBSCRIBER:
+                    if (user.isSubscriber) return true;
+                case CommandPermission.VIP:
+                    if (user.isVIP) return true;
+            }
         }
-
-        if (commandPermissions.includes(CommandPermission.MODERATOR)) {
-            return user.isModerator;
-        }
-
-        if (commandPermissions.includes(CommandPermission.SUBSCRIBER)) {
-            return user.isSubscriber;
-        }
-
-        if (commandPermissions.includes(CommandPermission.VIP)) {
-            return user.isVIP;
-        }
-
-        return true;
+    
+        return command.permissions.includes(CommandPermission.VIEWER);
     }
+    
 
     private checkCooldowns(user: ChatUser, command: Command, channel: Channel): boolean {
         if (!cooldowns.has(channel.user.username)) {
