@@ -12,7 +12,7 @@ export const handleRaid = async (channel: string, username: string, viewers: num
     const raider = await Channel.findByUsername(username);
 
     if (!channelData) return;
-    if (channelData.preferences.enableRaidAlerts) {
+    if (channelData.preferences.enableRaidAlerts?.value) {
         const bot = await Bot.getInstance();
         let message = `@${username} raided with ${viewers} viewers PopNemo`;
 
