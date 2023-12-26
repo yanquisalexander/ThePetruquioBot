@@ -220,6 +220,14 @@ class CommandsController {
 
             const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), impersonatedChannel.user.username, [CommandPermission.VIEWER], '', {}, response);
             newCommand.enabled = true; // By default, commands are enabled
+            newCommand.permissions = [
+                CommandPermission.VIEWER,
+                CommandPermission.SUBSCRIBER,
+                CommandPermission.MODERATOR,
+                CommandPermission.BROADCASTER,
+                CommandPermission.VIP,
+                CommandPermission.FOLLOWER
+            ];
             await newCommand.save(impersonatedChannel);
 
             return res.json({
@@ -257,6 +265,14 @@ class CommandsController {
 
         const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [CommandPermission.VIEWER], '', {}, response);
         newCommand.enabled = true; // By default, commands are enabled
+        newCommand.permissions = [
+            CommandPermission.VIEWER,
+            CommandPermission.SUBSCRIBER,
+            CommandPermission.MODERATOR,
+            CommandPermission.BROADCASTER,
+            CommandPermission.VIP,
+            CommandPermission.FOLLOWER
+        ];
         await newCommand.save(channel);
 
         return res.json({
