@@ -19,7 +19,7 @@ const getRandomFact = () => {
 const RandomMessageCommand = new Command(
     'random',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Devuelve un mensaje aleatorio.',
     {},
     '', // System commands don't need a response

@@ -40,7 +40,7 @@ const AddCommand = new Command(
         const command = new Command(
             commandName,
             channel.user.username,
-            [CommandPermission.VIEWER],
+            [CommandPermission.MODERATOR, CommandPermission.BROADCASTER],
             '',
             {
                 globalCooldown: 5,

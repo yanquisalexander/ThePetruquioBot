@@ -9,6 +9,7 @@ import User from "./User.model";
 
 
 enum CommandPermission {
+    EVERYONE = 'everyone',
     VIEWER = 'viewer',
     FOLLOWER = 'follower',
     SUBSCRIBER = 'subscriber',

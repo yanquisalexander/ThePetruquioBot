@@ -139,6 +139,10 @@ class CommandExecutor {
 
         const commandPermissions = command.getPermissions();
 
+        if(commandPermissions.includes(CommandPermission.EVERYONE)) {
+            return true;
+        }
+
         if (commandPermissions.includes(CommandPermission.VIEWER)) {
             return user.isViewer;
         }

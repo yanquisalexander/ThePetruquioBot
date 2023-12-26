@@ -11,7 +11,7 @@ import Twitch from "../modules/Twitch.module";
 const MapEmoteCommand = new Command(
     'emote',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Permite al espectador cambiar su emote en el mapa de la comunidad.',
     {},
     '', // System commands don't need a response

@@ -9,7 +9,7 @@ import SocketIO from "../modules/SocketIO.module";
 const MaskCommand = new Command(
     'mask',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Permite al espectador ocultar su identidad en el mapa de la comunidad.',
     {},
     '', // System commands don't need a response

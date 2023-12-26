@@ -110,15 +110,19 @@ class CommandsController {
             command.response = response;
         }
 
-        if(aliases) {
+        if (aliases) {
             command.preferences.aliases = aliases;
         }
 
-        if(permissions) {
-            command.permissions = permissions;
+        if (permissions) {
+            if (CommandPermission.EVERYONE in permissions) {
+                command.permissions = [CommandPermission.EVERYONE];
+            } else {
+                command.permissions = permissions;
+            }
         }
 
-        if(enabled !== undefined) {
+        if (enabled !== undefined) {
             command.enabled = enabled;
         }
 
@@ -218,15 +222,10 @@ class CommandsController {
                 return res.status(400).json({ error: 'Command already exists' });
             }
 
-            const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), impersonatedChannel.user.username, [CommandPermission.VIEWER], '', {}, response);
+            const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), impersonatedChannel.user.username, [CommandPermission.EVERYONE], '', {}, response);
             newCommand.enabled = true; // By default, commands are enabled
             newCommand.permissions = [
-                CommandPermission.VIEWER,
-                CommandPermission.SUBSCRIBER,
-                CommandPermission.MODERATOR,
-                CommandPermission.BROADCASTER,
-                CommandPermission.VIP,
-                CommandPermission.FOLLOWER
+                CommandPermission.EVERYONE
             ];
             await newCommand.save(impersonatedChannel);
 
@@ -266,12 +265,7 @@ class CommandsController {
         const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [CommandPermission.VIEWER], '', {}, response);
         newCommand.enabled = true; // By default, commands are enabled
         newCommand.permissions = [
-            CommandPermission.VIEWER,
-            CommandPermission.SUBSCRIBER,
-            CommandPermission.MODERATOR,
-            CommandPermission.BROADCASTER,
-            CommandPermission.VIP,
-            CommandPermission.FOLLOWER
+            CommandPermission.EVERYONE
         ];
         await newCommand.save(channel);
 

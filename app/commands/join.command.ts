@@ -5,7 +5,7 @@ import User from "../models/User.model";
 const JoinCommand = new Command(
     'join',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Une el bot a tu canal.',
     {},
     '', // System commands don't need a response

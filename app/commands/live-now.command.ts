@@ -6,7 +6,7 @@ import Twitch from "../modules/Twitch.module";
 const LiveNowCommand = new Command(
     'livenow',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Devuelve los canales en vivo en Petruquio.LIVE',
     {},
     '', // System commands don't need a response

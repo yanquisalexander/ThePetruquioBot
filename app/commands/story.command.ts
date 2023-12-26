@@ -4,7 +4,7 @@ import { Command, CommandPermission } from "../models/Command.model";
 const StoryCommand = new Command(
     'story',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Añade una contribución a la historia.',
     {},
     '', // System commands don't need a response
