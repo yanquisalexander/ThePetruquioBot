@@ -227,8 +227,13 @@ class CommandsController {
             newCommand.permissions = [
                 CommandPermission.EVERYONE
             ];
-            await newCommand.save(impersonatedChannel);
+            try {
+                await newCommand.save(impersonatedChannel);
 
+            } catch (error) {
+                console.log(error);
+                return res.status(500).json({ error: 'Error while saving command' });
+            }
             return res.json({
                 success: true,
                 data: {
@@ -267,8 +272,13 @@ class CommandsController {
         newCommand.permissions = [
             CommandPermission.EVERYONE
         ];
-        await newCommand.save(channel);
+        try {
+            await newCommand.save(channel);
 
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: 'Error while saving command' });
+        }
         return res.json({
             success: true,
             data: {
