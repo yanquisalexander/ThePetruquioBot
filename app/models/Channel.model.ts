@@ -182,12 +182,15 @@ function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
         }
       }
     }
-  
+
     const orderedPrefs: any = {};
-    Object.keys(mergedPrefs).sort().forEach(function (key) {
-      orderedPrefs[key] = mergedPrefs[key];
-    });
-  
+
+    for (const key in defaultPrefs) {
+        if (Object.prototype.hasOwnProperty.call(defaultPrefs, key)) {
+            orderedPrefs[key] = mergedPrefs[key];
+        }
+    }
+
     return orderedPrefs;
   }
   
