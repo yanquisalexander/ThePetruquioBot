@@ -3,7 +3,7 @@ import GreetingsManager from '../app/modules/GreetingsManager.module';
 import 'dotenv/config'
 
 class ChatUser {
-    constructor(private userstate: ChatUserstate, private message?: string) {}
+    constructor(private userstate: ChatUserstate, private message?: string) { }
 
     get id(): number {
         return parseInt(this.userstate['user-id'] || '0');
@@ -12,7 +12,7 @@ class ChatUser {
     get messageId(): string {
         return this.userstate.id || '';
     }
-    
+
     get rawMessage(): string {
         return this.message || '';
     }
@@ -21,13 +21,21 @@ class ChatUser {
         return this.userstate.color || '';
     }
 
+    get isBroadcaster(): boolean {
+        return this.userstate.badges && this.userstate.badges.broadcaster === '1' || false;
+    }
+
     get isModerator(): boolean {
         return this.userstate['user-type'] === 'mod' || (this.userstate.badges && this.userstate.badges.moderator === '1') || this.isBroadcaster || this.isBotOwner || false;
     }
 
-    get isBroadcaster(): boolean {
-        return this.userstate.badges && this.userstate.badges.broadcaster === '1' || false;
+    get isMod(): boolean {
+        /* 
+            Same as isModerator, but broadcaster is not considered a mod (Used only on CommandPermissions)
+        */
+        return this.userstate['user-type'] === 'mod' || (this.userstate.badges && this.userstate.badges.moderator === '1') || this.isBotOwner || false;
     }
+
 
     get isSubscriber(): boolean {
         return !!this.userstate.subscriber;

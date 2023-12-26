@@ -149,7 +149,7 @@ class CommandExecutor {
                     if (user.isBroadcaster) return true;
                     break;
                 case CommandPermission.MODERATOR:
-                    if (user.isModerator) return true;
+                    if (user.isMod) return true;
                     break;
                 case CommandPermission.SUBSCRIBER:
                     if (user.isSubscriber) return true;
