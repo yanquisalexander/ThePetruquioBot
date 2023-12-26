@@ -160,11 +160,7 @@ class CommandExecutor {
             }
         }
 
-        /*
-            Everyone can use the command if it has no permissions
-        */
-
-        return true;
+        return false;
     }
 
 
