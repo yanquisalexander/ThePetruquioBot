@@ -41,6 +41,13 @@ class ChatUser {
         return GreetingsManager.knownBots.includes(this.username);
     }
 
+    get isViewer(): boolean {
+        /*
+            Todo usuario que no tenga ninguna distinción en el canal, será considerado un viewer.
+        */
+        return !this.isModerator && !this.isBroadcaster && !this.isBot && !this.isVIP && !this.isSubscriber && !this.isBotOwner;
+    }
+
     get displayName(): string {
         return this.userstate['display-name'] || this.userstate.username || '';
     }

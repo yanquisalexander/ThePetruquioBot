@@ -10,16 +10,16 @@ import Environment from '../utils/environment';
 async function importCommandModules() {
     const commandFiles = await fs.readdir('./app/commands');
     const commandModules = [];
-  
+
     for (const file of commandFiles) {
-      if (file.endsWith('.command.ts')) {
-        const module = await import(`../app/commands/${file}`);
-        commandModules.push(module.default);
-      }
+        if (file.endsWith('.command.ts')) {
+            const module = await import(`../app/commands/${file}`);
+            commandModules.push(module.default);
+        }
     }
-  
+
     return commandModules;
-  }
+}
 
 
 const cooldowns = new Map();
@@ -50,24 +50,24 @@ class CommandExecutor {
     async loadCommands(): Promise<Command[]> {
         const systemCommandsArray = await importCommandModules();
         const commands = [];
-    
+
         if (!Array.isArray(systemCommandsArray)) {
             throw new Error('systemCommandsArray debe ser una matriz');
         }
 
-    
+
         for (let command of systemCommandsArray) {
             if (!command || !command.name || !command.execute) {
                 console.log(`[COMMAND EXECUTOR] ${chalk.red('ERROR:')} Command ${command.name} is invalid.`);
             }
-    
+
             commands.push(command);
             console.log(
                 chalk.green('[COMMAND EXECUTOR]'),
                 chalk.white(`Loaded command ${command.name}.`)
             );
         }
-    
+
         return commands;
     }
 
@@ -92,12 +92,12 @@ class CommandExecutor {
         }
         else {
             let command = await Command.find(channelData, commandName);
-            if(!command) {
+            if (!command) {
                 try {
                     let channelCommands = await Command.getChannelCommands(channelData);
-                    if(channelCommands) {
-                        for(let channelCommand of channelCommands) {
-                            if(channelCommand.preferences.aliases?.includes(commandName)) {
+                    if (channelCommands) {
+                        for (let channelCommand of channelCommands) {
+                            if (channelCommand.preferences.aliases?.includes(commandName)) {
                                 command = channelCommand;
                                 break;
                             }
@@ -117,7 +117,7 @@ class CommandExecutor {
                     return;
                 }
 
-                if(!command.enabled) {
+                if (!command.enabled) {
                     return;
                 }
 
@@ -136,25 +136,33 @@ class CommandExecutor {
         if (!user) {
             return false;
         }
-    
+
         const commandPermissions = command.getPermissions();
-    
+
+        if (commandPermissions.includes(CommandPermission.VIEWER)) {
+            return user.isViewer;
+        }
+
         for (const permission of commandPermissions) {
             switch (permission) {
                 case CommandPermission.BROADCASTER:
                     if (user.isBroadcaster) return true;
+                    break;
                 case CommandPermission.MODERATOR:
                     if (user.isModerator) return true;
+                    break;
                 case CommandPermission.SUBSCRIBER:
                     if (user.isSubscriber) return true;
+                    break;
                 case CommandPermission.VIP:
                     if (user.isVIP) return true;
+                    break;
             }
         }
-    
-        return command.permissions.includes(CommandPermission.VIEWER);
+
+        return false;
     }
-    
+
 
     private checkCooldowns(user: ChatUser, command: Command, channel: Channel): boolean {
         if (!cooldowns.has(channel.user.username)) {
