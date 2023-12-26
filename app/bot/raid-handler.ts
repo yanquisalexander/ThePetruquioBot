@@ -5,6 +5,7 @@ import GreetingsManager from "../modules/GreetingsManager.module";
 import Twitch from "../modules/Twitch.module";
 import Shoutout from "../models/Shoutout.model";
 import { defaultShoutoutMessages } from "../constants/Greetings.constants";
+import Greeting from "../models/Greeting.model";
 
 export const handleRaid = async (channel: string, username: string, viewers: number) => {
     console.log(chalk.green('[BOT]'), chalk.yellow(`${chalk.bold.cyan(username)} raided #${chalk.bold.cyan(channel)} with ${chalk.bold.cyan(viewers)} viewers`));
@@ -34,6 +35,11 @@ export const handleRaid = async (channel: string, username: string, viewers: num
             if (!shoutout) {
                 shoutoutMessage = raider.preferences.shoutoutPresentation?.value || defaultShoutoutMessages[Math.floor(Math.random() * defaultShoutoutMessages.length)];
             } else {
+                try {
+                    await Greeting.updateShoutoutTimestamp(raider.user, channelData) // Prevents shoutout greeting
+                } catch (error) {
+                    console.error(error);
+                }
                 shoutoutMessage = shoutout.messages[Math.floor(Math.random() * shoutout.messages.length)];
             }
 
