@@ -6,7 +6,7 @@ import Twitch from "../modules/Twitch.module";
 const UserUpdateCommand = new Command(
     'user-update',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Actualiza los datos del usuario en la base de datos.',
     {},
     '', // System commands don't need a response

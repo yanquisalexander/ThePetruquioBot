@@ -10,7 +10,7 @@ import Twitch from "../modules/Twitch.module";
 const MapMessageCommand = new Command(
     'msg',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Permite al espectador cambiar su mensaje en el mapa de la comunidad.',
     {},
     '', // System commands don't need a response

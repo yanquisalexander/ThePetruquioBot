@@ -5,7 +5,7 @@ import User from "../models/User.model";
 const BirthdayCommand = new Command(
     'bday',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Actualiza tu fecha de cumpleaños.',
     {},
     '', // System commands don't need a response

@@ -8,7 +8,7 @@ import SocketIO from "../modules/SocketIO.module";
 const FromCommand = new Command(
     'from',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Actualiza tu ubicación en el Community Map.',
     {},
     '', // System commands don't need a response

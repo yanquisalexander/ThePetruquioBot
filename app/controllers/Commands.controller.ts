@@ -267,7 +267,7 @@ class CommandsController {
             return res.status(400).json({ error: 'Command already exists' });
         }
 
-        const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [CommandPermission.VIEWER], '', {}, response);
+        const newCommand = new Command(name.toLowerCase().replace('!', '').replace(/ /g, '-'), channel.user.username, [CommandPermission.EVERYONE], '', {}, response);
         newCommand.enabled = true; // By default, commands are enabled
         newCommand.permissions = [
             CommandPermission.EVERYONE

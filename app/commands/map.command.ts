@@ -18,7 +18,7 @@ const getDefaultMessage = () => {
 const MapCommand = new Command(
     'map',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Devuelve el link al mapa de la comunidad en el canal especificado.',
     {},
     '', // System commands don't need a response

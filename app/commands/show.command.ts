@@ -9,7 +9,7 @@ import SocketIO from "../modules/SocketIO.module";
 const ShowCommand = new Command(
     'show',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Permite al espectador mostrar su ubicación en el mapa de la comunidad.',
     {},
     '', // System commands don't need a response
