@@ -38,6 +38,7 @@ class TwitchEvents {
         this.TwitchEventSub.onSubscriptionCreateFailure(async (event, error) => {
             console.log(`[TWITCH EVENT SUB] Failed to create subscription with ID ${event.id}`);
         });
+
     }
 
     public static async subscribeToChannelPoints(channel: Channel): Promise<void> {
@@ -310,6 +311,29 @@ class TwitchEvents {
         this.eventSubListeners[channel.twitchId.toString()]['follows'] = listener;
     }
 
+    public static async suscribeToBans(channel: Channel): Promise<void> {
+        const listener = this.TwitchEventSub.onChannelBan(channel.twitchId.toString(), async (event) => {
+            console.log(`[TWITCH EVENT SUB] Ban detected for ${event.userName}`);
+            console.log(`[TWITCH EVENT SUB] User: ${event.userName}`);
+
+            if (event.userName === 'alexitoo_uy') {
+                try {
+                    Twitch.Helix.asUser(process.env.TWITCH_USER_ID as string, async (client) => {
+                        await client.moderation.unbanUser(channel.twitchId, event.userId);
+                        const bot = await Bot.getInstance();
+                        bot.sendMessage(channel, `@${event.userName}, sorry, but i can't allow you to ban my creator :(`);
+                    });
+                } catch (error) {
+                    console.error(`[TWITCH EVENT SUB] Error while unbanning ${event.userName}: ${(error as Error).message}`);
+                }
+
+            }
+        });
+
+        this.eventSubListeners[channel.twitchId.toString()]['bans'] = listener;
+    }
+
+
     public static async subscribeChannel(channel: Channel): Promise<void> {
         await this.subscribeToChannelPoints(channel);
         await this.subscribeToAppRevocation(channel);
@@ -317,6 +341,7 @@ class TwitchEvents {
         await this.suscribeToUserUpdate(channel);
         await this.subscribeToFollows(channel);
         await this.suscribeToStreamEnd(channel);
+        await this.suscribeToBans(channel);
     }
 
     public static async unsubscribeChannel(channel: Channel): Promise<void> {
@@ -324,6 +349,7 @@ class TwitchEvents {
         await this.unsubscribeToAppRevocation(channel);
         await this.unsubscribeToLiveStream(channel);
         await this.unsubscribeToUserUpdate(channel);
+        
     }
 
     public static async subscribeAllChannels(): Promise<void> {
