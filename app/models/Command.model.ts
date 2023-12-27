@@ -16,6 +16,7 @@ enum CommandPermission {
     VIP = 'vip',
     MODERATOR = 'moderator',
     BROADCASTER = 'broadcaster',
+    BOT_OWNER = 'bot_owner',
 }
 
 interface CommandPreferences {

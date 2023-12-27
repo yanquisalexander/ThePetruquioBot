@@ -13,7 +13,7 @@ export const langExpl = [
 const LanguageCommand = new Command(
     'lang',
     '*',
-    [CommandPermission.VIEWER],
+    [CommandPermission.EVERYONE],
     'Devuelve un mensaje explicando el uso del módulo de traducción.',
     {},
     '', // System commands don't need a response

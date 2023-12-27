@@ -161,6 +161,9 @@ class CommandExecutor {
                 case CommandPermission.VIP:
                     if (user.isVIP) return true;
                     break;
+                case CommandPermission.BOT_OWNER:
+                    if (user.isBotOwner) return true;
+                    break;
             }
         }
 

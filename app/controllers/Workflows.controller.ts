@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { ExpressUser } from '../interfaces/ExpressUser.interface';
 import Workflow, { EventType } from '../models/Workflow.model';
 import CurrentUser from '../../lib/CurrentUser';
+import WorkflowLog from "../models/WorkflowLog.model";
 
 class WorkflowsController {
     static async getWorkflows(req: Request, res: Response) {
@@ -29,7 +30,7 @@ class WorkflowsController {
         const currentUser = new CurrentUser(req.user as ExpressUser);
         const { event_type, script } = req.body;
 
-        if(Object.values(EventType).indexOf(event_type) === -1) {
+        if (Object.values(EventType).indexOf(event_type) === -1) {
             return res.status(400).json({ error: `${event_type} is not a valid event type` });
         }
 
@@ -111,6 +112,53 @@ class WorkflowsController {
         return res.json({
             message: 'Workflow deleted successfully',
         });
+    }
+
+    static async getLogs(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+
+        const user = await currentUser.getCurrentUser();
+        const channel = await user?.getChannel();
+
+        if (!user || !channel) {
+            return res.status(404).json({ error: 'User or channel not found' });
+        }
+
+        try {
+            const logs = await WorkflowLog.findAll(channel)
+            return res.json({
+                data: {
+                    logs,
+                },
+            });
+        } catch (error) {
+            return res.status(404).json({ error: 'Cannot find logs' });
+        }
+    }
+
+    static async deleteLog(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+        const { log_id } = req.params;
+
+        const user = await currentUser.getCurrentUser();
+        const channel = await user?.getChannel();
+
+        if (!user || !channel) {
+            return res.status(404).json({ error: 'User or channel not found' });
+        }
+
+        try {
+            const log = await WorkflowLog.find(log_id);
+            if(!log) {
+                return res.status(404).json({ error: 'Log not found' });
+            }
+            await log.delete();
+            return res.json({
+                message: 'Log deleted successfully',
+            });
+        } catch (error) {
+            return res.status(404).json({ error: 'Cannot find log' });
+        }
     }
 }
 

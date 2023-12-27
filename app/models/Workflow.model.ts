@@ -112,7 +112,7 @@ class Workflow {
             console.log('[Workflow] Execution Status:', executionSuccess ? 'Success' : 'Failure');
 
             try {
-                await WorkflowLog.create(this.eventType, this.script, executionSuccess, this.channel)
+                await WorkflowLog.create(this.eventType, this.script, executionSuccess, this.channel, executionLog.join('\n'));
             } catch (error) {
                 console.error(error);
                 console.error(`[Workflow] Failed to create workflow log for workflow ${this.eventType} for channel ${this.channel.user.displayName}.`);

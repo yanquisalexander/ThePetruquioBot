@@ -59,7 +59,8 @@ router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { s
 router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
 router.put('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.updateWorkflow);
 router.delete('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteWorkflow);
-
+router.get('/channel/workflows/logs', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getLogs);
+router.delete('/channel/workflows/logs/:log_id', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteLog);
 
 router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts);
 router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout);
