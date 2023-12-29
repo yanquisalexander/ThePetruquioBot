@@ -164,18 +164,18 @@ class AdminController {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        const channel = await user.getChannel();
+        const channel = await userToImpersonate.getChannel();
 
         if(!channel) {
             return res.status(404).json({ error: 'You cannot impersonate a user without a channel' });
         }
 
-        const targetChannel = await userToImpersonate.getChannel();
 
         const audit = new Audit({
-            targetChannel,
+            channel,
             user: user,
             type: AuditType.IMPERSONATED_BY_ADMIN,
+            data: {}
         });
 
         try {
