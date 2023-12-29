@@ -4,6 +4,8 @@ import { RefreshingAuthProvider, AppTokenAuthProvider, TokenInfo, TokenInfoData,
 import chalk from "chalk";
 import UserToken from "../models/UserToken.model";
 import Environment from "../../utils/environment";
+import User from "../models/User.model";
+import Audit, { AuditType } from "../models/Audit.model";
 
 const TWITCH_SCOPES = [
     'user:edit',
@@ -97,6 +99,23 @@ class TwitchAuthenticator {
                 }
                 userToken.tokenData = token;
                 await userToken.save();
+
+                const user = await User.findByTwitchId(parseInt(userId));
+                const botAccount = await User.findByTwitchId(parseInt(process.env.TWITCH_USER_ID as string));
+                const channel = await user?.getChannel();
+
+                const audit = new Audit({
+                    channel,
+                    user: botAccount,
+                    type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
+                    data: {}
+                });
+
+                try {
+                    await audit.save();
+                } catch (error) {
+                    console.error(error);
+                }
             },
             // @ts-ignore
             onRefreshFailure: (userId) => {
