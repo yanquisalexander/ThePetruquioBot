@@ -9,6 +9,7 @@ import TwitchEvents from '../modules/TwitchEvents.module';
 import ExternalAccount, { ExternalAccountProvider } from "../models/ExternalAccount.model";
 import Passport from "../../lib/Passport";
 import CurrentUser from "../../lib/CurrentUser";
+import Audit, { AuditType } from "../models/Audit.model";
 
 
 class AccountsController {
@@ -82,6 +83,22 @@ class AccountsController {
             }, process.env.JWT_SECRET || 'secret', { expiresIn: '30d' });
 
             await TwitchEvents.subscribeChannel(channel)
+
+            const audit = new Audit({
+                channel,
+                user,
+                type: AuditType.LOGIN_SUCCESS,
+                data: {
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent'],
+                },
+            });
+
+            try {
+                await audit.save();
+            } catch (error) {
+                console.error(error);
+            }
 
             res.json({ token: customToken });
         } catch (error) {
@@ -234,8 +251,8 @@ class AccountsController {
         res: Response
     ) {
         Passport.getPassport().authorize(strategy, { session: false }, async (err: any, profile: { id: string; }, info: {
-            expires_in: number; accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined; 
-}) => {
+            expires_in: number; accessToken: string | undefined; refreshToken: string | undefined; expiresAt: Date | undefined;
+        }) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({ error: 'Failed to link account' });

@@ -14,6 +14,7 @@ export enum AuditType {
     WORKFLOW_CREATED = 'WORKFLOW_CREATED',
     WORKFLOW_UPDATED = 'WORKFLOW_UPDATED',
     WORKFLOW_DELETED = 'WORKFLOW_DELETED',
+    LOGIN_SUCCESS = 'LOGIN_SUCCESS',
 }
 
 export class AuditDTO {
@@ -35,7 +36,6 @@ export class AuditDTO {
         this.createdAt = data.createdAt;
     }
 }
-
 
 
 class Audit {
