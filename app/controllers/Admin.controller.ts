@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { exec } from "child_process";
 import Session from "../models/Session.model";
 import AdminDashboardProblems from "../models/admin/DashboardProblems.model";
+import Audit, { AuditType } from "../models/Audit.model";
 
 const removeAnsiColors = (str: string) => str.replace(/\u001b\[[0-9]{1,2}m/g, '');
 
@@ -167,6 +168,20 @@ class AdminController {
 
         if(!channel) {
             return res.status(404).json({ error: 'You cannot impersonate a user without a channel' });
+        }
+
+        const targetChannel = await userToImpersonate.getChannel();
+
+        const audit = new Audit({
+            targetChannel,
+            user: user,
+            type: AuditType.IMPERSONATED_BY_ADMIN,
+        });
+
+        try {
+            await audit.save();
+        } catch (error) {
+            console.error(error);
         }
 
         await session.setImpersonate(userToImpersonate.twitchId);
