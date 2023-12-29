@@ -212,7 +212,11 @@ class TwitchEvents {
                 const workflow = await Workflow.find(channel, EventType.OnStreamStarted);
 
                 if (workflow) {
-                    await workflow.execute(event);
+                    await workflow.execute({
+                        ...event,
+                        streamInfo,
+                        channel: channelData,
+                    });
                 }
             } else {
                 console.log(`[TWITCH EVENT SUB] Channel ${event.broadcasterDisplayName} (${event.broadcasterName}) not found on database. Skipping...`);
@@ -220,6 +224,10 @@ class TwitchEvents {
 
         });
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
+
+        if (Environment.isDevelopment) {
+            console.log(await listener.getCliTestCommand());
+        }
     }
 
 
@@ -350,6 +358,27 @@ class TwitchEvents {
         this.eventSubListeners[channel.twitchId.toString()]['bans'] = listener;
     }
 
+    public static async unsubscribeToFollows(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['follows'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async unsubscribeToBans(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['bans'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
+    public static async unsubscribeToStreamEnd(channel: Channel): Promise<void> {
+        const listener = this.eventSubListeners[channel.twitchId.toString()]['stream-end'];
+        if (listener) {
+            listener.stop();
+        }
+    }
+
 
     public static async subscribeChannel(channel: Channel): Promise<void> {
         await this.subscribeToChannelPoints(channel);
@@ -366,6 +395,9 @@ class TwitchEvents {
         await this.unsubscribeToAppRevocation(channel);
         await this.unsubscribeToLiveStream(channel);
         await this.unsubscribeToUserUpdate(channel);
+        await this.unsubscribeToFollows(channel);
+        await this.unsubscribeToStreamEnd(channel);
+        await this.unsubscribeToBans(channel);
 
     }
 

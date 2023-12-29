@@ -98,13 +98,13 @@ class Workflow {
         try {
             console.log(`[Workflow] Executing workflow ${this.eventType} for channel ${this.channel.user.displayName}`);
             console.log(`[Workflow] Script: ${this.script}`);
-
-            vm.run(this.script);
+            vm.run(this.script)
 
 
             console.log(`[Workflow] Workflow ${this.eventType} for channel ${this.channel.user.displayName} executed successfully.`);
         } catch (error) {
             executionSuccess = false;
+            executionLog.push((error as Error).message);
             console.error(error);
             console.error(`[Workflow] Workflow ${this.eventType} for channel ${this.channel.user.displayName} failed to execute.`);
         } finally {

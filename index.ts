@@ -79,3 +79,7 @@ const initializeApp = async () => {
 }
 
 initializeApp();
+
+process.on('uncaughtException', (err) => {
+    console.error('Asynchronous error caught.', err);
+});
