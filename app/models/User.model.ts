@@ -6,6 +6,7 @@ import Greeting from "./Greeting.model";
 import MessageLogger from "./MessageLogger.model";
 import Twitch from "../modules/Twitch.module";
 import ExternalAccount, { ExternalAccountProvider } from "./ExternalAccount.model";
+import Notification from "./Notification.model";
 
 
 class User {
@@ -157,6 +158,10 @@ class User {
 
     async getLinkedAccount(provider: ExternalAccountProvider): Promise<ExternalAccount | null> {
         return await ExternalAccount.findByProviderAndUser(provider, this);
+    }
+
+    async getUnreadNotificationsCount(): Promise<number> {
+        return await Notification.getUnreadCount(this);
     }
 }
 

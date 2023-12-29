@@ -1,5 +1,6 @@
 import Database from "../../lib/DatabaseManager";
 import { ChannelPreferences, defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
+import Audit, { AuditDTO } from "./Audit.model";
 import { Command } from "./Command.model";
 import CommunityBook from "./CommunityBook.model";
 import Shoutout from "./Shoutout.model";
@@ -123,6 +124,11 @@ class Channel {
     public async getWorkflows(): Promise<Workflow[]> {
         return await Workflow.findAll(this);
     }
+
+    public async getAudits(): Promise<AuditDTO[] | null> {
+        return await Audit.getAuditsByChannel(this);
+    }
+
 
     public static async findOrCreate(id: number): Promise<Channel> {
         const channel = await Channel.findByTwitchId(id);

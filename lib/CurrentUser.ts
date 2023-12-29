@@ -46,6 +46,20 @@ class CurrentUser {
 
         return channel.preferences
     }
+
+    get isImpersonating(): boolean {
+        return !!this.expressUser.session.impersonatedUserId;
+    }
+
+    async getOriginalUser(): Promise<User | null> {
+        const session = await Session.findBySessionId(this.expressUser.session.sessionId);
+
+        if (!session) {
+            return null;
+        }
+
+        return User.findByTwitchId(this.expressUser.session.userId) || null;
+    }
 }
 
 export default CurrentUser;

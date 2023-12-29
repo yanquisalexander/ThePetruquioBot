@@ -127,6 +127,8 @@ class AccountsController {
                 return res.status(404).json({ error: 'Impersonated channel not found' })
             }
 
+            const unreads = await impersonatedUser.getUnreadNotificationsCount();
+
             user = {
                 ...user,
                 id: impersonatedUser.twitchId.toString(),
@@ -135,7 +137,8 @@ class AccountsController {
                 email: impersonatedUser.email || null,
                 displayName: impersonatedUser.displayName || impersonatedUser.username,
                 avatar: impersonatedUser.avatar || `https://decapi.me/twitch/avatar/${impersonatedUser.username}`,
-                channel: impersonatedChannel
+                channel: impersonatedChannel,
+                unread_notifications_count: unreads
             }
 
             if (!user) {

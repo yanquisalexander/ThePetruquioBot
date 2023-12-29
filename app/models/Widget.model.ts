@@ -121,6 +121,27 @@ class Widget {
             throw new Error('Error finding widget in database.');
         }
     }
+
+    static async findPublic(_id: string): Promise<any> {
+        try {
+            const query = `SELECT json, channel_id FROM widgets WHERE id = $1`;
+            const values = [_id];
+            const result = await Database.query(query, values);
+            if (result.rows.length === 0) {
+                throw new Error('Widget not found.');
+            }
+            const row = result.rows[0];
+
+            return {
+                json: row.json,
+                channel_id: row.channel_id
+            };
+
+        } catch (error) {
+            console.log(error);
+            throw new Error('Error finding widget in database.');
+        }
+    }
 }
 
 

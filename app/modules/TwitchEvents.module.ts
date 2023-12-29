@@ -12,6 +12,8 @@ import chalk from "chalk";
 import EmailManager from "./EmailManager.module";
 import TwitchAuthenticator from "./TwitchAuthenticator.module";
 import UserToken from "../models/UserToken.model";
+import SocketIO from "./SocketIO.module";
+import Notification, { NotificationType } from "../models/Notification.model";
 
 type EventSubSubscription = ReturnType<EventSubMiddleware['onChannelRedemptionAdd']>;
 
@@ -162,6 +164,18 @@ class TwitchEvents {
                     } catch (error) {
                         console.error(`[TWITCH EVENT SUB] Error while sending email to ${channel.user.email}: ${(error as Error).message}`);
                     }
+
+                    try {
+                        const notification = new Notification({
+                            user: channel.user,
+                            type: NotificationType.ACCOUNT_SECURITY,
+                            title: 'Tu cuenta de Twitch ha sido desconectada',
+                            message: `Hemos detectado que tu cuenta de Twitch ha sido desconectada de Petruquio.LIVE. Si no has sido tú, te recomendamos que cambies tu contraseña de Twitch y actives la autenticación de dos factores.`
+                        })
+                        await notification.save();
+                    } catch (error) {
+                        console.error(`[TWITCH EVENT SUB] Error while saving notification for ${channel.user.username}: ${(error as Error).message}`);
+                    }
                 }
             } else {
                 console.log(`[TWITCH EVENT SUB] User ${event.userDisplayName} (${event.userName}) not found on database. Skipping...`);
@@ -205,13 +219,6 @@ class TwitchEvents {
             }
 
         });
-
-        if (Environment.isDevelopment) {
-            console.log(await listener.getCliTestCommand());
-        }
-
-
-
         this.eventSubListeners[channel.twitchId.toString()]['live-stream'] = listener;
     }
 
@@ -291,6 +298,12 @@ class TwitchEvents {
             if (user) {
                 const channel = await user.getChannel();
                 if (channel) {
+                    SocketIO.getInstance().emitEvent(`events:channel.${channel.twitchId}`, 'event', {
+                        type: 'follow',
+                        data: {
+                            user: event.userName,
+                        }
+                    });
                     if (channel.preferences.enableFollowAlerts?.value) {
                         let message = `@${event.userName}, welcome in to the community! PopNemo`;
 
@@ -309,6 +322,10 @@ class TwitchEvents {
         });
 
         this.eventSubListeners[channel.twitchId.toString()]['follows'] = listener;
+
+        if (Environment.isDevelopment) {
+            console.log(await listener.getCliTestCommand());
+        }
     }
 
     public static async suscribeToBans(channel: Channel): Promise<void> {
@@ -349,14 +366,11 @@ class TwitchEvents {
         await this.unsubscribeToAppRevocation(channel);
         await this.unsubscribeToLiveStream(channel);
         await this.unsubscribeToUserUpdate(channel);
-        
+
     }
 
     public static async subscribeAllChannels(): Promise<void> {
-        if (Environment.isDevelopment) {
-            console.log(chalk.bgYellow('[TWITCH EVENT SUB]'), chalk.yellow('Development mode enabled. Skipping subscriptions.'));
-            return;
-        }
+
         const channels = await Channel.getAutoJoinChannels();
         for (const channel of channels) {
             if (!this.eventSubListeners[channel.twitchId.toString()]) {

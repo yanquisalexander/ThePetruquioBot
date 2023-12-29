@@ -66,6 +66,7 @@ router.delete('/channel/workflows/logs/:log_id', Passport.getPassport().authenti
 router.post('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.createWidget);
 router.get('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.getWidgets);
 router.get('/channel/widgets/:widgetId', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.getWidget);
+router.put('/channel/widgets/:widgetId', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.updateWidget);
 
 router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts);
 router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout);
@@ -84,7 +85,7 @@ router.get('/worldmap/:channelName/splash.json', WorldMapController.getSplashEmo
 router.get('/worldmap/:channelName', WorldMapController.getWorldMap);
 router.get('/worldmap/:channelName/user-card/:username', WorldMapController.getUserCard);
 
-
+router.get('/audits', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getAudits);
 
 router.get('/community-books/:channelName', CommunityBooksController.getCommunityBooks);
 router.get('/community-books/:channelName/:communityBookId', CommunityBooksController.getCommunityBook);
@@ -104,6 +105,8 @@ router.get('/extras/:channelName/got-talent', ExtrasController.getGotTalentConfi
 router.post('/extras/:channelName/got-talent/red-button', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.addCrossTalentJudge);
 router.post('/extras/:channelName/got-talent/golden-buzzer', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.goldenBuzzerTalentJudge);
 
+
+router.get('/widgets/:widgetId', WidgetsController.getWidgetConfig);
 
 
 export default router;

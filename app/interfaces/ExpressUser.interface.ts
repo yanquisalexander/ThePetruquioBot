@@ -8,7 +8,12 @@ export interface ExpressUser {
     displayName: string | null;
     session: {
         sessionId: number;
+        impersonatedUserId: number | null;
+        userId: number;
+        createdAt: Date;
     };
+    admin: boolean;
+    unread_notifications_count: number;
     channel?: Channel;
     avatar: string;
 }

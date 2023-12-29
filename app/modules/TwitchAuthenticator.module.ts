@@ -88,7 +88,7 @@ class TwitchAuthenticator {
             clientId: this.clientId,
             clientSecret: this.clientSecret,
             // @ts-ignore
-            onRefresh: async (userId, token) => {
+            onRefresh: async (userId: string, token: AccessToken) => {
                 console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.white(`Refreshing token for user ${userId}`));
                 const userToken = await UserToken.findByUserId(parseInt(userId));
                 if (!userToken) {
