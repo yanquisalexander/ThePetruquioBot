@@ -30,8 +30,6 @@ const TWITCH_SCOPES = [
     'channel:manage:redemptions',
     'channel:read:editors',
     'channel:manage:videos',
-    'user:read:blocked_users',
-    'user:manage:blocked_users',
     'user:read:subscriptions',
     'user:read:follows',
     'channel:manage:polls',

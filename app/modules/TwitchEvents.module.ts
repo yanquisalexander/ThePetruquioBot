@@ -353,7 +353,7 @@ class TwitchEvents {
                 }
 
             }
-        });
+        })
 
         this.eventSubListeners[channel.twitchId.toString()]['bans'] = listener;
     }

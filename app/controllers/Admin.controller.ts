@@ -7,6 +7,8 @@ import { exec } from "child_process";
 import Session from "../models/Session.model";
 import AdminDashboardProblems from "../models/admin/DashboardProblems.model";
 import Audit, { AuditType } from "../models/Audit.model";
+import UserToken from "../models/UserToken.model";
+import TwitchAuthenticator from "../modules/TwitchAuthenticator.module";
 
 const removeAnsiColors = (str: string) => str.replace(/\u001b\[[0-9]{1,2}m/g, '');
 
@@ -20,7 +22,7 @@ class AdminController {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        if(!user.admin) {
+        if (!user.admin) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
@@ -137,8 +139,8 @@ class AdminController {
 
         const session = await Session.findBySessionId(currentUser.session.sessionId);
 
-    
-        
+
+
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
@@ -148,7 +150,7 @@ class AdminController {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
@@ -166,7 +168,7 @@ class AdminController {
 
         const channel = await userToImpersonate.getChannel();
 
-        if(!channel) {
+        if (!channel) {
             return res.status(404).json({ error: 'You cannot impersonate a user without a channel' });
         }
 
@@ -206,7 +208,7 @@ class AdminController {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        if(!session) {
+        if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
@@ -215,6 +217,65 @@ class AdminController {
         return res.json({
             sucess: true
         });
+    }
+
+    static async refreshUserToken(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (!user.admin) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const { userId } = req.params
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID is required' });
+        }
+
+        const targetUser = await User.findByTwitchId(parseInt(userId));
+        if (!targetUser) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const targetUserChannel = await targetUser.getChannel();
+        const userToken = await UserToken.findByUserId(targetUser.twitchId);
+
+        if (!userToken) {
+            return res.status(404).json({ error: "User's token not found" });
+        }
+
+
+        const audit = new Audit({
+            targetUserChannel,
+            user: user,
+            type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
+            data: {}
+        });
+
+        try {
+            const token = await TwitchAuthenticator.RefreshingAuthProvider.refreshAccessTokenForUser(targetUser.twitchId);
+            userToken.tokenData = token;
+            await userToken.save();
+
+            try {
+                await audit.save();
+            } catch (error) {
+                console.error(error);
+            }
+
+            return res.json({
+                sucess: true,
+                token,
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: (error as Error).message });
+        }
     }
 }
 
