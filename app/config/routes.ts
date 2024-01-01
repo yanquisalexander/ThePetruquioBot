@@ -27,7 +27,9 @@ router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { ses
 router.get('/accounts/login',  AccountsController.startLoginFlow);
 router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
 
+router.get('/account', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getAccount);
 router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
+router.post('/account/generate-api-token', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.generateApiToken);
 router.get('/account/messages', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getMessages);
 router.get('/external-accounts/:provider/link', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.linkExternalAccount);
 router.get('/external-accounts/:provider/callback', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.linkExternalAccountCallback);

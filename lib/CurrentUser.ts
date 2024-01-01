@@ -12,6 +12,13 @@ class CurrentUser {
     }
 
     async getCurrentUser(): Promise<User | null> {
+        if (this.expressUser.systemToken) {
+            /* 
+                If is a System Token (a.k.a API Token) don't verify session
+            */
+            return User.findByTwitchId(parseInt(this.expressUser.twitchId)) || null;
+        }
+
         const session = await Session.findBySessionId(this.expressUser.session.sessionId);
 
         if (!session) {

@@ -6,6 +6,7 @@ import UserToken from "../models/UserToken.model";
 import Environment from "../../utils/environment";
 import User from "../models/User.model";
 import Audit, { AuditType } from "../models/Audit.model";
+import Twitch from "./Twitch.module";
 
 const TWITCH_SCOPES = [
     'user:edit',

@@ -49,46 +49,70 @@ class Passport {
     private static jwtOptions = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.JWT_SECRET || 'secret',
+        passReqToCallback: true,
     }
 
     public static async setup(): Promise<void> {
         console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('Setting up passport...'));
         console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('Setting up JWT strategy...'));
-        passport.use('jwt', new JwtStrategy(this.jwtOptions, async (payload, done) => {
+        // @ts-ignore
+        passport.use('jwt', new JwtStrategy(this.jwtOptions, async (req, payload, done) => {
+            console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('JWT strategy called'));
+            console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('Payload:'), payload);
+        
             try {
-                const session = await Session.findBySessionId(payload.sessionId);
-                if (!session) {
-                    return done(null, false, { message: 'Invalid session' });
+                const isSystemToken = payload.systemToken || false;
+        
+                if (isSystemToken) {
+                    const token = req.headers.authorization?.replace('Bearer ', '');
+                    const isTokenRevoked = await User.isTokenRevoked(token);
+        
+                    if (isTokenRevoked) {
+                        return done(null, false, { message: 'This API token has been revoked' });
+                    }
                 }
-
-                const user = await User.findByTwitchId(session.userId);
+        
+                let session: Session | null = null;
+        
+                if (!isSystemToken) {
+                    session = await Session.findBySessionId(payload.sessionId);
+        
+                    if (!session) {
+                        return done(null, false, { message: 'Invalid session' });
+                    }
+                }
+        
+                const user = await User.findByTwitchId(payload.userId);
+        
                 if (!user) {
                     return done(null, false, { message: 'User not found' });
                 }
-
+        
+                const channel = await user.getChannel();
                 const linkedAccounts = await user.getLinkedAccounts();
-                let accounts = linkedAccounts.map((account) => {
-                    return {
-                        account_id: account.accountId,
-                        provider: account.provider,
-                        metadata: account.metadata,
-                        expires_at: account.expiresAt,
-                    }
-                })
-
-                let userData = {
+                const accounts = linkedAccounts.map((account) => ({
+                    account_id: account.accountId,
+                    provider: account.provider,
+                    metadata: account.metadata,
+                    expires_at: account.expiresAt,
+                }));
+        
+                const userData = {
                     ...user,
-                    session,
-                    channel: await user.getChannel(),
-                    linkedAccounts: accounts
-                }
-
+                    session: isSystemToken ? null : session,
+                    channel,
+                    linkedAccounts: accounts,
+                    systemToken: isSystemToken
+                };
+        
                 return done(null, userData);
             } catch (error) {
                 console.error(error);
                 return done(error, false, { message: 'Internal server error' });
             }
         }));
+        
+
 
         if (strategyCanBeConfigured('spotify')) {
             console.log('[PASSPORT] Configuring Spotify strategy...');

@@ -338,7 +338,7 @@ class TwitchEvents {
 
     public static async suscribeToBans(channel: Channel): Promise<void> {
         const listener = this.TwitchEventSub.onChannelBan(channel.twitchId.toString(), async (event) => {
-            console.log(`[TWITCH EVENT SUB] Ban detected for ${event.userName}`);
+            console.log(`[TWITCH EVENT SUB] Ban detected for ${event.userName} on channel ${event.broadcasterName}`);
             console.log(`[TWITCH EVENT SUB] User: ${event.userName}`);
 
             if (event.userName === 'alexitoo_uy') {

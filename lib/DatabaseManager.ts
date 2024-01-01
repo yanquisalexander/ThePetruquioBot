@@ -18,11 +18,13 @@ class Database {
                 password: process.env.DB_PASS || '',
             });
 
-            console.log(chalk.green('[DATABASE MANAGER]'), chalk.yellow('Conectado a la base de datos'));
-
             // Manejo de errores en la conexión
             Database.pool.on('error', (err: any) => {
                 console.error('Unexpected error on idle client', err);
+            });
+
+            Database.pool.on('connect', () => {
+                console.log(chalk.green('[DATABASE MANAGER]'), chalk.yellow('Conectado a la base de datos'));
             });
         }
     }

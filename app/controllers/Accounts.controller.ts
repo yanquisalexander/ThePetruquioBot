@@ -28,6 +28,8 @@ class AccountsController {
                 return res.status(400).json({ error: 'Access token is invalid' })
             }
 
+
+
             const userInfo = await TwitchAuthenticator.getUserInfo(token);
 
             if (!userInfo) {
@@ -74,11 +76,11 @@ class AccountsController {
                 }
             }
 
-            const session = await Session.create(userInfo.data[0].id, '', '');
-            console.log(`Created session ${session.sessionId} for user ${userInfo.data[0].id}`);
+            const session = await Session.create(user.twitchId, '', '');
+            console.log(`Created session ${session.sessionId} for user ${user.twitchId}`);
 
             const customToken = jwt.sign({
-                user,
+                userId: user.twitchId,
                 sessionId: session.sessionId
             }, process.env.JWT_SECRET || 'secret', { expiresIn: '30d' });
 
@@ -418,6 +420,57 @@ class AccountsController {
         }
     }
 
+    static async generateApiToken(req: Request, res: Response) {
+        try {
+            const user = new CurrentUser(req.user as ExpressUser);
+
+            if (!user) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const userAccount = await user.getCurrentUser();
+
+            if (!userAccount) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const token = await userAccount.generateApiToken();
+
+            return res.status(200).json({ token });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Failed to generate token' });
+        }
+    }
+
+    static async getAccount(req: Request, res: Response) {
+        try {
+            const user = new CurrentUser(req.user as ExpressUser);
+
+            if (!user) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+
+            const userAccount = await user.getCurrentUser();
+
+            if (!userAccount) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const linkedAccounts = await userAccount.getLinkedAccounts();
+
+            return res.status(200).json({
+                user: userAccount,
+                linkedAccounts,
+                security: {
+                    api_token: await userAccount.getApiToken(),
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ error: 'Failed to get account' });
+        }
+    }
 }
 
 export default AccountsController;

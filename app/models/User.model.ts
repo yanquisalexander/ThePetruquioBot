@@ -7,6 +7,9 @@ import MessageLogger from "./MessageLogger.model";
 import Twitch from "../modules/Twitch.module";
 import ExternalAccount, { ExternalAccountProvider } from "./ExternalAccount.model";
 import Notification from "./Notification.model";
+import jwt from 'jsonwebtoken';
+import Utils from "../../lib/Utils";
+
 
 
 class User {
@@ -163,6 +166,66 @@ class User {
     async getUnreadNotificationsCount(): Promise<number> {
         return await Notification.getUnreadCount(this);
     }
+
+    async generateApiToken(): Promise<string> {
+        try {
+            // Genera un nuevo token
+            const customToken = jwt.sign({
+                userId: this.twitchId,
+                systemToken: true
+            }, process.env.JWT_SECRET || 'secret', { expiresIn: '9999 years' }); /* System Token should never expire unless revoked */
+
+            // Consulta el token existente
+            const tokenExists = await Database.query('SELECT api_token FROM users WHERE twitch_id = $1', [this.twitchId]);
+
+            // Revoca el token existente si hay uno
+            if (tokenExists.rows[0] && tokenExists.rows[0].api_token) {
+                await Database.query('INSERT INTO revoked_api_tokens (api_token) VALUES ($1)', [tokenExists.rows[0].api_token]);
+            } else {
+                console.error('No se ha encontrado el token API del usuario', this.twitchId);
+                // Puedes manejar esta situación según tus necesidades
+            }
+
+            // Actualiza la base de datos con el nuevo token
+            await Database.query('UPDATE users SET api_token = $1 WHERE twitch_id = $2', [customToken, this.twitchId]);
+
+            return customToken;
+        } catch (error) {
+            console.error('Error al generar el token API:', error);
+            throw error;
+        }
+    }
+
+
+    static async isTokenRevoked(token: string): Promise<boolean> {
+        // Check if token is revoked
+        const revoked = await Database.query('SELECT * FROM revoked_api_tokens WHERE api_token = $1', [token]);
+        if (revoked.rows.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async getApiToken(): Promise<string | null> {
+        try {
+            const tokenQueryResult = await Database.query('SELECT api_token FROM users WHERE twitch_id = $1', [this.twitchId]);
+            
+            if (tokenQueryResult.rows.length > 0) {
+                const apiToken = tokenQueryResult.rows[0].api_token;
+    
+                if (apiToken && !await User.isTokenRevoked(apiToken) && !Utils.emptyString(apiToken)) {
+                    return apiToken;
+                }
+            }
+    
+            return await this.generateApiToken();
+        } catch (error) {
+            console.error('Error al obtener el token API:', error);
+            return null;
+        }
+    }
+    
 }
 
 export default User;
