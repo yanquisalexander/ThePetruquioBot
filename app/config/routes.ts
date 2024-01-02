@@ -58,12 +58,14 @@ router.put('/channel/extras/got-talent/clear-cross', Passport.getPassport().auth
 router.post('/channel/extras/got-talent/reload-overlay', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.reloadGotTalentOverlay);
 router.put('/channel/extras/got-talent/update-positions', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.updateJudgesOrder);
 
-router.post('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
-router.get('/channel/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
-router.put('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.updateWorkflow);
-router.delete('/channel/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteWorkflow);
-router.get('/channel/workflows/logs', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getLogs);
-router.delete('/channel/workflows/logs/:log_id', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteLog);
+router.get('/webhooks/:user_api_token', WorkflowsController.processIncomingRequest);
+router.post('/webhooks/:user_api_token', WorkflowsController.processIncomingRequest);
+router.post('/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.createWorkflow);
+router.get('/workflows', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getWorkflows);
+router.put('/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.updateWorkflow);
+router.delete('/workflows/:event_type', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteWorkflow);
+router.get('/workflows/logs', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getLogs);
+router.delete('/workflows/logs/:log_id', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteLog);
 
 router.post('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.createWidget);
 router.get('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.getWidgets);

@@ -3,6 +3,9 @@ import { ExpressUser } from '../interfaces/ExpressUser.interface';
 import Workflow, { EventType } from '../models/Workflow.model';
 import CurrentUser from '../../lib/CurrentUser';
 import WorkflowLog from "../models/WorkflowLog.model";
+import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import Channel from "../models/Channel.model";
+import User from "../models/User.model";
 
 class WorkflowsController {
     static async getWorkflows(req: Request, res: Response) {
@@ -22,6 +25,7 @@ class WorkflowsController {
             data: {
                 workflows,
                 event_types: Object.values(EventType),
+                user_api_token: await user?.getApiToken()
             },
         });
     }
@@ -149,7 +153,7 @@ class WorkflowsController {
 
         try {
             const log = await WorkflowLog.find(log_id);
-            if(!log) {
+            if (!log) {
                 return res.status(404).json({ error: 'Log not found' });
             }
             await log.delete();
@@ -160,6 +164,96 @@ class WorkflowsController {
             return res.status(404).json({ error: 'Cannot find log' });
         }
     }
+
+    static async processIncomingRequest(req: Request, res: Response) {
+        if (req.method === 'GET') {
+            return res.status(400).json({
+                error_type: 'GET_NOT_ALLOWED',
+                errors: [
+                    'GET method is not allowed for incoming requests 😿'
+                ]
+            });
+        }
+
+        try {
+            if (!req.params.user_api_token) {
+                return res.status(400).json({
+                    error_type: 'USER_API_TOKEN_NOT_FOUND',
+                    errors: [
+                        'User API token not found in request 😿'
+                    ]
+                });
+            }
+
+            const isTokenRevoked = await User.isTokenRevoked(req.params.user_api_token);
+
+            if (isTokenRevoked) {
+                return res.status(401).json({
+                    error_type: 'UNAUTHORIZED',
+                    errors: [
+                        'This API token has been revoked'
+                    ]
+                });
+            }
+
+            let decodedPayload: string | jwt.JwtPayload | null = null;
+            try {
+                decodedPayload = jwt.verify(req.params.user_api_token, process.env.JWT_SECRET as string);
+            } catch (JWTError) {
+                if (JWTError instanceof JsonWebTokenError) {
+                    return res.status(401).json({
+                        error_type: 'UNAUTHORIZED',
+                        errors: [
+                            'Invalid API token'
+                        ]
+                    });
+                } else {
+                    throw JWTError;
+                }
+
+            } const channel = await Channel.findByTwitchId((decodedPayload as any).userId);
+
+            if (!channel) {
+                return res.status(404).json({
+                    error_type: 'CHANNEL_NOT_FOUND',
+                    errors: [
+                        'The user associated with this token does not have a channel'
+                    ]
+                });
+            }
+
+            const workflow = await Workflow.find(channel, EventType.OnWebhook);
+
+            if (!workflow) {
+                return res.status(404).json({
+                    error_type: 'WORKFLOW_NOT_FOUND',
+                    errors: [
+                        "The user doesn't have a workflow for this event type (ON_WEBHOOK)"
+                    ]
+                });
+            } else {
+                await workflow.execute({
+                    payload: req.body,
+                    headers: req.headers,
+                    origin: req.hostname,
+                    query: req.query,
+                });
+                return res.status(200).json({
+                    success: true,
+                    message: 'Webhook executed successfully',
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                error_type: 'INTERNAL_SERVER_ERROR',
+                errors: [
+                    'An error occurred while processing the incoming request 😿'
+                ]
+            });
+        }
+    }
+
 }
 
 export default WorkflowsController;
