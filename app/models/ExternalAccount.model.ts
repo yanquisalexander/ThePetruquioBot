@@ -88,7 +88,7 @@ class ExternalAccount {
     public async update(accessToken?: string, refreshToken?: string, expiresAt?: Date, metadata?: Object): Promise<void> {
         try {
             const query = 'UPDATE external_accounts SET access_token = $1, refresh_token = $2, expires_at = $3, metadata = $4 WHERE user_id = $5 AND provider = $6 AND account_id = $7';
-            const values = [accessToken, refreshToken, expiresAt, this.user.twitchId, this.provider, this.accountId, this.metadata];
+            const values = [accessToken, refreshToken, expiresAt, metadata, this.user.twitchId, this.provider, this.accountId];
             await Database.query(query, values);
 
             this.accessToken = accessToken;
