@@ -39,8 +39,8 @@ class ChannelBotInstance {
 }
 
 export enum Platform {
-  Twitch = 'twitch',
-  Kick = 'kick',
+  TWITCH = 'twitch',
+  KICK = 'kick',
 }
 
 export class Bot {
@@ -128,8 +128,8 @@ export class Bot {
     return channels.map((channel) => channel.user.username);
   }
 
-  public sendMessage(channel: Channel, message: string, platform: Platform = Platform.Twitch): void {
-    if (platform === Platform.Twitch) {
+  public sendMessage(channel: Channel, message: string, platform: Platform = Platform.TWITCH): void {
+    if (platform === Platform.TWITCH) {
       if (typeof channel === 'string') {
         this.client.say(channel, message);
         return;
@@ -171,7 +171,7 @@ export class Bot {
       return
     }
 
-    if (platform === Platform.Kick) {
+    if (platform === Platform.KICK) {
       console.log({ channel, message, platform });
       // KickBot.say(channel, message);
     }
