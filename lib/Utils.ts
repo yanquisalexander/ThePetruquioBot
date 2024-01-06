@@ -186,7 +186,7 @@ class Utils {
             const match = jsevalMatches[i];
             const result = results[i];
             message = message.replace(match[0], result);
-            console.log('Reemplazando ${jseval(...)} por', result);
+            console.log(`Reemplazando ${match[0]} con ${result}`);
         }
 
         console.log('Mensaje final:', message);
@@ -219,9 +219,8 @@ class Utils {
         }
 
         const newAccessToken = response.data.access_token;
-        const newRefreshToken = response.data.refresh_token;
 
-        await spotifyAccount.update(newAccessToken, newRefreshToken);
+        await spotifyAccount.update(newAccessToken);
     }
 }
 
