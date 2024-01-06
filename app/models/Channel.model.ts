@@ -1,5 +1,5 @@
 import Database from "../../lib/DatabaseManager";
-import { ChannelPreferences, defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
+import defaultChannelPreferences, { ChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Audit, { AuditDTO } from "./Audit.model";
 import { Command } from "./Command.model";
 import CommunityBook from "./CommunityBook.model";
@@ -142,18 +142,6 @@ class Channel {
             const channel = new Channel(id, true, defaultChannelPreferences, user);
             await channel.save();
             return channel;
-        }
-    }
-
-
-    async updatePreferences(preferences: ChannelPreferences): Promise<void> {
-        try {
-            const query = 'UPDATE channels SET preferences = $1::jsonb WHERE twitch_id = $2';
-            const values = [preferences, this.user.twitchId];
-            await Database.query(query, values);
-        } catch (error) {
-            console.error(error);
-            throw new Error('Failed to update channel preferences.');
         }
     }
 }

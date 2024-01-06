@@ -2,7 +2,6 @@ import { ExpressUser } from '../app/interfaces/ExpressUser.interface';
 import Session from '../app/models/Session.model';
 import User from '../app/models/User.model';
 import Channel from '../app/models/Channel.model';
-import { defaultChannelPreferences } from '../utils/ChannelPreferences.class';
 
 class CurrentUser {
     private expressUser: ExpressUser;

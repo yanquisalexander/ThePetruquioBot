@@ -3,7 +3,7 @@ import { ExpressUser } from '../interfaces/ExpressUser.interface';
 import User from '../models/User.model';
 import Channel from '../models/Channel.model';
 import Twitch from '../modules/Twitch.module';
-import { ChannelPreferences, defaultChannelPreferences } from '../../utils/ChannelPreferences.class';
+import defaultChannelPreferences, { ChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Redemption from '../models/Redemption.model';
 import Session from '../models/Session.model';
 import TwitchAuthenticator from "../modules/TwitchAuthenticator.module";
@@ -115,6 +115,15 @@ class ChannelsController {
                 // @ts-ignore
                 channel.preferences[preferenceKey].value = preferences[preferenceKey].value;
             }
+            
+            // @ts-ignore
+            const preference = preferences[preferenceKey];
+
+            console.log(preferenceKey, preference);
+            if(preference.paidFeature && preference.value) {
+                return res.status(400).json({ error: 'PAID_FEATURE', message: `The setting ${preferenceKey} is a paid feature` });
+            }
+
         }
 
         if (preferencesKeys.includes('useStreamerAccount') && preferences.useStreamerAccount?.value) {
@@ -128,6 +137,10 @@ class ChannelsController {
                 }
             }
         }
+
+        // Some preferences has a paidFeatures property, if the user doesn't have a subscription, it will return an error
+
+       
 
         await channel.save();
 

@@ -34,7 +34,7 @@ class CommunityWallController {
                     username: channel.user.username,
                     id: channel.id,
                 },
-                canvas_size: channel.preferences.canvasSize?.value,
+                //canvas_size: channel.preferences.canvasSize?.value,
             }
         });
     }

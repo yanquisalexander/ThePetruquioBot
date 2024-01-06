@@ -29,11 +29,8 @@ const ConfigCommand = new Command(
         try {
             // Value respects the type of the setting? (Boolean, Typescript)
            
-
-
-
-
-            await channel.updatePreferences({ [settingName]: settingValue });
+            // @ts-ignore
+            channel.preferences[settingName].value = settingValue;
 
             return `@${user.username}, la configuración ${settingName} fue actualizada correctamente.`;
         } catch (error) {

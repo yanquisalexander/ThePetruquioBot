@@ -1,6 +1,6 @@
 import { HelixUser } from "@twurple/api";
 import Database from "../../lib/DatabaseManager";
-import { defaultChannelPreferences } from "../../utils/ChannelPreferences.class";
+import defaultChannelPreferences, { ChannelPreferences } from "../../utils/ChannelPreferences.class";
 import Channel from "./Channel.model";
 import Greeting from "./Greeting.model";
 import MessageLogger from "./MessageLogger.model";

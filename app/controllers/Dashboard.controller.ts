@@ -105,11 +105,7 @@ class DashboardController {
             return res.status(404).json({ error: 'Channel not found' });
         }
 
-        channel.preferences.botMuted = {
-            ...channel.preferences.botMuted,
-            field_type: FieldTypes.BOOLEAN,
-            value: !channel.preferences.botMuted?.value ?? true
-        };
+        channel.preferences.botMuted.value = !channel.preferences.botMuted.value;
         await channel.save();
 
         const bot = await Bot.getInstance();
