@@ -31,7 +31,7 @@ export class AuditDTO {
     constructor(data: any) {
         this.id = data.id;
         this.username = data.username;
-        this.displayName = data.display_name;
+        this.displayName = data.displayName;
         this.avatar = data.avatar;
         this.type = data.type;
         this.data = data.data;
@@ -93,7 +93,7 @@ class Audit {
     public static async getAuditsByChannel(channel: Channel): Promise<AuditDTO[] | null> {
         const query = `
             SELECT audits.id, audits.type, audits.data, audits.created_at,
-                   users.username, users.display_name AS displayname, users.avatar
+                   users.username, users.display_name, users.avatar
             FROM audits
             INNER JOIN users ON audits.user_id = users.twitch_id
             WHERE audits.channel_id = $1 ORDER BY audits.created_at DESC
@@ -107,7 +107,7 @@ class Audit {
                 return new AuditDTO({
                     id: row.id,
                     username: row.username,
-                    displayName: row.displayname,
+                    displayName: row.display_name,
                     avatar: row.avatar,
                     type: row.type,
                     data: row.data,
