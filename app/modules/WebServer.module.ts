@@ -29,7 +29,7 @@ class WebServer {
         app.use(cors({
             origin: '*'
         }));
-        app.use('/v2/', bodyParser.json(), router);
+        app.use('/v2/', bodyParser.json(), bodyParser.urlencoded({ extended: true }), router);
         app.get('/v1/*', (req, res) => {
             res.status(410).json({
                 error_type: "deprecated",
