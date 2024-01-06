@@ -9,6 +9,7 @@ import AdminDashboardProblems from "../models/admin/DashboardProblems.model";
 import Audit, { AuditType } from "../models/Audit.model";
 import UserToken from "../models/UserToken.model";
 import TwitchAuthenticator from "../modules/TwitchAuthenticator.module";
+import chalk from "chalk";
 
 const removeAnsiColors = (str: string) => str.replace(/\u001b\[[0-9]{1,2}m/g, '');
 
@@ -249,23 +250,33 @@ class AdminController {
             return res.status(404).json({ error: "User's token not found" });
         }
 
+        const botAccount = await User.findByTwitchId(parseInt(process.env.TWITCH_USER_ID as string));
 
-        const audit = new Audit({
-            targetUserChannel,
-            user: user,
-            type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
-            data: {}
-        });
+
+
+
 
         try {
             const token = await TwitchAuthenticator.RefreshingAuthProvider.refreshAccessTokenForUser(targetUser.twitchId);
             userToken.tokenData = token;
             await userToken.save();
+            console.log(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.white(`Refreshing token for user ${userId}`));
 
-            try {
-                await audit.save();
-            } catch (error) {
-                console.error(error);
+            if (botAccount) {
+                if (targetUserChannel) {
+                    const audit = new Audit({
+                        channel: targetUserChannel,
+                        user: botAccount,
+                        type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
+                        data: {}
+                    });
+
+                    try {
+                        await audit.save();
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
             }
 
             return res.json({

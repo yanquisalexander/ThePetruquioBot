@@ -103,17 +103,25 @@ class TwitchAuthenticator {
                 const botAccount = await User.findByTwitchId(parseInt(process.env.TWITCH_USER_ID as string));
                 const channel = await user?.getChannel();
 
-                const audit = new Audit({
-                    channel,
-                    user: botAccount,
-                    type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
-                    data: {}
-                });
+                if(!user || !botAccount) {
+                    console.warn(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.yellow(`User ${userId} or bot account not found in database. Skipping audit`));
+                    return;
+                }
 
-                try {
-                    await audit.save();
-                } catch (error) {
-                    console.error(error);
+                if (channel) {
+
+                    const audit = new Audit({
+                        channel: channel,
+                        user: botAccount,
+                        type: AuditType.TOKEN_REFRESHED_BY_SYSTEM,
+                        data: {}
+                    });
+
+                    try {
+                        await audit.save();
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
             },
             // @ts-ignore

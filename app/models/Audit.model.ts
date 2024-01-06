@@ -39,16 +39,24 @@ export class AuditDTO {
     }
 }
 
+interface AuditData {
+    id?: number;
+    channel: Channel;
+    user: User;
+    type: AuditType;
+    data: any;
+    createdAt?: Date;
+}
 
 class Audit {
-    public id: number;
+    public id?: number|undefined;
     public channel: Channel;
     public user: User;
     public type: AuditType;
     public data: any;
-    public createdAt: Date;
+    public createdAt?: Date | undefined;
 
-    constructor(data: any) {
+    constructor(data: AuditData) {
         this.id = data.id;
         this.channel = data.channel;
         this.user = data.user;
