@@ -75,7 +75,6 @@ class WebServer {
 
     public static async boot(): Promise<void> {
         await this.setup();
-        // @ts-expect-error
         TwitchEvents.middleware.apply(this.app);
         const ioServer = http.createServer(this.app);
 
