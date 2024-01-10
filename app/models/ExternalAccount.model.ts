@@ -7,6 +7,7 @@ import User from "./User.model";
 export enum ExternalAccountProvider {
     SPOTIFY = 'spotify',
     DISCORD = 'discord',
+    PATREON = 'patreon',
 }
 
 

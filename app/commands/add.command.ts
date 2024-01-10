@@ -21,7 +21,7 @@ export const SystemCommands = [
 const AddCommand = new Command(
     'addcom',
     '*',
-    [CommandPermission.MODERATOR],
+    [CommandPermission.MODERATOR, CommandPermission.BROADCASTER],
     'Añade un comando al bot.',
     {},
     '', // System commands don't need a response

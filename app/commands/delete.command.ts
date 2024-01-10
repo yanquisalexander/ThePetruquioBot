@@ -5,7 +5,7 @@ import { SystemCommands } from "./add.command";
 const DeleteCommand = new Command(
     'delcom',
     '*',
-    [CommandPermission.MODERATOR],
+    [CommandPermission.MODERATOR, CommandPermission.BROADCASTER],
     'Elimina un comando del bot.',
     {},
     '', // System commands don't need a response

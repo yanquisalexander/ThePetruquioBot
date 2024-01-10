@@ -8,7 +8,7 @@ import Utils from "../../lib/Utils";
 const ShoutoutCommand = new Command(
     'so',
     '*',
-    [CommandPermission.MODERATOR],
+    [CommandPermission.MODERATOR, CommandPermission.BROADCASTER],
     'Realiza un shoutout a un canal.',
     {},
     '', // System commands don't need a response

@@ -5,7 +5,7 @@ import { Command, CommandPermission } from "../models/Command.model";
 const ConfigCommand = new Command(
     'cfg',
     '*',
-    [CommandPermission.MODERATOR],
+    [CommandPermission.MODERATOR, CommandPermission.BROADCASTER],
     'Edita la configuración del bot.',
     {},
     '', // System commands don't need a response

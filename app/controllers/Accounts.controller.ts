@@ -328,6 +328,9 @@ class AccountsController {
                 // @ts-ignore
                 Passport.getPassport().authenticate('discord', { prompt: true })(req, res, next);
                 break;
+            case ExternalAccountProvider.PATREON:
+                Passport.getPassport().authenticate('patreon')(req, res, next);
+                break;
             default:
                 return res.status(400).json({ error: `Provider ${provider} not supported` });
         }
@@ -374,6 +377,9 @@ class AccountsController {
                     break;
                 case ExternalAccountProvider.DISCORD:
                     AccountsController.handleLinkAccount(userAccount, ExternalAccountProvider.DISCORD, 'discord', req, res);
+                    break;
+                case ExternalAccountProvider.PATREON:
+                    AccountsController.handleLinkAccount(userAccount, ExternalAccountProvider.PATREON, 'patreon', req, res);
                     break;
                 default:
                     return res.status(400).json({ error: 'Invalid provider' });

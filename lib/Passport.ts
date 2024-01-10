@@ -3,6 +3,7 @@ import "dotenv/config";
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const DiscordStrategy = require('@soerenmetje/passport-discord').Strategy;
+const PatreonStrategy = require('@oauth-everything/passport-patreon').Strategy;
 
 import User from '../app/models/User.model';
 import Session from '../app/models/Session.model';
@@ -14,6 +15,7 @@ const Scopes = {
     DISCORD: ["identify", "email", "connections", "guilds", "guilds.join"],
     // We only use spotify to get the user currently playing song
     SPOTIFY: ["user-read-email", "user-read-playback-state", "user-read-currently-playing"],
+    PATREON: ["identity", "identity[email]", "identity.memberships"]
 }
 
 const strategyCanBeConfigured = (strategy: string) => {
@@ -156,6 +158,28 @@ class Passport {
                     }
                 }));
             console.log('[PASSPORT] Discord strategy configured.');
+        }
+
+        if (strategyCanBeConfigured('patreon')) {
+            console.log('[PASSPORT] Configuring Patreon strategy...');
+
+            passport.use('patreon', new PatreonStrategy({
+                clientID: process.env.PATREON_CLIENT_ID,
+                clientSecret: process.env.PATREON_CLIENT_SECRET,
+                callbackURL: process.env.PATREON_CALLBACK_URL,
+                scope: Scopes.PATREON,
+                prompt: 'consent',
+            },
+                // @ts-ignore
+                async (accessToken, refreshToken, profile, done) => {
+                    try {
+                        return done(null, profile, { accessToken, refreshToken });
+                    } catch (error) {
+                        console.error(error);
+                        return done(error, false, { message: 'Internal server error' });
+                    }
+                }));
+            console.log('[PASSPORT] Patreon strategy configured.');
         }
 
         console.log('[PASSPORT] Finished setting up passport.');
