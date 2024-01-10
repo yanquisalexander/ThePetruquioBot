@@ -362,6 +362,30 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@oauth-everything/oauth2-types@^1.0.1":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@oauth-everything/oauth2-types/-/oauth2-types-1.0.2.tgz#1662a99d1b5f507efb9476e1e2cd7b50be91caea"
+  integrity sha512-fGddJhO8bnvljIhSTMuOSWFilkJ67TDqqgB1/qPVCu6s8swju7qWYZm2Qyit0miBebTtCf1jQ6hcz+GPA7glJw==
+  dependencies:
+    "@types/express" "^4.17.2"
+    "@types/passport-oauth2" "^1.4.8"
+
+"@oauth-everything/passport-patreon@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@oauth-everything/passport-patreon/-/passport-patreon-1.0.1.tgz#4b93194d2a3ea35708fa205d9bc5a5ef65fe2439"
+  integrity sha512-m7oV9q9ic8Y4ilUgAhkh8ZrbXr20ZLODxjEl1ATSsxT2F1P15R7X7GtrlLm+x8GDBI5XO48Y1/Nd2JnCLeKeAg==
+  dependencies:
+    "@oauth-everything/oauth2-types" "^1.0.1"
+    "@oauth-everything/profile" "^1.0.0"
+    "@types/passport-oauth2" "^1.4.8"
+    jsonapi-typescript "^0.1.3"
+    passport-oauth2 "^1.5.0"
+
+"@oauth-everything/profile@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@oauth-everything/profile/-/profile-1.0.0.tgz#0b5e78749415519fa312dc83347a677903f456ba"
+  integrity sha512-OmCuBPhjaLHh9MST9P5jRuVBZaP0z7hBk8nH4Yt7Id5kNM1AXGd5uud6CP7W2zuhKl2nk0KsYmeMT7SkzN6VWg==
+
 "@one-ini/wasm@0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@one-ini/wasm/-/wasm-0.1.1.tgz#6013659736c9dbfccc96e8a9c2b3de317df39323"
@@ -632,6 +656,16 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/express@^4.17.2":
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.21.tgz#c26d4a151e60efe0084b23dc3369ebc631ed192d"
+  integrity sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==
+  dependencies:
+    "@types/body-parser" "*"
+    "@types/express-serve-static-core" "^4.17.33"
+    "@types/qs" "*"
+    "@types/serve-static" "*"
+
 "@types/http-errors@*":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.3.tgz#c54e61f79b3947d040f150abd58f71efb422ff62"
@@ -729,6 +763,13 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/oauth@*":
+  version "0.9.4"
+  resolved "https://registry.yarnpkg.com/@types/oauth/-/oauth-0.9.4.tgz#dcbab5efa2f34f312b915f80685760ccc8111e0a"
+  integrity sha512-qk9orhti499fq5XxKCCEbd0OzdPZuancneyse3KtR+vgMiHRbh+mn8M4G6t64ob/Fg+GZGpa565MF/2dKWY32A==
+  dependencies:
+    "@types/node" "*"
+
 "@types/passport-jwt@^3.0.11":
   version "3.0.12"
   resolved "https://registry.yarnpkg.com/@types/passport-jwt/-/passport-jwt-3.0.12.tgz#9d0bba1f584ec387d8d97b7b18a01c3917a4a441"
@@ -737,6 +778,15 @@
     "@types/express" "*"
     "@types/jsonwebtoken" "*"
     "@types/passport-strategy" "*"
+
+"@types/passport-oauth2@^1.4.8":
+  version "1.4.15"
+  resolved "https://registry.yarnpkg.com/@types/passport-oauth2/-/passport-oauth2-1.4.15.tgz#34f2684f53aad36e664cd01ca9879224229f47e7"
+  integrity sha512-9cUTP/HStNSZmhxXGuRrBJfEWzIEJRub2eyJu3CvkA+8HAMc9W3aKdFhVq+Qz1hi42qn+GvSAnz3zwacDSYWpw==
+  dependencies:
+    "@types/express" "*"
+    "@types/oauth" "*"
+    "@types/passport" "*"
 
 "@types/passport-strategy@*":
   version "0.2.37"
@@ -2213,15 +2263,10 @@ flatted@^3.2.9:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.9.tgz#7eb4c67ca1ba34232ca9d2d93e9886e611ad7daf"
   integrity sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==
 
-follow-redirects@^1.14.0:
-  version "1.15.2"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
-  integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
-
-follow-redirects@^1.15.0:
-  version "1.15.3"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.3.tgz#fe2f3ef2690afce7e82ed0b44db08165b207123a"
-  integrity sha512-1VzOtuEM8pC9SFU1E+8KfTjZyMztRsgEfwQl44z8A25uy13jSzTj6dyK2Df52iV0vgHCfBwLhDWevLn95w5v6Q==
+follow-redirects@^1.14.0, follow-redirects@^1.15.0:
+  version "1.15.4"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.4.tgz#cdc7d308bf6493126b17ea2191ea0ccf3e535adf"
+  integrity sha512-Cr4D/5wlrb0z9dgERpUL3LrmPKVDsETIJhaCMeDfuFYcqa5bldGV6wBsAN6X/vxlXQtFBMrXdXxdL8CbDTGniw==
 
 for-each@^0.3.3:
   version "0.3.3"
@@ -3015,6 +3060,18 @@ json-stringify-safe@~5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
   integrity sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==
+
+json-typescript@^1.0.0:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/json-typescript/-/json-typescript-1.1.2.tgz#033f8309856ef9054cc3384db2ce81d4e0ad4d00"
+  integrity sha512-Np07MUsYMKbB0nNlw/MMIRjUK7ehO48LA4FsrzrhCfTUxMKbvOBAo0sc0b4nQ80ge9d32sModCunCgoyUojgUA==
+
+jsonapi-typescript@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/jsonapi-typescript/-/jsonapi-typescript-0.1.3.tgz#f903ca20ae7cce31bdc848667d8197b9471106a4"
+  integrity sha512-uPcPS01GeM+4HIyn18s7l1yD2S3uLZy2TX1UkQffCM0bLb3TMwudXUyVXPHTMZ4vdZT8MqKqN2vjB5PogTAdFQ==
+  dependencies:
+    json-typescript "^1.0.0"
 
 jsonfile@^6.0.1:
   version "6.1.0"
