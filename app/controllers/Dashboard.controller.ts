@@ -42,6 +42,7 @@ class DashboardController {
         const isBotJoined = bot.joinedChannels.includes(channel.user.username);
         const isBotMuted = channel.preferences.botMuted?.value;
 
+        const isPatron = await user.isPatron();
         return res.json({
             data: {
                 bot: {
@@ -49,7 +50,8 @@ class DashboardController {
                     muted: isBotMuted
                 },
                 stats,
-                timezone
+                timezone,
+                is_patron: isPatron
             }
         })
 

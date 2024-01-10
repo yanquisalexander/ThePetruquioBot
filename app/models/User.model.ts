@@ -9,6 +9,8 @@ import ExternalAccount, { ExternalAccountProvider } from "./ExternalAccount.mode
 import Notification from "./Notification.model";
 import jwt from 'jsonwebtoken';
 import Utils from "../../lib/Utils";
+import Patreon from "../modules/Patreon.module";
+
 
 
 
@@ -99,6 +101,10 @@ class User {
 
     async getMessages(): Promise<any[]> {
         return await MessageLogger.getByUser(this);
+    }
+
+    async isPatron(): Promise<boolean> {
+        return await Patreon.isUserSubscribed(this);
     }
 
     public async getGreetingsData(): Promise<any> {
