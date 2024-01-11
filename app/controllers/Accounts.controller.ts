@@ -329,6 +329,8 @@ class AccountsController {
                 Passport.getPassport().authenticate('discord', { prompt: true })(req, res, next);
                 break;
             case ExternalAccountProvider.PATREON:
+                // Invocar authenticate con la estrategia 'patreon'
+                // @ts-ignore
                 Passport.getPassport().authenticate('patreon')(req, res, next);
                 break;
             default:
