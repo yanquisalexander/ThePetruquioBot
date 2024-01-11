@@ -115,17 +115,6 @@ class GreetingsManager {
         const times = SunCalc.getTimes(userTime, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
         const hour = userTime.getHours();
 
-        console.log({
-            user: user.username,
-            timezone,
-            times,
-            hour,
-            userTime,
-            date,
-            userLocation,
-            latitude: parseFloat(userLocation.latitude.toString()),
-        })
-
         if (hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
             return sunlightGreetings[lang].morning
         } else if (hour >= times.sunriseEnd.getHours() && hour < times.sunset.getHours()) {
