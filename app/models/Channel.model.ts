@@ -150,31 +150,32 @@ export default Channel;
 
 function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
     const mergedPrefs: any = { ...channelPrefs }; // Inicia con las preferencias del canal
-  
+
     // Itera sobre todas las claves de defaultPrefs
     for (const key in defaultPrefs) {
-      if (Object.prototype.hasOwnProperty.call(defaultPrefs, key)) {
-        // Verifica si la clave existe en channelPrefs
-        if (channelPrefs[key] !== undefined) {
-          // Si la clave es un objeto y contiene field_type
-          if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object' && 'field_type' in defaultPrefs[key]) {
-            // Realiza la fusión recursiva del campo field_type sin reemplazar el valor de value
-            mergedPrefs[key] = {
-              ...channelPrefs[key],
-              field_type: mergeFieldType(defaultPrefs[key].field_type, channelPrefs[key].field_type),
-            };
-          } else if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object') {
-            // En caso de objetos anidados, realiza la fusión recursiva
-            mergedPrefs[key] = mergePreferences(defaultPrefs[key], channelPrefs[key]);
-          } else {
-            // En otros casos, asigna el valor de channelPrefs[key]
-            mergedPrefs[key] = channelPrefs[key];
-          }
-        } else {
-          // Si la clave no existe en channelPrefs, asigna el valor de defaultPrefs[key]
-          mergedPrefs[key] = defaultPrefs[key];
+        if (Object.prototype.hasOwnProperty.call(defaultPrefs, key)) {
+            // Verifica si la clave existe en channelPrefs
+            if (channelPrefs[key] !== undefined) {
+                // Si la clave es un objeto y contiene field_type
+                if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object' && 'field_type' in defaultPrefs[key]) {
+                    // Realiza la fusión recursiva del campo field_type sin reemplazar el valor de value
+                    mergedPrefs[key] = {
+                        ...channelPrefs[key],
+                        field_type: mergeFieldType(defaultPrefs[key].field_type, channelPrefs[key].field_type),
+                        patreon_required: channelPrefs[key].patreonRequired || defaultPrefs[key].patreonRequired,
+                    };
+                } else if (typeof defaultPrefs[key] === 'object' && typeof channelPrefs[key] === 'object') {
+                    // En caso de objetos anidados, realiza la fusión recursiva
+                    mergedPrefs[key] = mergePreferences(defaultPrefs[key], channelPrefs[key]);
+                } else {
+                    // En otros casos, asigna el valor de channelPrefs[key]
+                    mergedPrefs[key] = channelPrefs[key];
+                }
+            } else {
+                // Si la clave no existe en channelPrefs, asigna el valor de defaultPrefs[key]
+                mergedPrefs[key] = defaultPrefs[key];
+            }
         }
-      }
     }
 
     const orderedPrefs: any = {};
@@ -186,8 +187,8 @@ function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
     }
 
     return orderedPrefs;
-  }
-  
+}
+
 
 function mergeFieldType(defaultFieldType: any, channelFieldType: any): any {
     // Si channelFieldType es undefined o es del mismo tipo que defaultFieldType, devuelve defaultFieldType
