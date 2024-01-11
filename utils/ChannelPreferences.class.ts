@@ -16,7 +16,7 @@ type ChannelPreferences = {
     [K in keyof typeof defaultChannelPreferences]: ChannelPreference<typeof defaultChannelPreferences[K]['value']>;
 };
 
-const createChannelPreference = <T>(value: T, field_type: FieldTypes, paidFeature: boolean = false, newFeature: boolean = false) => ({ value, field_type, paidFeature, newFeature });
+const createChannelPreference = <T>(value: T, field_type: FieldTypes, patreonRequired: boolean = false, newFeature: boolean = false) => ({ value, field_type, patreonRequired: patreonRequired, newFeature });
 
 const createDefaultChannelPreferences = () => ({
     botMuted: createChannelPreference(false, FieldTypes.BOOLEAN),

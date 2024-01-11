@@ -7,6 +7,9 @@ import User from "../models/User.model";
 import { Bot } from "../../bot";
 import SpectatorLocation from "../models/SpectatorLocation.model";
 import SunCalc from "suncalc";
+import ct, { Timezone } from 'countries-and-timezones';
+import { DateTime, Duration } from 'luxon';
+
 
 class GreetingsManager {
     constructor() {
@@ -61,6 +64,7 @@ class GreetingsManager {
     ];
 
     private static shouldGreetSunlight() {
+        return true
         // 80% of the time, it shouldn't greet based on the time of day
         const random = Math.random();
         return !(random < 0.8)
@@ -68,7 +72,7 @@ class GreetingsManager {
 
     private static async getRandomGreetingList(username: string, isBot: boolean, lang: string, isUserBirthday?: boolean) {
         console.log(chalk.blue(`[GREETINGS] Getting random greeting list for ${username}, isBot: ${isBot}, lang: ${lang}`));
-        if(isUserBirthday) {
+        if (isUserBirthday) {
             return birthdayGreetings[lang];
         }
         if (isBot) {
@@ -95,10 +99,32 @@ class GreetingsManager {
         if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
             return greetings[lang];
         }
+        let timezone: Timezone | string = 'UTC';
+        try {
+            const userTimezones = ct.getTimezonesForCountry(userLocation.countryCode || 'US');
+            if (userTimezones && userTimezones.length > 0) {
+                timezone = userTimezones[0].name;
+            }
+        } catch (error) {
+            console.error(chalk.red('[GREETINGS]'), chalk.white('Error getting timezone:'), error);
+        }
 
-        const date = new Date();
-        const times = SunCalc.getTimes(date, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
-        const hour = date.getHours();
+        const date = new Date(); // Obtén la fecha y hora actuales en la zona horaria local
+        const userTime = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+        
+        const times = SunCalc.getTimes(userTime, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
+        const hour = userTime.getHours();
+
+        console.log({
+            user: user.username,
+            timezone,
+            times,
+            hour,
+            userTime,
+            date,
+            userLocation,
+            latitude: parseFloat(userLocation.latitude.toString()),
+        })
 
         if (hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
             return sunlightGreetings[lang].morning

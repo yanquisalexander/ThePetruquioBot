@@ -107,6 +107,8 @@ class ChannelsController {
 
         const preferencesKeys = Object.keys(preferences);
 
+        const userIsPatreon = await user.isPatron();
+
         for (const preferenceKey of preferencesKeys) {
             // @ts-ignore
             if (channel.preferences[preferenceKey] === undefined) {
@@ -119,9 +121,19 @@ class ChannelsController {
             // @ts-ignore
             const preference = preferences[preferenceKey];
 
+            //migrate paidFeature to patreonRequired
+
+            if(preference.paidFeature) {
+                preference.patreonRequired = preference.paidFeature;
+                delete preference.paidFeature;
+            }
+
             console.log(preferenceKey, preference);
-            if(preference.paidFeature && preference.value) {
-                return res.status(400).json({ error: 'PAID_FEATURE', message: `The setting ${preferenceKey} is a paid feature` });
+            if(preference.patreonRequired && preference.value && !user.admin) { 
+                /* Admins can use any preference, even if it requires a patreon subscription */
+                if(!userIsPatreon) {
+                    return res.status(400).json({ error: 'PATREON_REQUIRED', message: `The setting ${preferenceKey} requires a patreon subscription` });
+                }
             }
 
         }
@@ -138,7 +150,7 @@ class ChannelsController {
             }
         }
 
-        // Some preferences has a paidFeatures property, if the user doesn't have a subscription, it will return an error
+        // Some preferences has a patreonRequired property, if the user doesn't have a subscription, it will return an error
 
        
 
