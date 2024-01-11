@@ -130,6 +130,7 @@ class Utils {
 
         } catch (error) {
             console.error(chalk.red('Error replacing Spotify variables:'), error);
+            return `An error occurred while getting Spotify data`;
         }
         // Reemplazar ${randomNum VALOR_MIN-VALOR_MAX} con un número aleatorio dentro del rango especificado
         const randomNumRegex = /\${randomNum(?:\s+(\d+)\s*-\s*(\d+))?}/g;
@@ -201,7 +202,7 @@ class Utils {
         const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
         if (!spotifyAccount) return;
         console.log(chalk.yellow("[SPOTIFY]"), chalk.white(`Trying to refresh Spotify access token for user ${channel.user.username}`));
-
+        console.log(chalk.yellow("[SPOTIFY]"), chalk.white(`Refresh token: ${spotifyAccount.refreshToken}`));
         const response = await axios.post('https://accounts.spotify.com/api/token', {
             grant_type: 'refresh_token',
             refresh_token: spotifyAccount.refreshToken,
