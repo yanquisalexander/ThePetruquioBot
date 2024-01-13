@@ -44,7 +44,7 @@ const initializeApp = async () => {
         Environment.https = process.env.HTTPS === 'true';
 
         CommandExecutor.initialize();
-        StreamCopilot.initialize(process.env.OPENAI_API_KEY!);
+        //StreamCopilot.initialize(process.env.OPENAI_API_KEY!);
 
         await Passport.setup();
 
