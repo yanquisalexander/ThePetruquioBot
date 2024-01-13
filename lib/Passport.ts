@@ -3,7 +3,7 @@ import "dotenv/config";
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const DiscordStrategy = require('@soerenmetje/passport-discord').Strategy;
-const PatreonStrategy = require('passport-patreon').Strategy;
+const PatreonStrategy = require('@oauth-everything/passport-patreon').Strategy;
 
 import User from '../app/models/User.model';
 import Session from '../app/models/Session.model';
@@ -98,14 +98,20 @@ class Passport {
                     metadata: account.metadata,
                     expires_at: account.expiresAt,
                 }));
+
+                const unreads = await user.getUnreadNotificationsCount();
+                const isPatron = await user.isPatron();
         
                 const userData = {
                     ...user,
                     session: isSystemToken ? null : session,
                     channel,
                     linkedAccounts: accounts,
-                    systemToken: isSystemToken
+                    system_token: isSystemToken,
+                    unread_notifications_count: unreads,
+                    is_patron: isPatron,
                 };
+
         
                 return done(null, userData);
             } catch (error) {

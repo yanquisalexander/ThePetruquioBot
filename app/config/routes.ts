@@ -15,19 +15,23 @@ import { Bot } from "../../bot";
 import CommunityWallController from "../controllers/CommunityWall.controller";
 import ExtrasController from "../controllers/Extras.controller";
 import WidgetsController from "../controllers/Widgets.controller";
+import DecksController from "../controllers/Decks.controller";
+
 
 
 const router = Router();
 
+const authMiddleware = Passport.getPassport().authenticate('jwt', { session: false });
+
 router.post('/accounts/getToken', AccountsController.getToken);
 
-router.get('/accounts/me', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentUser);
+router.get('/accounts/me', authMiddleware, AccountsController.currentUser);
 
-router.get('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.currentSession);
+router.get('/accounts/session', authMiddleware, AccountsController.currentSession);
 router.get('/accounts/login',  AccountsController.startLoginFlow);
-router.delete('/accounts/session', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.destroySession);
+router.delete('/accounts/session', authMiddleware, AccountsController.destroySession);
 
-router.get('/account', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getAccount);
+router.get('/account', authMiddleware, AccountsController.getAccount);
 router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
 router.post('/account/generate-api-token', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.generateApiToken);
 router.get('/account/messages', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getMessages);
@@ -112,6 +116,23 @@ router.post('/extras/:channelName/got-talent/golden-buzzer', Passport.getPasspor
 
 
 router.get('/widgets/:widgetId', WidgetsController.getWidgetConfig);
+
+
+
+// Decks
+
+router.get('/decks', authMiddleware, DecksController.getDecks);
+router.get('/decks/:deckId', authMiddleware, DecksController.getDeckById);
+router.post('/decks', authMiddleware, DecksController.createDeck);
+router.put('/decks/:deckId', authMiddleware, DecksController.updateDeck);
+router.delete('/decks/:deckId', authMiddleware, DecksController.deleteDeckById);
+
+router.post('/decks/:deckId/page', authMiddleware, DecksController.createDeckPage);
+router.delete('/decks/:deckId/page', authMiddleware, DecksController.deleteDeckPageById);
+router.post('/decks/:deckId/button', authMiddleware, DecksController.createDeckButton);
+router.delete('/decks/:deckId/button', authMiddleware, DecksController.deleteDeckButtonById);
+router.put('/decks/:deckId/button', authMiddleware, DecksController.updateDeckButtonById);
+
 
 
 export default router;

@@ -21,6 +21,7 @@ import Passport from "./lib/Passport";
 import SocketIO from "./app/modules/SocketIO.module";
 import Shoutout from "./app/models/Shoutout.model";
 import EmailManager from "./app/modules/EmailManager.module";
+import StreamCopilot from "./app/modules/StreamCopilot.module";
 
 MonkeyPatches.apply();
 
@@ -43,6 +44,7 @@ const initializeApp = async () => {
         Environment.https = process.env.HTTPS === 'true';
 
         CommandExecutor.initialize();
+        StreamCopilot.initialize(process.env.OPENAI_API_KEY!);
 
         await Passport.setup();
 

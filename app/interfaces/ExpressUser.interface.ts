@@ -17,4 +17,5 @@ export interface ExpressUser {
     channel?: Channel;
     avatar: string;
     systemToken: boolean;
+    is_patron: boolean;
 }

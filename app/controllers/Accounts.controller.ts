@@ -147,6 +147,7 @@ class AccountsController {
             }
 
             const unreads = await impersonatedUser.getUnreadNotificationsCount();
+            const isPatron = await impersonatedUser.isPatron();
 
             user = {
                 ...user,
@@ -155,9 +156,10 @@ class AccountsController {
                 username: impersonatedUser.username,
                 email: impersonatedUser.email || null,
                 displayName: impersonatedUser.displayName || impersonatedUser.username,
-                avatar: impersonatedUser.avatar || `https://decapi.me/twitch/avatar/${impersonatedUser.username}`,
+                avatar: impersonatedUser.avatar as string,
                 channel: impersonatedChannel,
-                unread_notifications_count: unreads
+                unread_notifications_count: unreads,
+                is_patron: isPatron,
             }
 
             if (!user) {
