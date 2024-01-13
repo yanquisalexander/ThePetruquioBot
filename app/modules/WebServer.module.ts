@@ -39,6 +39,9 @@ class WebServer {
                 more_info: "https://www.petruquio.live"
             })
         });
+        app.get('/ping', (req, res) => {
+            res.status(200).send('PONG');
+        });
         app.use(Passport.getPassport().initialize());
 
         app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

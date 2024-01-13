@@ -3,7 +3,7 @@ import "dotenv/config";
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const DiscordStrategy = require('@soerenmetje/passport-discord').Strategy;
-const PatreonStrategy = require('@oauth-everything/passport-patreon').Strategy;
+const PatreonStrategy = require('passport-patreon').Strategy;
 
 import User from '../app/models/User.model';
 import Session from '../app/models/Session.model';

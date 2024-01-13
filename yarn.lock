@@ -3705,7 +3705,7 @@ passport-oauth1@1.x.x:
     passport-strategy "1.x.x"
     utils-merge "1.x.x"
 
-passport-oauth2@1.x.x, passport-oauth2@^1.5.0, passport-oauth2@^1.6.1:
+passport-oauth2@1.x.x, passport-oauth2@^1.3.0, passport-oauth2@^1.5.0, passport-oauth2@^1.6.1:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/passport-oauth2/-/passport-oauth2-1.7.0.tgz#5c4766c8531ac45ffe9ec2c09de9809e2c841fc4"
   integrity sha512-j2gf34szdTF2Onw3+76alNnaAExlUmHvkc7cL+cmaS5NzHzDP/BvFHJruueQ9XAeNOdpI+CH+PWid8RA7KCwAQ==
@@ -3723,6 +3723,15 @@ passport-oauth@1.0.0:
   dependencies:
     passport-oauth1 "1.x.x"
     passport-oauth2 "1.x.x"
+
+passport-patreon@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/passport-patreon/-/passport-patreon-1.0.1.tgz#b09d63750f3d1cdaef4e89004a0e260941ac2313"
+  integrity sha512-Whb9BH3RvdEFivu5sKWb3DU3/vB0jyuRrF5YCx+L152mifrzfE6+hMOLyYei8yf1sgANKg9dddb4Jt6Xf8saig==
+  dependencies:
+    passport-oauth2 "^1.3.0"
+    pkginfo "^0.4.0"
+    request "^2.74.0"
 
 passport-spotify@^2.0.0:
   version "2.0.0"
@@ -3877,6 +3886,11 @@ picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
+
+pkginfo@^0.4.0:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/pkginfo/-/pkginfo-0.4.1.tgz#b5418ef0439de5425fc4995042dced14fb2a84ff"
+  integrity sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==
 
 postgres-array@~2.0.0:
   version "2.0.0"
@@ -4107,7 +4121,7 @@ regexp.prototype.flags@^1.5.1:
     define-properties "^1.2.0"
     set-function-name "^2.0.0"
 
-request@^2.81.0, request@^2.88.0:
+request@^2.74.0, request@^2.81.0, request@^2.88.0:
   version "2.88.2"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.2.tgz#d73c918731cb5a87da047e207234146f664d12b3"
   integrity sha512-MsvtOrfG9ZcrOwAW+Qi+F6HbD0CWXEh9ou77uOb7FM2WPhwT7smM833PzanhJLsgXjN89Ir6V2PczXNnMpwKhw==
