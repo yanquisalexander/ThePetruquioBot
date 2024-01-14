@@ -109,8 +109,15 @@ class GreetingsManager {
             console.error(chalk.red('[GREETINGS]'), chalk.white('Error getting timezone:'), error);
         }
 
-        const date = new Date(); // Obtén la fecha y hora actuales en la zona horaria local
-        const userTime = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+        const date = DateTime.local().setZone(timezone);
+        const offsetHours = date.offset / 60;
+        const offsetMinutes = date.offset % 60;
+        
+        const userTime = new Date();
+        userTime.setHours(userTime.getHours() + offsetHours);
+        userTime.setMinutes(userTime.getMinutes() + offsetMinutes);
+
+        console.log(chalk.blue(`[GREETINGS] Getting sunlight greeting for ${username}, lang: ${lang}, userTime: ${userTime}`));
         
         const times = SunCalc.getTimes(userTime, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
         const hour = userTime.getHours();
