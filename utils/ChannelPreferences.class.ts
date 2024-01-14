@@ -41,6 +41,7 @@ const createDefaultChannelPreferences = () => ({
     firstRankingRewardId: createChannelPreference("", FieldTypes.CHANNEL_POINT),
     firstRankingRedeemedMessage: createChannelPreference("", FieldTypes.TEXT),
     showSongRequestsOnMap: createChannelPreference(false, FieldTypes.BOOLEAN),
+    communityWallCanvasSize: createChannelPreference("600x600", FieldTypes.INPUT),
 } as const);
 
 const defaultChannelPreferences = createDefaultChannelPreferences();
