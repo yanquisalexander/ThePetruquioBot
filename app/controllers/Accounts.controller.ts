@@ -91,8 +91,8 @@ class AccountsController {
                 user,
                 type: AuditType.LOGIN_SUCCESS,
                 data: {
-                    ip: req.ip,
-                    userAgent: req.headers['user-agent'],
+                    ip_address: req.headers['x-envoy-external-address'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+                    user_agent: req.headers['user-agent']
                 },
             });
 
