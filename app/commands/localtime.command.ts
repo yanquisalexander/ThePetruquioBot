@@ -28,11 +28,12 @@ const LocalTimeCommand = new Command(
                 }
 
                 const date = DateTime.local().setZone(timezone);
-                const offset = date.offsetNameShort;
                 const offsetHours = date.offset / 60;
                 const offsetMinutes = date.offset % 60;
                 const offsetString = `${offsetHours > 0 ? '+' : ''}${offsetHours}:${offsetMinutes}`;
-                const timeString = date.toLocaleString(DateTime.TIME_SIMPLE);
+                const timeString = date.toLocaleString(DateTime.TIME_24_SIMPLE);
+                console.log(chalk.green('[GREETINGS]'), chalk.white('Local time for'), chalk.yellow(_user.displayName), chalk.white('is'), chalk.yellow(timeString), chalk.white('in timezone'), chalk.yellow(timezone), chalk.white('with offset'), chalk.yellow(offsetString));
+                console.log(`Hours: ${date.hour}, Minutes: ${date.minute}, Offset: ${date.offset}`)
                 _bot.sendMessage(_channel, `@${_user.displayName}, la hora local es ${timeString} (UTC${offsetString})`);
             } catch (error) {
                 console.error(chalk.red('[GREETINGS]'), chalk.white('Error getting timezone:'), error);

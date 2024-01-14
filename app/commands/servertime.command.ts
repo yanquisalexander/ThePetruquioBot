@@ -17,7 +17,8 @@ const ServerTimeCommand = new Command(
             const serverTime = DateTime.local();
 
             // Formatea la fecha y hora en un formato legible
-            const timeString = serverTime.toLocaleString(DateTime.TIME_SIMPLE);
+            const timeString = serverTime.toLocaleString(DateTime.TIME_24_SIMPLE);
+            console.log(chalk.green('[ServerTime]'), chalk.white('Server time is'), chalk.yellow(timeString));
 
             // Envía el mensaje con la hora del servidor al canal
             _bot.sendMessage(_channel, `@${_user.displayName}, la hora del servidor es ${timeString}`);
