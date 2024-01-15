@@ -161,7 +161,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
                 message: message,
                 isCommand: message ? message.startsWith('!') : false,
                 isBot: user.isBot,
-                command: message ? message.split(' ')[0].replace('!', '') : '',
+                command: message ? message.split(' ')[0].replace('!', '').toLowerCase() : '',
             });
         }
     } catch (error) {
@@ -171,7 +171,7 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
 
 
     if (message.startsWith('!')) {
-        const command = message.split(' ')[0].replace('!', '');
+        const command = message.split(' ')[0].replace('!', '').toLowerCase();
         const args = message.split(' ').slice(1);
 
         const response = await CommandExecutor.getInstance().executeCommand(user, command, args, channelData, bot);

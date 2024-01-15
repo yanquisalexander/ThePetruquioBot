@@ -26,7 +26,7 @@ const AddCommand = new Command(
     {},
     '', // System commands don't need a response
     async (user, args, channel) => {
-        const commandName = args[0].toLowerCase().replace('!', '');
+        const commandName = args[0].toLowerCase().replace('!', '').toLowerCase();
         const commandResponse = args.slice(1).join(' ');
 
         if (!commandName || !commandResponse) {
