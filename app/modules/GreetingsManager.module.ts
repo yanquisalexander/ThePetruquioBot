@@ -122,15 +122,18 @@ class GreetingsManager {
         const times = SunCalc.getTimes(userTime, parseFloat(userLocation.latitude.toString()), parseFloat(userLocation.longitude.toString()));
         const hour = userTime.getHours();
 
-        if (hour >= times.sunrise.getHours() && hour < times.sunriseEnd.getHours()) {
-            return sunlightGreetings[lang].morning
-        } else if (hour >= times.sunriseEnd.getHours() && hour < times.sunset.getHours()) {
-            return sunlightGreetings[lang].afternoon
-        } else if (hour >= times.sunset.getHours() && hour < times.sunset.getHours()) {
-            return sunlightGreetings[lang].evening
+        if (hour >= 0 && hour < 6) {
+            return sunlightGreetings.night[lang];
+        } else if (hour >= 6 && hour < 12) {
+            return sunlightGreetings.morning[lang];
+        } else if (hour >= 12 && hour < 18) {
+            return sunlightGreetings.afternoon[lang];
+        } else if (hour >= 18 || hour < 6) {
+            return sunlightGreetings.evening[lang];
         } else {
-            return sunlightGreetings[lang].night
+            return greetings[lang];
         }
+        
     }
 
     public static async getRandomGreeting(username: string, isBot: boolean, lang: string, isUserBirthday?: boolean) {
