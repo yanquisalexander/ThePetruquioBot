@@ -123,13 +123,13 @@ class GreetingsManager {
         const hour = userTime.getHours();
 
         if (hour >= 0 && hour < 6) {
-            return sunlightGreetings.night[lang];
+            return sunlightGreetings[lang].night;
         } else if (hour >= 6 && hour < 12) {
-            return sunlightGreetings.morning[lang];
+            return sunlightGreetings[lang].morning;
         } else if (hour >= 12 && hour < 18) {
-            return sunlightGreetings.afternoon[lang];
+            return sunlightGreetings[lang].afternoon;
         } else if (hour >= 18 || hour < 6) {
-            return sunlightGreetings.evening[lang];
+            return sunlightGreetings[lang].evening;
         } else {
             return greetings[lang];
         }
