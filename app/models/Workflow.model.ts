@@ -59,7 +59,7 @@ class Workflow {
         await Database.query('DELETE FROM workflows WHERE id = $1', [this.id]);
     }
 
-    async execute(data: any): Promise<void> {
+    async execute(data: any, skipLog?: boolean): Promise<void> {
         const bot = await Bot.getInstance();
 
         let executionLog: string[] = [];
@@ -97,7 +97,6 @@ class Workflow {
 
         try {
             console.log(`[Workflow] Executing workflow ${this.eventType} for channel ${this.channel.user.displayName}`);
-            console.log(`[Workflow] Script: ${this.script}`);
             vm.run(this.script)
 
 
