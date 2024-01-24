@@ -1,7 +1,21 @@
 import Database from "../../lib/DatabaseManager";
 import Channel from "./Channel.model";
+import DeckPage from "./DeckPage.model";
 
 class Deck {
+    deck_id: number;
+    name: string;
+    channel_id: number;
+    rows: number;
+    cols: number;
+
+    constructor(deck_id: number, name: string, channel_id: number, rows: number, cols: number) {
+        this.deck_id = deck_id;
+        this.name = name;
+        this.channel_id = channel_id;
+        this.rows = rows;
+        this.cols = cols;
+    }
     static async createDeck(name: string, channel: Channel, rows: number, cols: number): Promise<Deck | null> {
         try {
             const query = `
@@ -35,7 +49,7 @@ class Deck {
             const result = await Database.query(query, values);
 
             if (result.rows.length > 0) {
-                const deck = result.rows[0];
+                const deck = new Deck(result.rows[0].deck_id, result.rows[0].name, result.rows[0].channel_id, result.rows[0].rows, result.rows[0].cols);
                 return deck;
             } else {
                 // No se encontró el deck, puedes manejarlo según tus necesidades
@@ -116,6 +130,11 @@ class Deck {
             console.error("Error updating deck by id:", error);
             return null;
         }
+    }
+
+    async getPages(): Promise<DeckPage[]> {
+        const deckPages = await DeckPage.getDeckPagesByDeckId(this.deck_id);
+        return deckPages || [];
     }
 
 }

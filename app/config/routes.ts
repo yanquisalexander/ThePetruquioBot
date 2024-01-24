@@ -24,12 +24,16 @@ const router = Router();
 const authMiddleware = Passport.getPassport().authenticate('jwt', { session: false });
 
 router.post('/accounts/getToken', AccountsController.getToken);
+router.post('/accounts/token', AccountsController.getToken);
+
 
 router.get('/accounts/me', authMiddleware, AccountsController.currentUser);
 
 router.get('/accounts/session', authMiddleware, AccountsController.currentSession);
 router.get('/accounts/login',  AccountsController.startLoginFlow);
 router.delete('/accounts/session', authMiddleware, AccountsController.destroySession);
+
+router.get('/moderated-channels', authMiddleware, DashboardController.getModeratedChannels);
 
 router.get('/account', authMiddleware, AccountsController.getAccount);
 router.get('/account/greetings', Passport.getPassport().authenticate('jwt', { session: false }), AccountsController.getGreetingsData);
@@ -127,11 +131,18 @@ router.post('/decks', authMiddleware, DecksController.createDeck);
 router.put('/decks/:deckId', authMiddleware, DecksController.updateDeck);
 router.delete('/decks/:deckId', authMiddleware, DecksController.deleteDeckById);
 
+/* static async updateDeckButtonById(req: Request, res: Response): Promise<Response> {
+    const deckButtonId = req.params.deckButtonId as unknown as number;
+    const deckPageId = req.params.deckPageId as unknown as number;
+    const deckId = req.params.deckId as unknown as number;
+ */
+
 router.post('/decks/:deckId/page', authMiddleware, DecksController.createDeckPage);
 router.delete('/decks/:deckId/page', authMiddleware, DecksController.deleteDeckPageById);
-router.post('/decks/:deckId/button', authMiddleware, DecksController.createDeckButton);
-router.delete('/decks/:deckId/button', authMiddleware, DecksController.deleteDeckButtonById);
-router.put('/decks/:deckId/button', authMiddleware, DecksController.updateDeckButtonById);
+router.post('/decks/:deckId/:deckPageId/button', authMiddleware, DecksController.createDeckButton);
+router.delete('/decks/:deckId/:deckPageId/button/:deckButtonId', authMiddleware, DecksController.deleteDeckButtonById);
+router.put('/decks/:deckId/:deckPageId/button/:deckButtonId', authMiddleware, DecksController.updateDeckButtonById);
+router.put('/decks/:deckId/:deckPageId/buttons/update-positions', authMiddleware, DecksController.updateDeckButtonsOrder);
 
 
 

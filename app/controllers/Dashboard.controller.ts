@@ -192,6 +192,20 @@ class DashboardController {
         return res.json({ data: { success: true } });
     }
 
+    static async getModeratedChannels(req: Request, res: Response) {
+        const currentUser = new CurrentUser(req.user as ExpressUser);
+
+        const user = await currentUser.getCurrentUser();
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const channels = await user.getModeratedChannels();
+
+        return res.json({ data: channels });
+    }
+
 }
 
 export default DashboardController;

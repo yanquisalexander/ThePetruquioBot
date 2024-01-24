@@ -216,6 +216,7 @@ class CommandsController {
                 return res.status(400).json({ error: 'Command and response are required' });
             }
 
+
             const command = await Command.find(impersonatedChannel, name);
 
             if (command) {

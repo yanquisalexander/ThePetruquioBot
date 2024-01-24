@@ -63,7 +63,8 @@ const TWITCH_SCOPES = [
     'moderator:read:followers',
     'channel:bot',
     'chat:edit',
-    'user:bot'
+    'user:bot',
+    'user:read:moderated_channels'
 ];
 
 class TwitchAuthenticator {

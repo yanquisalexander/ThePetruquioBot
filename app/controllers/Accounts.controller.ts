@@ -102,7 +102,12 @@ class AccountsController {
                 console.error(error);
             }
 
-            res.json({ token: customToken });
+            res.json({ 
+                token: customToken, // legacy, for compatibility with old clients
+                access_token: customToken,
+                token_type: 'bearer',
+                expires_in: 30 * 24 * 60 * 60, // 30 days
+             });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Failed to get token' })

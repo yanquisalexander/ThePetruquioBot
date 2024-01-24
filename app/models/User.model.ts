@@ -10,6 +10,7 @@ import Notification from "./Notification.model";
 import jwt from 'jsonwebtoken';
 import Utils from "../../lib/Utils";
 import Patreon from "../modules/Patreon.module";
+import TwitchAuthenticator from "../modules/TwitchAuthenticator.module";
 
 
 
@@ -141,6 +142,10 @@ class User {
         return this.birthday.getDate() === today.getDate() && this.birthday.getMonth() === today.getMonth();
     }
 
+    hasHelixToken(): boolean {
+        return TwitchAuthenticator.RefreshingAuthProvider.hasUser(this.twitchId);
+    }
+
     async fromHelix(): Promise<HelixUser | null> {
         try {
             let user = await Twitch.getUser(this.username);
@@ -150,6 +155,8 @@ class User {
             return null;
         }
     }
+
+    
 
     static async count(): Promise<number> {
         try {
@@ -230,6 +237,30 @@ class User {
             console.error('Error al obtener el token API:', error);
             return null;
         }
+    }
+
+    async getModeratedChannels(): Promise<any[] | unknown> {
+        if(!this.hasHelixToken()) {
+            return [];
+        }
+
+        const helixUser = await this.fromHelix();
+        if(!helixUser) {
+            return [];
+        }
+
+        const moderatedChannels = Twitch.Helix.asUser(helixUser, async ctx => {
+            const result = await ctx.callApi({
+                url: `/moderation/channels?user_id=${helixUser.id}`,
+            })
+
+            return result
+        });
+
+        console.log(moderatedChannels);
+
+        return moderatedChannels;
+
     }
     
 }

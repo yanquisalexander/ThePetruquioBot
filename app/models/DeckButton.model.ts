@@ -7,14 +7,16 @@ class DeckButton {
   actions: any; // Puedes ajustar el tipo según tus necesidades
   icon: string;
   text: string;
+  position?: number | null;
 
-  constructor(deckButtonId: number, pageId: number, deckId: number, actions: any, icon: string, text: string) {
+  constructor(deckButtonId: number, pageId: number, deckId: number, actions: any, icon: string, text: string, position?: number) {
     this.deckButtonId = deckButtonId;
     this.pageId = pageId;
     this.deckId = deckId;
     this.actions = actions;
     this.icon = icon;
     this.text = text;
+    this.position = position;
   }
 
   static async createDeckButton(pageId: number, deckId: number, actions: any, icon: string, text: string): Promise<DeckButton | null> {
@@ -65,13 +67,13 @@ class DeckButton {
     }
   }
 
-    static async getDeckButtonById(id: number): Promise<DeckButton | null> {
+    static async getDeckButtonByIdAndPageId(id: number, pageId: number, deckId: number): Promise<DeckButton | null> {
         try {
         const query = `
             SELECT * FROM deck_buttons
-            WHERE button_id = $1`;
+            WHERE button_id = $1 AND page_id = $2 AND deck_id = $3`;
     
-        const values = [id];
+        const values = [id, pageId, deckId];
         const result = await Database.query(query, values);
     
         if (result.rows.length > 0) {
@@ -97,7 +99,7 @@ class DeckButton {
     
         if (result.rows.length > 0) {
             const deckButtons = result.rows;
-            return deckButtons.map((deckButton) => new DeckButton(deckButton.button_id, deckButton.page_id, deckButton.deck_id, deckButton.actions, deckButton.icon, deckButton.text));
+            return deckButtons.map((deckButton) => new DeckButton(deckButton.button_id, deckButton.page_id, deckButton.deck_id, deckButton.actions, deckButton.icon, deckButton.text, deckButton.position || null));
         } else {
             return null;
         }
@@ -107,14 +109,14 @@ class DeckButton {
         }
     }
 
-    async updateDeckButton(actions: any, icon: string, text: string): Promise<boolean> {
+    async updateDeckButton(actions: any, icon: string, text: string, position?: number): Promise<boolean> {
         try {
         const query = `
             UPDATE deck_buttons
-            SET actions = $1, icon = $2, text = $3
+            SET actions = $1, icon = $2, text = $3, position = $5
             WHERE button_id = $4`;
     
-        const values = [actions, icon, text, this.deckButtonId];
+        const values = [actions, icon, text, this.deckButtonId, position];
         const result = await Database.query(query, values);
     
         if (!result.rowCount) {

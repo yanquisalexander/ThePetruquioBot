@@ -148,9 +148,16 @@ class DecksController {
             });
         }
 
+        const deckPages = await deck.getPages();
+
+
+
         return res.status(200).json({
             data: {
-                deck
+                deck: {
+                    ...deck,
+                    pages: deckPages
+                }
             }
         });
     }
@@ -279,6 +286,7 @@ class DecksController {
     }
 
     static async createDeckButton(req: Request, res: Response): Promise<Response> {
+        const deckId = req.params.deckId as unknown as number;
         const deckPageId = req.params.deckPageId as unknown as number;
 
         if (!deckPageId) {
@@ -334,6 +342,8 @@ class DecksController {
 
     static async deleteDeckButtonById(req: Request, res: Response): Promise<Response> {
         const deckButtonId = req.params.deckButtonId as unknown as number;
+        const deckPageId = req.params.deckPageId as unknown as number;
+        const deckId = req.params.deckId as unknown as number;
 
         if (!deckButtonId) {
             return res.status(400).json({
@@ -344,7 +354,7 @@ class DecksController {
             });
         }
 
-        const deckButton = await DeckButton.getDeckButtonById(deckButtonId);
+        const deckButton = await DeckButton.getDeckButtonByIdAndPageId(deckButtonId, deckPageId, deckId);
 
         if (!deckButton) {
             return res.status(404).json({
@@ -375,6 +385,8 @@ class DecksController {
 
     static async getDeckButtonById(req: Request, res: Response): Promise<Response> {
         const deckButtonId = req.params.deckButtonId as unknown as number;
+        const deckPageId = req.params.deckPageId as unknown as number;
+        const deckId = req.params.deckId as unknown as number;
 
         if (!deckButtonId) {
             return res.status(400).json({
@@ -385,7 +397,7 @@ class DecksController {
             });
         }
 
-        const deckButton = await DeckButton.getDeckButtonById(deckButtonId);
+        const deckButton = await DeckButton.getDeckButtonByIdAndPageId(deckButtonId, deckPageId, deckId);
 
         if (!deckButton) {
             return res.status(404).json({
@@ -405,6 +417,8 @@ class DecksController {
 
     static async updateDeckButtonById(req: Request, res: Response): Promise<Response> {
         const deckButtonId = req.params.deckButtonId as unknown as number;
+        const deckPageId = req.params.deckPageId as unknown as number;
+        const deckId = req.params.deckId as unknown as number;
 
         if (!deckButtonId) {
             return res.status(400).json({
@@ -415,7 +429,7 @@ class DecksController {
             })
         }
 
-        const deckButton = await DeckButton.getDeckButtonById(deckButtonId);
+        const deckButton = await DeckButton.getDeckButtonByIdAndPageId(deckButtonId, deckPageId, deckId);
 
         if (!deckButton) {
             return res.status(404).json({
@@ -455,6 +469,52 @@ class DecksController {
                 deckButton
             }
         });
+    }
+
+    static async updateDeckButtonsOrder(req: Request, res: Response): Promise<Response> {
+        const deckPageId = req.params.deckPageId as unknown as number;
+
+        if (!deckPageId) {
+            return res.status(400).json({
+                errors: ["Missing required parameters."],
+                error_type: "missing_parameters",
+            });
+        }
+
+        const deckPage = await DeckPage.getDeckPageById(deckPageId);
+
+        if (!deckPage) {
+            return res.status(404).json({
+                errors: ["Deck page not found."],
+                error_type: "deck_page_not_found",
+            });
+        }
+
+        if (!req.body.buttonsOrder) {
+            return res.status(400).json({
+                errors: ["buttonsOrder is required."],
+                error_type: "missing_parameters",
+            });
+        }
+
+        try {
+            const buttonsOrder: number[] = req.body.buttonsOrder;
+
+            // Iterar sobre el orden de los botones y actualizar la posición
+            for (let index = 0; index < buttonsOrder.length; index++) {
+                const buttonId = buttonsOrder[index];
+                const button = await DeckButton.getDeckButtonByIdAndPageId(buttonId, deckPageId, deckPage.deckId);
+
+                if (button) {
+                    await button.updateDeckButton(button.actions, button.icon, button.text, index)
+                }
+            }
+
+            return res.json({ message: 'Buttons order updated successfully' });
+        } catch (error) {
+            return res.status(500).json({ error: (error as Error).message });
+        }
+
     }
 
     static async getDeckPageById(req: Request, res: Response): Promise<Response> {
