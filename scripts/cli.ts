@@ -13,7 +13,7 @@ Twitch.initialize();
 EmailManager.initialize();
 
 const showMenu = () => {
-    console.log('=== PetruquioBot Console ===');
+    console.log('=== PetruquioLIVE Console ===');
     console.log('1. Update user');
     console.log('2. Test Email');
     console.log('3. Exit');
@@ -39,7 +39,7 @@ const main = async () => {
         option = showMenu();
     }
 
-    console.log('Thanks for using PetruquioBot Console');
+    console.log('Thanks for using Petruquio.LIVE Console');
     process.exit(0);
 }
 

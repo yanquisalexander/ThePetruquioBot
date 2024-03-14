@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import "dotenv/config";
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
@@ -194,6 +195,23 @@ class Passport {
     public static getPassport(): typeof passport {
         return this.passport;
     }
-}
+
+    public static async middleware (req: Request, res: Response, next: NextFunction): Promise<void> {
+        passport.authenticate('jwt', { session: false }, (err: Error, user: User) => {
+          if (err || !user) {
+            console.error(chalk.red('[PASSPORT]'), err);
+            res.status(401).json({
+              errors: [
+                "Looks like you're not authenticated. Please log in and try again."
+              ],
+              error_type: err
+            })
+          } else {
+            req.user = user
+            next()
+          }
+        })(req, res, next)
+      }
+    }
 
 export default Passport;

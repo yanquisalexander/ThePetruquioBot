@@ -4,7 +4,7 @@ export enum FieldTypes {
     INPUT = "input",
     CHANNEL_POINT = "channel_point",
     NUMBER = "number",
-    LIST = "list",
+    LIST = "list"
 }
 
 type ChannelPreference<T> = {
@@ -41,7 +41,8 @@ const createDefaultChannelPreferences = () => ({
     firstRankingRewardId: createChannelPreference("", FieldTypes.CHANNEL_POINT),
     firstRankingRedeemedMessage: createChannelPreference("", FieldTypes.TEXT),
     showSongRequestsOnMap: createChannelPreference(false, FieldTypes.BOOLEAN),
-    communityWallCanvasSize: createChannelPreference("600x600", FieldTypes.INPUT),
+    communityWallCanvasSize: createChannelPreference("600x600", FieldTypes.INPUT, true, false),
+    enableLightsControl: createChannelPreference(false, FieldTypes.BOOLEAN, true, true)
 } as const);
 
 const defaultChannelPreferences = createDefaultChannelPreferences();

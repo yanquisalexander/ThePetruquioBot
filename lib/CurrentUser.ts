@@ -11,7 +11,8 @@ class CurrentUser {
     }
 
     async getCurrentUser(): Promise<User | null> {
-        if (this.expressUser.systemToken) {
+        console.log(this)
+        if (this.expressUser.system_token) {
             /* 
                 If is a System Token (a.k.a API Token) don't verify session
             */

@@ -8,7 +8,7 @@ import User from "../models/User.model";
 import Audit, { AuditType } from "../models/Audit.model";
 import Twitch from "./Twitch.module";
 
-const TWITCH_SCOPES = [
+export const TWITCH_SCOPES = [
     'user:edit',
     'user:read:email',
     'clips:edit',
@@ -104,7 +104,7 @@ class TwitchAuthenticator {
                 const botAccount = await User.findByTwitchId(parseInt(process.env.TWITCH_USER_ID as string));
                 const channel = await user?.getChannel();
 
-                if(!user || !botAccount) {
+                if (!user || !botAccount) {
                     console.warn(chalk.bgMagenta.bold('[TWITCH AUTHENTICATOR]'), chalk.yellow(`User ${userId} or bot account not found in database. Skipping audit`));
                     return;
                 }

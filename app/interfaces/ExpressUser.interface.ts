@@ -16,6 +16,6 @@ export interface ExpressUser {
     unread_notifications_count: number;
     channel?: Channel;
     avatar: string;
-    systemToken: boolean;
+    system_token: boolean;
     is_patron: boolean;
 }
