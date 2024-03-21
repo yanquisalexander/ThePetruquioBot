@@ -122,8 +122,8 @@ export const SpectatorLocationsTable = pgTable('spectator_locations', {
 
 export const UserTokensTable = pgTable('user_tokens', {
   id: serial('id').primaryKey(),
-  user_id: integer('user_id').references(() => UsersTable.twitch_id),
-  token_data: jsonb('token_data').notNull()
+  user_id: integer('user_id').references(() => UsersTable.twitch_id).notNull(),
+  token_data: jsonb('token_data').default('{}')
 })
 
 export const WorldMapsTable = pgTable('world_maps', {
