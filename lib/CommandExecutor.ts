@@ -13,15 +13,14 @@ async function importCommandModules (): Promise<Command[]> {
   const commandsDirectory = path.join(appRoot, 'app', 'commands')
   const commandFiles = await getCommandFiles(commandsDirectory)
 
-  const commandModules = await Promise.all(
-    commandFiles
-      .filter(file => file.endsWith('.command.ts'))
-      .map(async file => {
-        const commandFilePath = path.join(commandsDirectory, file)
-        const module = await Utils.importModule(commandFilePath)
-        return module.default
-      })
-  )
+  const commandModules: Command[] = []
+  for (const file of commandFiles) {
+    if (file.endsWith('.command.ts')) {
+      const commandFilePath = path.join(commandsDirectory, file)
+      const module = await Utils.importModule(commandFilePath)
+      commandModules.push(module.default)
+    }
+  }
 
   return commandModules
 }

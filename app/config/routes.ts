@@ -85,7 +85,7 @@ router.put('/channel/widgets/:widgetId', Passport.getPassport().authenticate('jw
 
 router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts)
 router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout)
-router.put('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.updateShoutout)
+router.put('/channel/community/shoutouts/:targetStreamerId', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.updateShoutout)
 router.delete('/channel/community/shoutouts/:targetStreamerId', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.deleteShoutout)
 
 router.get('/admin/dashboard', Passport.getPassport().authenticate('jwt', { session: false }), AdminController.dashboardIndex)

@@ -9,10 +9,11 @@ export const Configuration = {
   HTTPS: process.env.HTTPS === 'true' || false,
   JWT_SECRET: process.env.JWT_SECRET ?? 'secret',
   BREVO_API_KEY: process.env.BREVO_API_KEY ?? '',
+  DB_NAME: process.env.DB_NAME ?? 'postgres',
   DB_HOST: process.env.DB_HOST ?? 'localhost',
   DB_PORT: process.env.DB_PORT ?? '5432',
-  DB_USERNAME: process.env.DB_USERNAME ?? 'postgres',
-  DB_PASSWORD: process.env.DB_PASSWORD ?? 'password',
+  DB_USER: process.env.DB_USER ?? 'postgres',
+  DB_PASS: process.env.DB_PASS ?? 'password',
   SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID ?? '',
   SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET ?? '',
   SPOTIFY_CALLBACK_URL: process.env.SPOTIFY_CALLBACK_URL ?? '',
@@ -24,5 +25,9 @@ export const Configuration = {
   DEVELOPMENT_CHANNELS: process.env.CHANNELS?.split(',') ?? ['alexitoo_uy, petruquiolive'],
   LEMON_API_KEY: process.env.LEMON_API_KEY ?? '',
   LEMON_STORE_ID: process.env.LEMON_STORE_ID ?? '',
-  LEMON_PRODUCT_ID: process.env.LEMON_PRODUCT_ID ?? ''
+  LEMON_PRODUCT_ID: process.env.LEMON_PRODUCT_ID ?? '',
+  PAYPAL_MODE: process.env.PAYPAL_MODE ?? 'sandbox',
+  PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID ?? '',
+  PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET ?? '',
+  PAYPAL_SUBSCRIPTION_PLAN_ID: process.env.PAYPAL_SUBSCRIPTION_PLAN_ID ?? ''
 }

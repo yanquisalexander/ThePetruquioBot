@@ -14,11 +14,19 @@ import Environment from './utils/environment'
 import Passport from './lib/Passport'
 import EmailManager from './app/modules/EmailManager.module'
 
+let PETRUQUIOLIVE_COMPILED_DATE: string | undefined
+
 MonkeyPatches.apply()
 
 Database.connect()
 
 const initializeApp = async (): Promise<void> => {
+  /* eslint-disable no-undef */
+  if (PETRUQUIOLIVE_COMPILED_DATE) {
+    console.log(chalk.bgCyan.bold('[APP]'), chalk.white(`Petruquio.LIVE compiled on ${PETRUQUIOLIVE_COMPILED_DATE}`))
+    return process.exit(0)
+  }
+
   try {
     dotenv.config()
     const bot = await Bot.getInstance()

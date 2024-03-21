@@ -134,11 +134,17 @@ export const handleChatMessage = async (channel: string, userstate: ChatUserstat
     }
 
     if (await GreetingsManager.canReceiveShoutoutGreeting(channelData, userData)) {
-      const greeting = await Shoutout.find(channelData, userData)
-      console.log(greeting)
-      if (greeting) {
+      const shoutout = await Shoutout.find(channelData, userData)
+      console.log(shoutout)
+      if (shoutout) {
         console.log(chalk.yellow('[GREETINGS]'), `${chalk.hex(user.color).bold(user.displayName)} is eligible for a shoutout greeting!`)
-        GreetingsManager.addToGreetingStack(channelData, greeting.messages[Math.floor(Math.random() * greeting.messages.length)])
+        if (shoutout.messages.length === 0) {
+          console.log(chalk.yellow('[GREETINGS]'), `No messages found for user ${chalk.bold(user.username)}. Updating last shoutout date...`)
+          shoutout.updatedAt = new Date(new Date().getTime() - 21600000)
+          await shoutout.save()
+          return
+        }
+        GreetingsManager.addToGreetingStack(channelData, shoutout.messages[Math.floor(Math.random() * shoutout.messages.length)])
         try {
           const helixUser = await userData.fromHelix()
           if (!helixUser) {

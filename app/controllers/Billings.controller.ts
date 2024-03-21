@@ -1,4 +1,4 @@
-import { lemonSqueezy } from '@/app/services/LemonSqueezy'
+import { paypalService } from '@/app/services/PayPal'
 import { type Request, type Response } from 'express'
 import { type ExpressUser } from '@/app/interfaces/ExpressUser.interface'
 import CurrentUser from '@/lib/CurrentUser'
@@ -19,25 +19,9 @@ export class BillingsController {
     }
 
     try {
-      const variant = await lemonSqueezy.listAllVariants({
-        productId: Configuration.LEMON_PRODUCT_ID
-      })
+      const checkout = await paypalService.createSubscription(user)
 
-      const { data: checkout } = await lemonSqueezy.createCheckout({
-        store: Configuration.LEMON_STORE_ID,
-        variant: variant.data[0].id,
-        checkout_data: {
-          email: user.email,
-          custom: {
-            // @ts-expect-error userId is optional
-            userId: user.twitchId.toString()
-          },
-          name: user.displayName ?? user.username
-        },
-        custom_price: 0
-      })
-
-      return res.json(checkout.attributes)
+      return res.json(checkout)
     } catch (error) {
       console.error(error)
       return res.status(500).json({ error: 'Error creating checkout' })

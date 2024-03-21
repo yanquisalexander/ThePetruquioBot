@@ -8,6 +8,7 @@ import { Bot } from '../../bot'
 import SpectatorLocation from '../models/SpectatorLocation.model'
 import ct, { type Timezone } from 'countries-and-timezones'
 import { DateTime } from 'luxon'
+import cron from 'node-cron'
 
 class GreetingsManager {
   constructor () {
@@ -20,7 +21,7 @@ class GreetingsManager {
 
     */
 
-  private static readonly cooldown = Environment.isDevelopment ? 30 * 1000 : 6 * 60 * 60 * 1000
+  private static readonly cooldown = 6 * 60 * 60 * 1000 // 6 hours in milliseconds
 
   private static readonly knownBotsList: string[] = ['streamelements', 'streamlabs', 'nightbot', 'tangerinebot_']
 
@@ -222,7 +223,8 @@ class GreetingsManager {
 
   public static initialize (): void {
     console.log(chalk.green('[GREETINGS]'), chalk.white('Initialized.'))
-    setInterval(async () => {
+
+    cron.schedule('*/10 * * * * *', async () => {
       try {
         if (this.greetingStacks.length > 0) {
           const greeting = this.greetingStacks.shift()
@@ -233,7 +235,7 @@ class GreetingsManager {
       } catch (error) {
         console.error(chalk.red('[GREETINGS]'), chalk.white('Error sending greeting:'), error)
       }
-    }, 10 * 1000)
+    })
   }
 
   public static get knownBots (): string[] {

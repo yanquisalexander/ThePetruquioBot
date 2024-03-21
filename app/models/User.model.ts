@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken'
 import Utils from '../../lib/Utils'
 import Patreon from '../modules/Patreon.module'
 import TwitchAuthenticator from '../modules/TwitchAuthenticator.module'
+import { paypalService } from '../services/PayPal'
 
 class User {
   username: string
@@ -20,6 +21,7 @@ class User {
   avatar?: string
   admin?: boolean
   birthday?: Date | null
+  customIdPaypal: string
 
   constructor (username: string, twitchId: number, email?: string, displayName?: string, avatar?: string, admin?: boolean, birthday?: Date) {
     this.username = username
@@ -29,6 +31,7 @@ class User {
     this.avatar = avatar
     this.admin = admin ?? false
     this.birthday = birthday
+    this.customIdPaypal = `P-${twitchId}`
   }
 
   public static async findByUsername (username: string): Promise<User | null> {
@@ -103,6 +106,10 @@ class User {
 
   async isPatron (): Promise<boolean> {
     return await Patreon.isUserSubscribed(this)
+  }
+
+  async isSuscribed (): Promise<boolean> {
+    return await paypalService.isSubscriptionActive(this.customIdPaypal)
   }
 
   public async getGreetingsData (): Promise<any> {

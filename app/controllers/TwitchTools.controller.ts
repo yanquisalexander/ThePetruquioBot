@@ -7,7 +7,7 @@ export class TwitchToolsController {
   async searchUsers (req: Request, res: Response): Promise<Response> {
     try {
       // Validate query parameter with zod, minimum 3 characters
-      const query = req.query.q as string
+      const { query } = req.query as { query: string }
 
       z.string().min(3, 'Query must be at least 3 characters long').parse(query)
 

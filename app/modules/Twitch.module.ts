@@ -6,6 +6,8 @@ import Channel from '../models/Channel.model'
 import MemoryVariables from '../../lib/MemoryVariables'
 import TwitchEmoticons from '@mkody/twitch-emoticons'
 import { type ChatUserstate } from 'tmi.js'
+import cron from 'node-cron'
+import { Configuration } from '../config'
 const { EmoteFetcher, EmoteParser } = TwitchEmoticons
 
 class Twitch {
@@ -15,9 +17,9 @@ class Twitch {
 
   public static Helix: ApiClient
   public static HelixApp: ApiClient
-  // @ts-expect-error
+  // @ts-expect-error EmoteFetcher es utilizado como tipo y como valor
   public static EmoteFetcher: EmoteFetcher
-  public static firstCheck: boolean = true
+  public static firstLiveStreamsCheck: boolean = true
 
   public static async initialize (): Promise<void> {
     this.Helix = new ApiClient({
@@ -51,12 +53,13 @@ class Twitch {
       throw new Error(`User ${Bot.username} not found.`)
     }
 
-    const twitchShoutout = this.Helix.asUser(moderator, async api => {
-      const shoutout = await api.chat.shoutoutUser(fromChannel.twitchId, targetChannel)
-      return shoutout
-    })
-
-    await twitchShoutout
+    try {
+      await this.Helix.asUser(moderator, async api => {
+        await api.chat.shoutoutUser(fromChannel.twitchId, targetChannel)
+      })
+    } catch (error) {
+      console.error(chalk.blue('[TWITCH MODULE]'), chalk.white('Error shouting out user:'), error)
+    }
   }
 
   public static async getUser (username: string): Promise<HelixUser | null> {
@@ -78,7 +81,7 @@ class Twitch {
     const liveChannels: HelixUser[] = []
 
     for (const channelGroup of channelGroups) {
-      const users = await this.Helix.asUser(process.env.TWITCH_USER_ID!, async api => {
+      const users = await this.Helix.asUser(Configuration.TWITCH_USER_ID, async api => {
         return await api.users.getUsersByNames(channelGroup)
       })
 
@@ -106,10 +109,10 @@ class Twitch {
   public static async checkLiveChannels (): Promise<void> {
     try {
       const bot = await Bot.getInstance()
-      let channels
-      if (this.firstCheck) {
+      let channels: string[] = []
+      if (this.firstLiveStreamsCheck) {
         channels = (await Channel.getAutoJoinChannels()).map(channel => channel.user.username)
-        this.firstCheck = false
+        this.firstLiveStreamsCheck = false
       } else {
         channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''))
       }
@@ -126,7 +129,7 @@ class Twitch {
               currentLiveChannels.push(liveStream)
             }
           } catch (error) {
-            console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${error}`))
+            console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${(error as Error).message}`))
           }
         })
       )
@@ -140,6 +143,10 @@ class Twitch {
         console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`))
       }
 
+      if (offlineChannels.length > 0) {
+        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New offline channels: ${offlineChannels.map(channel => channel.userName).join(', ')}`))
+      }
+
       MemoryVariables.setLastLiveStreamsCheck(new Date())
       MemoryVariables.setLiveChannels(currentLiveChannels)
     } catch (error) {
@@ -149,10 +156,14 @@ class Twitch {
 
   public static async initializeLiveMonitor (): Promise<void> {
     await this.checkLiveChannels() // Check live channels on startup
-    setInterval(async () => {
+    cron.schedule('*/2 * * * *', async () => {
       console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Checking live channels...'))
-      await this.checkLiveChannels()
-    }, 2 * 60 * 1000)
+      try {
+        await this.checkLiveChannels()
+      } catch (error) {
+        console.error(chalk.blue('[TWITCH MODULE]'), chalk.white('Error checking live channels:'), error)
+      }
+    })
   }
 
   public static async parseEmotes (channel: Channel, message: string, userstate: ChatUserstate, isMapPin?: boolean): Promise<string> {
@@ -216,6 +227,7 @@ class Twitch {
   public static async sendAnnouncement (channel: Channel, message: string, color?: string): Promise<void> {
     try {
       const moderator = await this.Helix.users.getUserByName(Bot.username)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const announcementColor: HelixChatAnnouncementColor = color as HelixChatAnnouncementColor
 
       if (!moderator) {
@@ -223,6 +235,7 @@ class Twitch {
       }
 
       const twitchAnnouncement = this.Helix.asUser(moderator, async api => {
+        // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
         const announcement = await api.chat.sendAnnouncement(channel.twitchId, {
           color: 'primary',
           message

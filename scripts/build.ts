@@ -1,26 +1,47 @@
-import ImportGlobPlugin from 'esbuild-plugin-import-glob';
-import * as esbuild from 'esbuild';
+import path from 'path'
+import ImportGlobPlugin from 'esbuild-plugin-import-glob'
+import * as esbuild from 'esbuild'
 
-const rootDir = __dirname + '/..';
+const rootDir = path.join(__dirname, '/..')
 
-async function build() {
+async function build (): Promise<void> {
   try {
-    await esbuild.build({
+    const { errors, warnings } = await esbuild.build({
       logLevel: 'debug',
       entryPoints: [rootDir + '/index.ts'],
       bundle: true,
-      outfile: rootDir + '/dist/index.js',
-      minify: true,
       platform: 'node',
       plugins: [ImportGlobPlugin()],
       packages: 'external',
-      target: ['node16']
-    });
+      target: ['node16'],
+      outdir: rootDir + '/dist',
+      metafile: true, // Habilita la generación del archivo meta,
+      banner: {
+        js: `/******************\n * Build: ${new Date().toLocaleString()}\n ******************/\n
+     let PETRUQUIOLIVE_COMPILED_DATE = '${new Date().toLocaleString()}'\n   
+  
+`
+      }
+    })
 
-    console.log('Build complete!'); // Agrega un mensaje de registro
+    // Handle errors and warnings
+    if (errors.length > 0) {
+      console.error('Build failed with errors:')
+      errors.forEach((error) => { console.error(error) })
+      return
+    }
+
+    if (warnings.length > 0) {
+      console.warn('Build completed with warnings:')
+      // warnings.forEach((warning) => { console.warn(warning) })
+    }
+
+    console.log('Build complete!') // Agrega un mensaje de registro
   } catch (error) {
-    console.error('Build failed:', error); // Manejo de errores en caso de que la compilación falle
+    console.error('Build failed:', error) // Manejo de errores en caso de que la compilación falle
   }
 }
 
-build();
+build().catch((error) => {
+  console.error('Build failed:', error)
+})
