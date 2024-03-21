@@ -27,6 +27,16 @@ CREATE TABLE IF NOT EXISTS "commands" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "core_widgets" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"channel_id" integer NOT NULL,
+	"widget_type" text NOT NULL,
+	"preferences" jsonb DEFAULT '{}',
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "core_widgets_channel_id_widget_type_unique" UNIQUE("channel_id","widget_type")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "external_accounts" (
 	"user_id" integer,
 	"provider" text NOT NULL,
@@ -104,8 +114,8 @@ CREATE TABLE IF NOT EXISTS "spectator_locations" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_tokens" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer,
-	"token_data" jsonb NOT NULL
+	"user_id" integer NOT NULL,
+	"token_data" jsonb DEFAULT '{}'
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
@@ -170,6 +180,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "commands" ADD CONSTRAINT "commands_channel_id_channels_twitch_id_fk" FOREIGN KEY ("channel_id") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "core_widgets" ADD CONSTRAINT "core_widgets_channel_id_channels_twitch_id_fk" FOREIGN KEY ("channel_id") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

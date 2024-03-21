@@ -13,12 +13,21 @@ import TwitchEvents from './app/modules/TwitchEvents.module'
 import Environment from './utils/environment'
 import Passport from './lib/Passport'
 import EmailManager from './app/modules/EmailManager.module'
+import Channel from './app/models/Channel.model'
 
 let PETRUQUIOLIVE_COMPILED_DATE: string | undefined
 
 MonkeyPatches.apply()
 
 Database.connect()
+
+const Test = async () => {
+  const channel = await Channel.findByTwitchId(589751969)
+  const core = await channel?.getCoreWidgets()
+  console.log(core)
+}
+
+Test()
 
 const initializeApp = async (): Promise<void> => {
   /* eslint-disable no-undef */

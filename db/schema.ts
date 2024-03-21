@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid } from 'drizzle-orm/pg-core'
+import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid, unique } from 'drizzle-orm/pg-core'
 
 export const UsersTable = pgTable('users', {
   twitch_id: integer('twitch_id').primaryKey(),
@@ -155,4 +155,18 @@ export const WorkflowLogsTable = pgTable('workflow_logs', {
   created_at: timestamp('created_at').default(sql.raw('now()')),
   updated_at: timestamp('updated_at').default(sql.raw('now()')),
   execution_log: text('execution_log')
+})
+
+export const CoreWidgetsTable = pgTable('core_widgets', {
+  id: uuid('id').primaryKey(),
+  channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id).notNull(),
+  widget_type: text('widget_type').notNull(),
+  preferences: jsonb('preferences').default('{}'),
+  created_at: timestamp('created_at').default(sql.raw('now()')),
+  updated_at: timestamp('updated_at').default(sql.raw('now()'))
+}, (table) => {
+  // Unique channel_id, widget_type
+  return {
+    unique: unique().on(table.channel_id, table.widget_type)
+  }
 })

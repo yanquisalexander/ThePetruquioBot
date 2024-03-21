@@ -1,5 +1,5 @@
 {
-  "id": "bf0c0e6c-f486-485f-b5d9-45e4ca812b80",
+  "id": "95e38e0a-6f6f-41c8-8f27-e6af4eb2ba0a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -217,6 +217,78 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "core_widgets": {
+      "name": "core_widgets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "widget_type": {
+          "name": "widget_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "preferences": {
+          "name": "preferences",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "core_widgets_channel_id_channels_twitch_id_fk": {
+          "name": "core_widgets_channel_id_channels_twitch_id_fk",
+          "tableFrom": "core_widgets",
+          "tableTo": "channels",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "twitch_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "core_widgets_channel_id_widget_type_unique": {
+          "name": "core_widgets_channel_id_widget_type_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "channel_id",
+            "widget_type"
+          ]
+        }
+      }
     },
     "external_accounts": {
       "name": "external_accounts",
@@ -797,13 +869,14 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "token_data": {
           "name": "token_data",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "'{}'"
         }
       },
       "indexes": {},
