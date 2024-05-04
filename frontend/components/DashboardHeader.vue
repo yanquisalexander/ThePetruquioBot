@@ -56,9 +56,9 @@ const handleLanguageChange = (value?: string) => {
   if (!value) return;
   i18n.locale.value = value;
   cookie.value = value;
+  updateLanguageOptions();
 };
 
-// Inicialización
 onMounted(() => {
   updateLanguageOptions();
   handleLanguageChange(cookie.value);

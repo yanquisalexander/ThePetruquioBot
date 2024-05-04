@@ -133,9 +133,9 @@ import { BadgeCheckIcon, DicesIcon, RefreshCwIcon, MoreHorizontalIcon } from "lu
 const soundManager = SoundManager.getInstance();
 const { $moment } = useNuxtApp();
 import { io, Socket } from 'socket.io-client';
-import { useSnackbar } from "#imports";
 import type { LatLngExpression, LayerGroup, Marker, Map } from "leaflet";
 const { showSnackbar, snackbar } = useSnackbar();
+const { fetchMapData, createMap, createTileLayer, createMarker: createMarkerInstance } = useCommunityMap();
 
 
 
@@ -166,15 +166,16 @@ const channelName = route.params.channel_name;
 
 const fetchMap = async () => {
   try {
-    const response = await useFetch(`${API_ENDPOINT}/worldmap/${channelName}`);
+    const response = await fetchMapData(channelName.toString())
     // @ts-ignore
-    const data = response.data.value?.data;
-
-    if (!data || response.error.value?.statusCode === 404) {
+    
+    const data = response.data;
+    console.log(data);
+    mapMarkers.value = data.worldMap;
+    if (!data) {
       throw new Error('No se pudo obtener el mapa');
     }
 
-    mapMarkers.value = data.worldMap;
   } catch (error) {
     handleError((error as Error));
   }
@@ -196,9 +197,8 @@ const initializeMap = async () => {
   let resizeHandler: any = null;
 
   if (mapMarkers.value) {
-    const L = (await import('leaflet')).default;
     if(!map.value) {
-      map.value = L.map('map')
+      map.value = await createMap(document.getElementById('map') as HTMLElement)
     }
     
     map.value.setView(center.value, zoom.value);
@@ -206,14 +206,9 @@ const initializeMap = async () => {
       console.log('[Map] Petroquio.LIVE Map ready');
     });
     map.value.getContainer().classList.add('petruquio-community-map');
-    L.tileLayer('https://www.google.com/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}', {
-      maxZoom: 20,
-      minZoom: 2, // to prevent grey tiles at world zoom levels
-    }).addTo(map.value);
-
+    const tileLayer = await createTileLayer(map.value);
+   
     if (!map.value) return;
-
-    map.value.attributionControl.setPrefix(false);
 
     map.value.on('moveend', (e: any) => {
       // Keep markers in the map bounds
@@ -287,7 +282,16 @@ const createMarker = async (L: any, markerData: any) => {
     iconAnchor: [16, 32]
   });
 
-  const marker: Marker = L.marker([markerData.latitude, markerData.longitude], { icon: emoteIcon, user_id: markerData.user_id, username: markerData.user_username, isStreamer: markerData.user_username === channelName.toString().toLowerCase() });
+  const marker: Marker = await createMarkerInstance(map.value, markerData.latitude, markerData.longitude)
+  marker.setIcon(emoteIcon);
+  marker.options
+  marker.options.username = markerData.user_username;
+  marker.options.user_display_name = markerData.user_display_name;
+  marker.options.user_avatar = markerData.user_avatar;
+  marker.options.pin_message = markerData.pin_message;
+  marker.options.isStreamer = markerData.isStreamer;
+  marker.options.last_seen = markerData.last_seen;
+
   marker.bindTooltip(markerData.user_display_name, { direction: 'top', className: 'text-black rounded-lg py-2 px-4 text-base font-gabarito transition-opacity duration-300', opacity: 1.0 });
 
   marker.on('click', async (e: any) => {
