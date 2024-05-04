@@ -53,6 +53,9 @@
     "title": "Comandos"
   },
   "dashboard": {
+    "command_palette": {
+      "search_placeholder": "Busca un comando..."
+    },
     "recommendedActions": {
       "ENABLE_COMMUNITY_MAP": {
         "description": "Deja que tus espectadores se añadan al mapa de la comunidad del canal. ¡Fomenta el espíritu comunitario!",

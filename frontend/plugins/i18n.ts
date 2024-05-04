@@ -4,7 +4,7 @@ import es from '../lang/es.json'
 import en from '../lang/en.json'
 
 export default defineNuxtPlugin(({ vueApp }) => {
-    const cookie = useCookie('language');
+    const cookie = useCookie('language')
     const browserLanguage = usePreferredLanguages().value[0].split('-')[0];
 
     const i18n = createI18n({
@@ -16,6 +16,9 @@ export default defineNuxtPlugin(({ vueApp }) => {
             es
         }
     })
+
+    console.log('i18n', i18n)
+    console.log('i18n.locale', i18n.global.locale.value)
 
     vueApp.use(i18n)
 })

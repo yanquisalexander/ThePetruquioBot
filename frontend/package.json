@@ -5,6 +5,8 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --max-old-space-size=1536",
+    "locale:upload": "npx @localazy/cli upload",
+    "locale:download": "npx @localazy/cli download",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
