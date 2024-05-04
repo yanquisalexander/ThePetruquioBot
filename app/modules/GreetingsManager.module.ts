@@ -189,6 +189,7 @@ class GreetingsManager {
       return true
     }
 
+
     if (this.knownBotsList.includes(user.username)) {
       if (greetingData.lastSeen && (Date.now() - greetingData.lastSeen.getTime()) < this.cooldown) {
         await Greeting.updateTimestamp(user, channel)

@@ -2,9 +2,9 @@ import { type Request, type Response } from 'express'
 
 import CurrentUser from '../../lib/CurrentUser'
 import Widget from '../models/Widget.model'
-import Channel from '../models/Channel.model'
 import { type ExpressUser } from '../interfaces/ExpressUser.interface'
 import SocketIO from '../modules/SocketIO.module'
+import { CoreWidget } from "../models/CoreWidget.model"
 
 class WidgetsController {
   static async getWidgets (req: Request, res: Response): Promise<Response> {
@@ -181,6 +181,76 @@ class WidgetsController {
         }
       })
     }
+  }
+
+  async getCoreWidgets (req: Request, res: Response): Promise<Response> {
+    const user = new CurrentUser(req.user as ExpressUser)
+
+    if (!user) {
+      return res.status(401).json({
+        error: {
+          message: 'Unauthorized'
+        }
+      })
+    }
+
+    const channel = await user.getCurrentChannel()
+
+    if (!channel) {
+      return res.status(404).json({
+        error: {
+          message: 'Channel not found'
+        }
+      })
+    }
+
+    const coreWidgets = await channel.getCoreWidgets()
+
+    return res.status(200).json({
+      data: coreWidgets.map((coreWidget) => {
+        return {
+          ...coreWidget,
+          channel: undefined
+        }
+      })
+    })
+  }
+
+  async createCoreWidget (req: Request, res: Response): Promise<Response> {
+    const user = new CurrentUser(req.user as ExpressUser)
+
+    if (!user) {
+      return res.status(401).json({
+        error: {
+          message: 'Unauthorized'
+        }
+      })
+    }
+
+    const channel = await user.getCurrentChannel()
+
+    if (!channel) {
+      return res.status(404).json({
+        error: {
+          message: 'Channel not found'
+        }
+      })
+    }
+
+    const { widget_type, preferences } = req.body
+
+    const coreWidget = new CoreWidget({
+      id: crypto.randomUUID(),
+      widget_type,
+      preferences,
+      channel
+    })
+
+    await coreWidget.save()
+
+    return res.status(201).json({
+      data: coreWidget
+    })
   }
 }
 

@@ -1,24 +1,32 @@
-import path from 'path'
 import ImportGlobPlugin from 'esbuild-plugin-import-glob'
 import * as esbuild from 'esbuild'
+import * as path from 'node:path'
+import * as fs from 'node:fs/promises'
 
-const rootDir = path.join(__dirname, '/..')
+const __dirname = path.resolve(path.dirname(''))
 
 async function build (): Promise<void> {
   try {
-    const { errors, warnings } = await esbuild.build({
+    console.log('***** Building Petruquio.LIVE *****')
+    const start = Date.now()
+    // Clean the dist folder
+    console.log('Cleaning dist folder...')
+    console.log('Removing:', __dirname + '/dist')
+    await fs.rm(__dirname + '/dist', { recursive: true, force: true })
+    const { errors, warnings, metafile } = await esbuild.build({
       logLevel: 'debug',
-      entryPoints: [rootDir + '/index.ts'],
+      entryPoints: [__dirname + '/index.ts'],
       bundle: true,
       platform: 'node',
       plugins: [ImportGlobPlugin()],
       packages: 'external',
       target: ['node16'],
-      outdir: rootDir + '/dist',
-      metafile: true, // Habilita la generación del archivo meta,
+      format: 'cjs',
+      minify: true,
+      outfile: __dirname + '/dist/index.cjs',
+      metafile: true,
       banner: {
         js: `/******************\n * Build: ${new Date().toLocaleString()}\n ******************/\n
-     let PETRUQUIOLIVE_COMPILED_DATE = '${new Date().toLocaleString()}'\n   
   
 `
       }
@@ -36,6 +44,10 @@ async function build (): Promise<void> {
       // warnings.forEach((warning) => { console.warn(warning) })
     }
 
+    const totalSize = Object.values(metafile.outputs).reduce((acc, output) => acc + output.bytes, 0)
+
+    console.log('Total size:', (totalSize / 1024).toFixed(2), 'KB')
+    console.log('Time:', Date.now() - start, 'ms')
     console.log('Build complete!') // Agrega un mensaje de registro
   } catch (error) {
     console.error('Build failed:', error) // Manejo de errores en caso de que la compilación falle

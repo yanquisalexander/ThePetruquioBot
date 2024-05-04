@@ -17,6 +17,7 @@ import { createDashboardRouter } from '@/app/config/routes/dashboard.router'
 import { createSubscriptionsHooksRouter } from '@/app/config/routes/subscriptions-hooks.router'
 import { createTwitchToolsRouter } from '@/app/config/routes/twitch-tools.router'
 import { createBillingRouter } from '@/app/config/routes/billing.router'
+import { createWidgetsRouter } from '@/app/config/routes/widgets.router'
 
 const router = Router()
 
@@ -29,11 +30,12 @@ router.get('/ping', (req, res) => {
 })
 
 /*
-    This router don't have middleware, it receives data from LemonSqueezy and updates the user's subscription via Webhooks
+    This router don't have middleware, it receives data from PayPal and updates the user's subscription
 */
 router.use('/subscriptions-hooks', createSubscriptionsHooksRouter())
 router.use('/twitch-tools', createTwitchToolsRouter())
 router.use('/billing', authMiddleware, createBillingRouter())
+router.use('/widgets', authMiddleware, createWidgetsRouter())
 
 router.post('/accounts/getToken', AccountsController.getToken)
 router.post('/accounts/token', AccountsController.getToken)

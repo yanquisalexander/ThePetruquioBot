@@ -29,5 +29,6 @@ export const Configuration = {
   PAYPAL_MODE: process.env.PAYPAL_MODE ?? 'sandbox',
   PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID ?? '',
   PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET ?? '',
-  PAYPAL_SUBSCRIPTION_PLAN_ID: process.env.PAYPAL_SUBSCRIPTION_PLAN_ID ?? ''
+  PAYPAL_SUBSCRIPTION_PLAN_ID: process.env.PAYPAL_SUBSCRIPTION_PLAN_ID ?? '',
+  HUGGING_FACE_API_KEY: process.env.HUGGING_FACE_API_KEY ?? '',
 }

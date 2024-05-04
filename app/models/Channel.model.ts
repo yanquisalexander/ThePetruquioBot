@@ -128,7 +128,7 @@ class Channel {
     return await Audit.getAuditsByChannel(this)
   }
 
-  public async getCoreWidgets (): Promise<CoreWidget[] | null> {
+  public async getCoreWidgets (): Promise<CoreWidget[]> {
     return await CoreWidget.findByChannel(this)
   }
 

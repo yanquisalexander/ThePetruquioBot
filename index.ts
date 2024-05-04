@@ -14,28 +14,14 @@ import Environment from './utils/environment'
 import Passport from './lib/Passport'
 import EmailManager from './app/modules/EmailManager.module'
 import Channel from './app/models/Channel.model'
-
-let PETRUQUIOLIVE_COMPILED_DATE: string | undefined
+import { getHuggingFace } from "./app/modules/HuggingFace.module"
 
 MonkeyPatches.apply()
 
 Database.connect()
 
-const Test = async () => {
-  const channel = await Channel.findByTwitchId(589751969)
-  const core = await channel?.getCoreWidgets()
-  console.log(core)
-}
-
-Test()
 
 const initializeApp = async (): Promise<void> => {
-  /* eslint-disable no-undef */
-  if (PETRUQUIOLIVE_COMPILED_DATE) {
-    console.log(chalk.bgCyan.bold('[APP]'), chalk.white(`Petruquio.LIVE compiled on ${PETRUQUIOLIVE_COMPILED_DATE}`))
-    return process.exit(0)
-  }
-
   try {
     dotenv.config()
     const bot = await Bot.getInstance()

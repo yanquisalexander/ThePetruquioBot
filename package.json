@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --ext ts,js --exec ts-node -r tsconfig-paths/register index.ts --excludeDir node_modules,scripts",
     "build": "tsx ./scripts/build.ts",
-    "start": "node dist/index.js",
+    "start": "node dist/index.cjs",
     "db:generate": "drizzle-kit generate:pg",
     "cli": "tsx ./scripts/cli.ts",
     "db:migrate": "tsx ./scripts/db.ts"
@@ -17,6 +17,7 @@
   "dependencies": {
     "@getbrevo/brevo": "^2.0.0-beta.4",
     "@growthbook/growthbook": "^0.35.0",
+    "@huggingface/inference": "^2.6.7",
     "@logtail/node": "^0.4.21",
     "@mkody/twitch-emoticons": "^2.8.3",
     "@oauth-everything/passport-patreon": "^1.0.1",

@@ -94,8 +94,8 @@ class Greeting {
         return new Greeting({
           twitchId: user.twitchId,
           channel,
-          lastSeen: result.rows[0].last_seen,
-          shoutoutedAt: result.rows[0].shoutouted_at,
+          lastSeen: new Date(result.rows[0].last_seen),
+          shoutoutedAt: new Date(result.rows[0].shoutouted_at),
           enabled: result.rows[0].enabled
         })
       } else {
