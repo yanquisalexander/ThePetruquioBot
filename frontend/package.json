@@ -48,7 +48,7 @@
     "@radix-icons/vue": "^1.0.0",
     "@tsparticles/confetti": "^3.0.2",
     "@types/howler": "^2.2.11",
-    "@vercel/analytics": "^1.1.1",
+    "@vercel/analytics": "^1.2.2",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "axios": "^1.6.2",
     "chart.js": "^4.4.0",
