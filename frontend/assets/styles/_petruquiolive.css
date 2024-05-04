@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700;800&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.2.96/css/materialdesignicons.min.css');
+@import url('https://raw.githubusercontent.com/nitrowo/roobert-cdn/master/font.css');
+
+:root {
+    --pixel-box-shadow: 8px 8px 0px rgba(0,0,0,.75);
+}
+
+html {
+    overflow-y: auto !important;
+}
+
+body {
+    font-family: 'Jost', sans-serif;
+}
+
+html, body, main {
+    background-color: transparent;
+}
+
+:root, [data-theme] {
+    background-color: transparent!important;
+}
+
+
+.pixelated-btn {
+    @apply flex items-center justify-center py-2 px-4 border-[3px] border-solid border-black bg-white hover:bg-gray-100 transition-all;
+    @apply mx-4 md:mx-8;
+    box-shadow: var(--pixel-box-shadow);
+}
+
+.pixelated-btn.is-icon {
+    @apply h-10 w-10 !p-0
+}
+
+
+.pixelated-btn.featured svg {
+    @apply mr-2
+}
+
+.pixelated-btn.featured {
+    @apply bg-black text-white hover:bg-gray-800
+}
+
+/* Map */
+
+.map-popup-emote {
+    display: inline-block;
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+/* Emote splash */
+
+
+#emotesplash {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.92);
+    position: relative;
+    z-index: 99999
+}
+
+#emotesplash.removing {
+    animation: fadeOut 1s ease-in-out forwards;
+}
+
+.b-intro__emote {
+    display: inline-block !important;
+    background-size: cover;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto;
+    background-position: -650px 0;
+}
+
+.b-intro__emote--base {
+    margin-left: 50px;
+    opacity: 0;
+}
+
+
+.b-intro__emote-anim {
+    width: 130px;
+    height: 130px;
+    position: absolute;
+    display: inline-block;
+    top: calc(50% - 65px);
+    left: calc(50% - 65px);
+    transform: scale(2);
+    transition: transform 300ms cubic-bezier(0.87, 0, 0.04, 1);
+    animation: scale 300ms cubic-bezier(0.87, 0, 0.04, 1) 100ms 1 forwards, ticker 650ms steps(5) 400ms 1 forwards
+}
+
+
+
+@keyframes ticker {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -650px 0;
+    }
+}
+
+@keyframes scale {
+    from {
+        transform: scale(2);
+    }
+
+    to {
+        transform: scale(0.6);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

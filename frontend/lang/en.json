@@ -1,0 +1,215 @@
+{
+  "application": {
+    "languages": {
+      "cn": "中文",
+      "de": "Deutsch",
+      "en": "English",
+      "es": "Spanish",
+      "fi": "Suomi",
+      "fr": "Français",
+      "it": "Italiano",
+      "jp": "日本語",
+      "ko": "한국어",
+      "kr": "Kreyòl Ayisyen",
+      "pl": "Polski",
+      "pt": "Português",
+      "ro": "Română",
+      "ru": "Русский",
+      "tu": "Türkçe"
+    }
+  },
+  "audit": {
+    "actions": {
+      "IMPERSONATED_BY_ADMIN": "Impersonated by admin",
+      "LOGIN_SUCCESS": "Login success",
+      "SETTING_UPDATED": "Setting updated",
+      "TOKEN_REFRESHED_BY_SYSTEM": "Token refreshed by System"
+    },
+    "title": "Audits"
+  },
+  "commands": {
+    "actions": "Actions",
+    "add": "Add Command",
+    "add_alias": "Add alias",
+    "alias": "Alias",
+    "command": "Command",
+    "command_name": "Command name",
+    "command_response": "Command response",
+    "cooldowns": {
+      "global": "Global cooldown",
+      "title": "Cooldown",
+      "user": "User cooldown"
+    },
+    "delete": "Delete command",
+    "edit": "Edit command",
+    "everyone_info": "Any user who is not a follower, subscriber, vip, moderator or broadcaster",
+    "message": "Message",
+    "permissions": "Permissions",
+    "permissions_everyone_warn": {
+      "description": "Selecting {everyone} will give permission to all users to use the {command} command and their respective aliases.",
+      "title": "Warning"
+    },
+    "search": "Search commands",
+    "title": "Commands"
+  },
+  "dashboard": {
+    "recommendedActions": {
+      "ENABLE_COMMUNITY_MAP": {
+        "description": "Let your viewers add themselves to the channel's community map. Foment the community spirit!",
+        "title": "Enable Community Map"
+      }
+    },
+    "title": "Dashboard"
+  },
+  "settings": {
+    "botMuted": {
+      "description": "If enabled, the bot will not be able to send messages in the server.",
+      "title": "Bot Muted"
+    },
+    "channel_language": {
+      "description": "The language of the channel. This is used for the bot to reply in channel's language.",
+      "title": "Channel Language"
+    },
+    "conversation_prompt": {
+      "description": "The prompt to use when engaging in a conversation with the bot. It allows you to bring personality to the bot.",
+      "title": "Conversation Prompt"
+    },
+    "detoxify_threshold": {
+      "description": "The threshold to use when deleting messages that contain profanity. The higher the threshold, the message will be deleted.",
+      "title": "Detoxify Threshold"
+    },
+    "detoxify_timeout_threshold": {
+      "description": "The threshold to use when deleting messages that contain profanity. The higher the threshold, the user will be timed out.",
+      "title": "Detoxify Timeout Threshold"
+    },
+    "detoxify_timeout_time": {
+      "description": "The time to use when timing out users that send messages that contain profanity.",
+      "title": "Detoxify Timeout Time"
+    },
+    "disabled": "Disabled",
+    "enableAnimatedPins": {
+      "description": "Enable animated pins on the map. NOTE: BetterTTV emotes will not be affected by this setting.",
+      "title": "Enable Animated Pins"
+    },
+    "enableCommunityMap": {
+      "description": "Allow users to add their self to the channel's community map.",
+      "title": "Enable Community Map"
+    },
+    "enableFirstRanking": {
+      "description": "Enable the first ranking in the channel.",
+      "title": "Enable First Ranking"
+    },
+    "enableFollowAlerts": {
+      "description": "Show a message in the chat when a user follows the channel.",
+      "title": "Enable Follow Alerts"
+    },
+    "enableGreetings": {
+      "description": "Greet users when they write in the chat. It will greet them only after 8 hours from their last message, and the user must be registered on the Community Map to receive the greeting (regardless of the channel they registered in).",
+      "title": "Enable Greetings"
+    },
+    "enableLiveNotification": {
+      "description": "Notify the chat when the channel goes live.",
+      "title": "Enable Live Notification"
+    },
+    "enableRaidAlerts": {
+      "description": "Show a message in the chat and Shoutout the raiding channel when receiving a raid.",
+      "title": "Enable Raid Alerts"
+    },
+    "enableShoutout": {
+      "description": "Allow shoutout other users in the chat.",
+      "title": "Enable Shoutout"
+    },
+    "enableSmartAssistant": {
+      "description": "Allow user's to keep an interactive conversation with the bot. This feature is powered by OpenAI's ChatGPT-3.",
+      "title": "Enable Smart Assistant"
+    },
+    "enableTranslations": {
+      "description": "Translate messages in the chat. Powered by Google Translate.",
+      "title": "Enable Translation"
+    },
+    "enable_auto_shoutout": {
+      "description": "Automatically shoutout users when receiving a raid or a host.",
+      "title": "Enable Auto Shoutout"
+    },
+    "enable_clip_command": {
+      "description": "Allow users to create clips of the stream using a chat command.",
+      "title": "Enable Clip Command"
+    },
+    "enable_community_features": {
+      "description": "Features to share the community spirit with other channels.",
+      "title": "Enable Community Features"
+    },
+    "enable_conversation": {
+      "description": "Allow users to have a conversation with the bot. Powered by OpenAI's ChatGPT-3.",
+      "title": "Enable Conversation"
+    },
+    "enable_detoxify": {
+      "description": "Automatically delete messages that contain profanity. Powered by Google's Perspective API.",
+      "title": "Enable Detoxify"
+    },
+    "enable_experimental_features": {
+      "description": "Enable experimental features. These features are not ready for mass use and may be unstable.",
+      "title": "Enable Experimental Features"
+    },
+    "enabled": "Enabled",
+    "firstRankingRedeemedMessage": {
+      "description": "The message to use when a user redeems the first ranking.",
+      "title": "First Ranking Redeemed Message"
+    },
+    "firstRankingRewardId": {
+      "description": "The Twitch reward to use for the first ranking.",
+      "title": "First Ranking Twitch Reward"
+    },
+    "followAlertMessages": {
+      "description": "The messages to use when a user follows the channel. You can use variables to customize the message.",
+      "title": "Follow Alert Messages"
+    },
+    "liveNotificationMessage": {
+      "description": "The message to use when notifying the chat that the channel is live (Variables: #channel, #title).",
+      "title": "Live Notification Message"
+    },
+    "mapCommandMessage": {
+      "description": "The message to use when a user uses the !map command. You can use variables to customize the message.",
+      "title": "Map Command Message"
+    },
+    "minRaidViewers": {
+      "description": "The minimum number of viewers the raiding channel must have to trigger a raid alert.",
+      "title": "Minimum Raid Viewers"
+    },
+    "patreon_exclusive": "Patreon exclusive",
+    "raidAlertMessage": {
+      "description": "The message to use when a user raids the channel. You can use variables to customize the message.",
+      "title": "Raid Alert Message"
+    },
+    "shoutoutPresentation": {
+      "description": "The message to use when shouting out you in another channel when receiving a raid.",
+      "title": "Shoutout Presentation"
+    },
+    "showSongRequestsOnMap": {
+      "description": "Display the song requested by a user on their map marker. CAUTION: This will slow down the map loading. Valid only for streamers using StreamerSongList.",
+      "title": "Show Song Requests on Map"
+    },
+    "smartAssistantPrompt": {
+      "description": "The prompt to use when engaging in a conversation with the bot. It allows you to bring personality to the bot.",
+      "title": "Smart Assistant Prompt"
+    },
+    "title": "Bot Settings",
+    "useStreamerAccount": {
+      "description": "Use the streamer's account to send messages in the chat. If disabled, the bot will use its own account.",
+      "title": "Use Streamer Account"
+    }
+  },
+  "widgets": {
+    "settings": {
+      "alert_duration": "Alert duration",
+      "font_color": "Font color",
+      "font_family": "Font family",
+      "font_size": "Font size",
+      "font_weight": "Font weight",
+      "higlight_color": "Highlight color",
+      "sound_href": "Sound URL",
+      "sound_volume": "Sound volume",
+      "text": "Text"
+    }
+  }
+}

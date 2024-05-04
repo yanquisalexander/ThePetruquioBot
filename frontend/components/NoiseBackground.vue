@@ -1,0 +1,14 @@
+<template>
+	<div class="fixed inset-0 -z-30 m-auto bg-zinc-950">
+		<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"></svg>
+	</div>
+</template>
+
+<style scoped>
+div::before {
+	@apply absolute left-0 top-0 h-full w-full transform-gpu bg-repeat opacity-20;
+	content: "";
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E");
+	background-size: 182px;
+}
+</style>

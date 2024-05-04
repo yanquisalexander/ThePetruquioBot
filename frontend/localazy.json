@@ -1,0 +1,13 @@
+{
+    "writeKey": "a7729584839949436782-64161fac308ec5a64f90708ea52e2ce8403b45c44a548fd5a888d82378afcc48",
+    "readKey": "a7729584839949436782-f65f6c44d8fb6b9c9c83949aea4ecad37378efd26845f4ff55d025fd390e06b0",
+    "upload": {
+        "type": "json",
+        "files": "lang/en.json",
+        "deprecate": "project"
+    },
+    "download": {
+        "files": "lang/${lang}.json",
+        "includeSourceLang": true
+    }
+}

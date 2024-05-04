@@ -1,0 +1,215 @@
+{
+  "application": {
+    "languages": {
+      "cn": "中文",
+      "de": "Alemán",
+      "en": "Inglés",
+      "es": "Español",
+      "fi": "Suomi",
+      "fr": "Francés",
+      "it": "italiano",
+      "jp": "日本語",
+      "ko": "한국어",
+      "kr": "Kreyol Ayisyen",
+      "pl": "polaco (Polski)",
+      "pt": "Português",
+      "ro": "Română",
+      "ru": "Русский",
+      "tu": "turco (Türkçe)"
+    }
+  },
+  "audit": {
+    "actions": {
+      "IMPERSONATED_BY_ADMIN": "Suplantado por el administrador",
+      "LOGIN_SUCCESS": "Inicio de sesión exitoso",
+      "SETTING_UPDATED": "Ajuste actualizado",
+      "TOKEN_REFRESHED_BY_SYSTEM": "Token actualizado por el sistema"
+    },
+    "title": "Auditorías"
+  },
+  "commands": {
+    "actions": "Acciones",
+    "add": "Agregar comando",
+    "add_alias": "Agregar alias",
+    "alias": "Alias",
+    "command": "Comando",
+    "command_name": "Nombre del comando",
+    "command_response": "Respuesta de comando",
+    "cooldowns": {
+      "global": "Enfriamiento global",
+      "title": "Enfriamiento",
+      "user": "Enfriamiento del usuario"
+    },
+    "delete": "Eliminar comando",
+    "edit": "Editar comando",
+    "everyone_info": "Cualquier usuario que no sea seguidor, suscriptor, vip, moderador o broadcaster",
+    "message": "Mensaje",
+    "permissions": "Permisos",
+    "permissions_everyone_warn": {
+      "description": "Al seleccionar {everyone}, se dará permiso a todos los usuarios para usar el {command} comando y sus respectivos alias.",
+      "title": "Advertencia"
+    },
+    "search": "Buscar comandos",
+    "title": "Comandos"
+  },
+  "dashboard": {
+    "recommendedActions": {
+      "ENABLE_COMMUNITY_MAP": {
+        "description": "Deja que tus espectadores se añadan al mapa de la comunidad del canal. ¡Fomenta el espíritu comunitario!",
+        "title": "Habilitar el mapa de la comunidad"
+      }
+    },
+    "title": "Panel de control"
+  },
+  "settings": {
+    "botMuted": {
+      "description": "Si está habilitado, el bot no podrá enviar mensajes en el chat.",
+      "title": "Silenciar bot"
+    },
+    "channel_language": {
+      "description": "Se usa para que el bot responda en el idioma del canal.",
+      "title": "Idioma del canal"
+    },
+    "conversation_prompt": {
+      "description": "El mensaje que se debe utilizar al entablar una conversación con el bot. Te permite aportar personalidad al bot.",
+      "title": "Prompt de conversación"
+    },
+    "detoxify_threshold": {
+      "description": "El umbral que se debe usar al eliminar mensajes que contienen blasfemias. Si se supera el umbral, se eliminará el mensaje",
+      "title": "Umbral de Detoxify"
+    },
+    "detoxify_timeout_threshold": {
+      "description": "El umbral que se debe usar al eliminar mensajes que contienen blasfemias. Si se supera el umbral, se dará un timeout al usuario",
+      "title": "Umbral de Detoxify para Timeout"
+    },
+    "detoxify_timeout_time": {
+      "description": "El tiempo que se usa para el Timeout de los usuarios que envían mensajes que contienen blasfemias.",
+      "title": "Tiempo de Timeout (Detoxify)"
+    },
+    "disabled": "Deshabilitado",
+    "enableAnimatedPins": {
+      "description": "Activa los marcadores animados en el mapa. NOTA: Esta configuración no afectará a los emoticonos de BetterTTV.",
+      "title": "Habilitar pines animados"
+    },
+    "enableCommunityMap": {
+      "description": "Permite a los usuarios añadirse al mapa de la comunidad del canal.",
+      "title": "Habilitar el mapa de la comunidad"
+    },
+    "enableFirstRanking": {
+      "description": "Habilita el ranking de primero del canal.",
+      "title": "Habilitar Ranking de Primero"
+    },
+    "enableFollowAlerts": {
+      "description": "Muestra un mensaje en el chat cuando un usuario sigue el canal.",
+      "title": "Habilitar alertas de seguimiento"
+    },
+    "enableGreetings": {
+      "description": "Saluda a los usuarios cuando escriban en el chat. Los recibirá solo transcurridas 8 horas desde su último mensaje, y el usuario debe estar registrado en el mapa de la comunidad para recibir el saludo (independientemente del canal en el que se haya registrado).",
+      "title": "Habilitar saludos"
+    },
+    "enableLiveNotification": {
+      "description": "Notifica al chat cuando el canal esté en directo",
+      "title": "Habilitar notificación en vivo"
+    },
+    "enableRaidAlerts": {
+      "description": "Muestra un mensaje en el chat y realiza una mención al raider cuando recibe una raid.",
+      "title": "Activar alertas de Raid"
+    },
+    "enableShoutout": {
+      "description": "Permite realizar shoutout a otros usuarios en el chat.",
+      "title": "Activar Shoutout"
+    },
+    "enableSmartAssistant": {
+      "description": "Permita a los usuarios mantener una conversación interactiva con el bot. Esta función funciona con ChatGPT-3 de OpenAI.",
+      "title": "Activar Smart Assistant"
+    },
+    "enableTranslations": {
+      "description": "Traduce los mensajes del chat. Impulsado por Google Translate.",
+      "title": "Habilitar traducción"
+    },
+    "enable_auto_shoutout": {
+      "description": "Realiza un Shoutout automáticamente a los usuarios cuando recibe un raid o un host.",
+      "title": "Activar Auto Shoutout"
+    },
+    "enable_clip_command": {
+      "description": "Permita a los usuarios crear clips de la transmisión mediante un comando de chat.",
+      "title": "Habilitar el comando !clip"
+    },
+    "enable_community_features": {
+      "description": "Funciones para compartir el espíritu de comunidad con otros canales.",
+      "title": "Habilitar funciones de comunidad"
+    },
+    "enable_conversation": {
+      "description": "Permita que los usuarios mantengan una conversación con el bot. Impulsado por ChatGPT-3 de OpenAI.",
+      "title": "Habilitar conversación"
+    },
+    "enable_detoxify": {
+      "description": "Elimina automáticamente los mensajes que contengan blasfemias. Desarrollado por la API Perspective de Google.",
+      "title": "Habilitar Detoxify"
+    },
+    "enable_experimental_features": {
+      "description": "Habilite las funciones experimentales. Estas funciones no están listas para su uso masivo y pueden ser inestables.",
+      "title": "Habilitar características experimentales"
+    },
+    "enabled": "Habilitado",
+    "firstRankingRedeemedMessage": {
+      "description": "El mensaje que se usará cuando un usuario canjee el Ranking de Primero",
+      "title": "Mensaje canjeado de Ranking de Primero"
+    },
+    "firstRankingRewardId": {
+      "description": "La recompensa de Twitch que se usará para el Ranking de Canjes de Primero",
+      "title": "Recompensa de Twitch para Ranking de Primero"
+    },
+    "followAlertMessages": {
+      "description": "Los mensajes que se utilizan cuando un usuario sigue el canal. Puede usar variables para personalizar el mensaje.",
+      "title": "Mensajes de alerta de Follow"
+    },
+    "liveNotificationMessage": {
+      "description": "El mensaje que se utilizará al notificar al chat que el canal está en directo (Variables: #channel, #title).",
+      "title": "Mensaje de notificación en vivo"
+    },
+    "mapCommandMessage": {
+      "description": "El mensaje que se debe usar cuando un usuario usa el comando !map. Puede usar variables para personalizar el mensaje.",
+      "title": "Mensaje de comando de mapa"
+    },
+    "minRaidViewers": {
+      "description": "El número mínimo de espectadores que debe tener el raider para activar una alerta de Raid.",
+      "title": "Número mínimo de espectadores para Raid"
+    },
+    "patreon_exclusive": "Exclusivo para Patreons",
+    "raidAlertMessage": {
+      "description": "El mensaje que se usará cuando un usuario haga una raid en el canal. Puede usar variables para personalizar el mensaje.",
+      "title": "Mensaje de alerta de Raid"
+    },
+    "shoutoutPresentation": {
+      "description": "El mensaje que debe utilizarse cuando se realice un Shoutout en otro canal al recibir un raid.",
+      "title": "Presentación para Shoutout"
+    },
+    "showSongRequestsOnMap": {
+      "description": "Muestra la canción solicitada por un usuario en su marcador de mapa. PRECAUCIÓN: Esto ralentizará la carga del mapa. Válido solo para streamers que usen StreamerSongList.",
+      "title": "Mostrar solicitudes de canciones en el mapa"
+    },
+    "smartAssistantPrompt": {
+      "description": "El mensaje que se debe utilizar al entablar una conversación con el bot. Te permite aportar personalidad al bot.",
+      "title": "Smart Assistant Prompt"
+    },
+    "title": "Configuración del Bot",
+    "useStreamerAccount": {
+      "description": "Usa la cuenta del streamer para enviar mensajes en el chat. Si está deshabilitado, el bot usará su propia cuenta.",
+      "title": "Usa la cuenta de Streamer"
+    }
+  },
+  "widgets": {
+    "settings": {
+      "alert_duration": "Duración de la alerta",
+      "font_color": "Color de fuente",
+      "font_family": "Familia de fuentes",
+      "font_size": "Tamaño de fuente",
+      "font_weight": "Font weight",
+      "higlight_color": "Color de resaltado",
+      "sound_href": "URL de sonido",
+      "sound_volume": "Volumen del sonido",
+      "text": "Texto"
+    }
+  }
+}
