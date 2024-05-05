@@ -60,6 +60,17 @@ const connectSocket = () => {
         streamData.value = data
     })
 
+    socket.value.on('channel-point-redemption', (data) => {
+        console.log('channel-point-redemption', data)
+        toast.add({
+            title: 'Nuevo canje de puntos de canal',
+            color: 'blue',
+            description: `@${data.user} canjeó ${data.reward} por ${data.cost} puntos.`,
+            icon: 'i-lucide-gift',
+            timeout: 5000
+        })
+    })
+
     socket.value.on('chat-cleared', () => {
         toast.add({
             title: 'Chat despejado',

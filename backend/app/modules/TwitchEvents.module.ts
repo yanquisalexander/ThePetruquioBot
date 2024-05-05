@@ -56,7 +56,7 @@ class TwitchEvents {
         try {
           const user = await User.findByTwitchId(parseInt(event.userId))
           const rewardInfo = await Twitch.Helix.channelPoints.getCustomRewardById(event.broadcasterId, event.rewardId)
-          await Redemption.create({
+          const redemption = await Redemption.create({
             channel: channelData,
             user,
             eventId: event.id,
@@ -67,9 +67,12 @@ class TwitchEvents {
             rewardName: event.rewardTitle,
             message: event.input
           })
+
+          SocketIO.getInstance().emitEvent(`stream-manager:${channelData.twitchId}`, 'channel-point-redemption', redemption)
         } catch (error) {
           console.error(`[TWITCH EVENT SUB] Error while registering redemption: ${(error as Error).message}`)
         }
+
 
         const workflow = await Workflow.find(channelData, EventType.OnCustomRewardRedeemed)
 
