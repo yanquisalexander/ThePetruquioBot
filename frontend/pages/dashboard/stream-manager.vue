@@ -5,7 +5,7 @@
         <UContainer>
             <UCard>
                 <template #header>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between flex-col md:flex-row">
                         <h2 class="text-xl font-medium font-jost">Stream Manager</h2>
                         <StreamManagerHeader :data="streamData" />
                     </div>

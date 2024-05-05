@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center justify-center">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-col md:flex-row">
             <UTooltip text="Viewers" placement="bottom">
                 <UButton color="blue" variant="soft" @click="toggleViewers">
                     <UIcon name="i-lucide-eye" class="w-5 h-5" />

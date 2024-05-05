@@ -14,7 +14,8 @@
                 <UButton @click="startStream" color="blue" variant="soft" icon="i-lucide-play" disabled>
                     Iniciar stream
                 </UButton>
-                <UButton @click="createClip" color="twitch" variant="soft" icon="i-lucide-clapperboard">
+                <UButton @click="createClip" color="twitch" variant="soft" icon="i-lucide-clapperboard"
+                    :loading="state.isCreatingClip">
                     Generar clip
                 </UButton>
             </div>
@@ -27,8 +28,13 @@ const currentUser = useCurrentUser()
 const { generateClip } = useStreamManager()
 const toast = useToast()
 
+const state = ref({
+    isCreatingClip: false,
+})
+
 const createClip = async () => {
     try {
+        state.value.isCreatingClip = true
         await generateClip()
         toast.add({
             icon: 'i-lucide-clapperboard',
@@ -44,6 +50,8 @@ const createClip = async () => {
             color: 'red',
             timeout: 5000,
         })
+    } finally {
+        state.value.isCreatingClip = false
     }
 }
 

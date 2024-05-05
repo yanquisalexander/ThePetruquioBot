@@ -13,7 +13,7 @@
       <div class="mx-auto w-full">
         <div class="flex flex-col flex-1 w-full">
           <DashboardHeader />
-          <main class="relative z-0 max-w-7xl xl:px-10 px-4 mx-auto">
+          <main class="flex-1 w-full relative z-0 xl:px-10 px-4 max-w-7xl mx-auto">
             <slot />
           </main>
           <DashboardQuickActions />
