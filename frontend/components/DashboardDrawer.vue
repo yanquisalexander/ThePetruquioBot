@@ -180,7 +180,7 @@ const moderationNotAvailable = () => {
 }
 
 const getModeratedChannels = async () => {
-  const { data } = await axios.get(`${API_ENDPOINT}/moderated-channels`, {
+  const { data } = await axios.get(`${API_ENDPOINT}/dashboard/moderated-channels`, {
     headers: {
       Authorization: `Bearer ${currentUser.getToken()}`
     }

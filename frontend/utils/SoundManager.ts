@@ -11,6 +11,7 @@ export enum Sounds {
   GOLDEN_BUZZER_BACKDROP = '/assets/sounds/golden-backdrop.mp3',
   NEW_NOTIFICATION = '/assets/sounds/notification.mp3',
   CONFETTI = '/assets/sounds/confetti.mp3',
+  SLACK_NOTIFICATION = '/assets/sounds/slack-notification.mp3',
 }
 
 class SoundManager {

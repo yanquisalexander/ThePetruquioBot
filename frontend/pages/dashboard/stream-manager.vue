@@ -63,12 +63,17 @@ const connectSocket = () => {
     socket.value.on('channel-point-redemption', (data) => {
         console.log('channel-point-redemption', data)
         toast.add({
+            id: data.eventId,
             title: 'Nuevo canje de puntos de canal',
             color: 'blue',
-            description: `@${data.user} canjeó ${data.reward} por ${data.cost} puntos.`,
+            description: `<b>${data.user.displayName}</b> canjeó <b>${data.rewardName}</b> por ${data.rewardCost} puntos.`,
             icon: 'i-lucide-gift',
-            timeout: 5000
+            timeout: 6000,
+            avatar: {
+                src: data.user.avatar ?? data.rewardIcon,
+            }
         })
+        SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
     })
 
     socket.value.on('chat-cleared', () => {
@@ -111,6 +116,12 @@ onBeforeMount(async () => {
         streamData.value = await getStream()
     } catch (error) {
         console.error(error)
+    }
+})
+
+onUnmounted(() => {
+    if (socket.value) {
+        socket.value.disconnect()
     }
 })
 

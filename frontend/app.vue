@@ -3,7 +3,11 @@
     <NuxtLoadingIndicator />
     <NuxtLayout>
       <NuxtPage />
-      <UNotifications />
+      <UNotifications>
+        <template #description="{ description }">
+          <span v-html="description" />
+        </template>
+      </UNotifications>
     </NuxtLayout>
   </div>
 </template>

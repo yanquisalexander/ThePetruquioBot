@@ -254,17 +254,12 @@ class User {
       return []
     }
 
-    const moderatedChannels = Twitch.Helix.asUser(helixUser, async ctx => {
-      const result = await ctx.callApi({
-        url: `/moderation/channels?user_id=${helixUser.id}`
-      })
-
-      return result
+    const moderatedChannels = await Twitch.Helix.asUser(helixUser, async ctx => {
+      const res = await ctx.moderation.getModeratedChannels(helixUser.id)
+      return res
     })
 
-    console.log(moderatedChannels)
-
-    return await moderatedChannels
+    return moderatedChannels.data
   }
 }
 
