@@ -56,6 +56,11 @@
     "command_palette": {
       "search_placeholder": "Search for a command..."
     },
+    "moderator_account_chooser": {
+      "cancel": "Cancel",
+      "choose": "Choose",
+      "title": "Choose the account to manage"
+    },
     "recommendedActions": {
       "ENABLE_COMMUNITY_MAP": {
         "description": "Let your viewers add themselves to the channel's community map. Foment the community spirit!",

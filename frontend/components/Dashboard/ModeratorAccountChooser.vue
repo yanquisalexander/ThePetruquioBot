@@ -14,7 +14,7 @@
                     <div class="flex items-center gap-4">
                         <img :src="channel.avatar" alt="Channel profile image" class="w-10 h-10 rounded-full">
                         <div>
-                            <h3 class="text-lg font-medium font-jost">{{ channel.displayName }}</h3>
+                            <h3 class="text-lg font-jost">{{ channel.displayName }}</h3>
                             <p class="text-sm text-gray-500">{{ channel.name }}</p>
                         </div>
                     </div>
