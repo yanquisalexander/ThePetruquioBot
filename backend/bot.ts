@@ -3,7 +3,6 @@ import 'dotenv/config'
 import Channel from '@/app/models/Channel.model'
 import chalk from 'chalk'
 import User from '@/app/models/User.model'
-import UserToken from '@/app/models/UserToken.model'
 import Twitch from '@/app/modules/Twitch.module'
 import { Configuration } from '@/app/config'
 import { handleClearedChat } from './app/bot/cleared-chat-handler'
@@ -29,7 +28,6 @@ const EventHandlers = {
 
 export enum Platform {
   TWITCH = 'twitch',
-  KICK = 'kick',
 }
 
 export class Bot {
@@ -58,16 +56,24 @@ export class Bot {
 
   private async initialize(): Promise<void> {
     this.channels = await this.autoJoinChannels()
+    this.registerEventHandlers()
+    await this.initializeBotAccount()
+    await this.client.connect()
+    console.log(chalk.green('[BOT]'), chalk.white('Bot connected. Joining channels...'))
+    await this.joinChannels()
+  }
+
+  private registerEventHandlers(): void {
     for (const event of Object.keys(EventHandlers) as Array<keyof typeof EventHandlers>) {
       console.log(chalk.bgCyan.bold('[Bot EventHandlers]'), chalk.white(`Registering event handler for ${event}`))
       this.client.on(event, EventHandlers[event])
     }
-    await this.initializeBotAccount()
-    await this.client.connect()
-    console.log(chalk.green('[BOT]'), chalk.white('Bot connected. Joining channels...'))
+  }
+
+  private async joinChannels(): Promise<void> {
     for (const channel of this.channels) {
       try {
-        await this.joinChannel(channel)
+        await this.client.join(channel)
       } catch (error) {
         console.error(chalk.red('[BOT]'), chalk.white('Error joining channel:'), error)
       }
@@ -75,10 +81,27 @@ export class Bot {
   }
 
   private async initializeBotAccount(): Promise<void> {
-    const user = await User.findByUsername(Configuration.BOT_NAME.toLowerCase())
+    const botUsername = Configuration.BOT_NAME.toLowerCase()
+    const botUserId = Configuration.TWITCH_USER_ID
+
+    console.log(chalk.yellow('[BOT]'), chalk.white('Checking bot account...'))
+
+    if (!botUsername || !botUserId) {
+      console.error(chalk.red('[FATAL ERROR]'), chalk.white('Bot username or user ID not found.'))
+      process.exit(1)
+    }
+
+    let user = await User.findByUsername(botUsername)
 
     if (!user) {
-      await this.createBotAccount()
+      try {
+        user = new User(botUsername, parseInt(botUserId))
+        await user.save()
+        console.log(chalk.green('[BOT]'), chalk.white('Bot account created.'))
+      } catch (error) {
+        console.error(chalk.red('[FATAL ERROR]'), chalk.white('Error creating bot account:'), error)
+        process.exit(1)
+      }
     } else {
       let channel = await user.getChannel()
       if (!channel) {
@@ -88,30 +111,11 @@ export class Bot {
           throw new Error('Error creating channel')
         }
       }
-      this.BotUserInstance = user
     }
+
+    this.BotUserInstance = user
   }
 
-  private async createBotAccount(): Promise<void> {
-    const botUsername = Configuration.BOT_NAME.toLowerCase()
-    const botUserId = Configuration.TWITCH_USER_ID
-
-    console.log(chalk.yellow('[BOT]'), chalk.white('Bot account not found. Creating...'))
-
-    if (!botUsername || !botUserId) {
-      console.error(chalk.red('[FATAL ERROR]'), chalk.white('Bot username or user ID not found.'))
-      process.exit(1)
-    }
-
-    try {
-      const newBotUser = new User(botUsername.toLowerCase(), parseInt(botUserId))
-      await newBotUser.save()
-      console.log(chalk.green('[BOT]'), chalk.white('Bot account created.'))
-    } catch (error) {
-      console.error(chalk.red('[FATAL ERROR]'), chalk.white('Error creating bot account:'), error)
-      process.exit(1)
-    }
-  }
 
   private async autoJoinChannels(): Promise<string[]> {
     if (process.env.NODE_ENV === 'development') {
@@ -182,11 +186,6 @@ export class Bot {
 
       await sendTwitchMessage(channel.user.username)
       return
-    }
-
-    if (platform === Platform.KICK) {
-      console.log({ channel, message, platform })
-      // KickBot.say(channel, message);
     }
   }
 
