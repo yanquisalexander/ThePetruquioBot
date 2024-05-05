@@ -1,0 +1,50 @@
+<template>
+    <UCard>
+        <template #header>
+            <h2 class="text-xl font-medium font-jost">
+                Vista previa
+            </h2>
+        </template>
+
+        <iframe :src="`https://player.twitch.tv/?channel=${currentUser.getUsername()}&parent=${FRONTEND_URL}`"
+            frameborder="0" scrolling="no" allowfullscreen="true" class="w-full h-96"></iframe>
+
+        <template #footer>
+            <div class="flex justify-end gap-4">
+                <UButton @click="startStream" color="blue" variant="soft" icon="i-lucide-play" disabled>
+                    Iniciar stream
+                </UButton>
+                <UButton @click="createClip" color="twitch" variant="soft" icon="i-lucide-clapperboard">
+                    Generar clip
+                </UButton>
+            </div>
+        </template>
+    </UCard>
+</template>
+
+<script lang="ts" setup>
+const currentUser = useCurrentUser()
+const { generateClip } = useStreamManager()
+const toast = useToast()
+
+const createClip = async () => {
+    try {
+        await generateClip()
+        toast.add({
+            icon: 'i-lucide-clapperboard',
+            title: 'Clip generado',
+            color: 'green',
+            timeout: 5000,
+        })
+    } catch (error) {
+        toast.add({
+            icon: 'i-lucide-clapperboard',
+            title: 'Error al generar clip',
+            description: (error as Error).message,
+            color: 'red',
+            timeout: 5000,
+        })
+    }
+}
+
+</script>

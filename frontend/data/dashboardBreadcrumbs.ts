@@ -41,5 +41,20 @@ export const DASHBOARD_BREADCRUMBS = [
                 to: "/dashboard/preferences"
             }
         ]
+    },
+    {
+        path: "/dashboard/stream-manager",
+        crumbs: [
+            {
+                label: "Dashboard",
+                icon: "i-mdi-view-dashboard-outline",
+                to: "/dashboard"
+            },
+            {
+                label: "Stream Manager",
+                icon: "i-lucide-clapperboard",
+                to: "/dashboard/stream-manager"
+            }
+        ]
     }
 ];

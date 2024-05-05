@@ -1,22 +1,14 @@
 <template>
-  <aside
-    class="pointer-events-none fixed start-0 top-0 !z-[15] flex h-full xl:z-10 transition-transform duration-300"
-    :class="{ 'translate-x-0': sidebar.sidebarVisible, '-translate-x-full': !sidebar.sidebarVisible }"
-  >
+  <aside class="pointer-events-none fixed start-0 top-0 !z-[15] flex h-full xl:z-10 transition-transform duration-300"
+    :class="{ 'translate-x-0': sidebar.sidebarVisible, '-translate-x-full': !sidebar.sidebarVisible }">
     <div
-      class="border-muted-200 pointer-events-auto relative z-10 h-full w-[280px] border-r bg-white transition-all duration-300"
-    >
+      class="border-muted-200 pointer-events-auto relative z-10 h-full w-[280px] border-r bg-white transition-all duration-300">
       <div class="flex h-screen flex-col">
         <div class="relative h-full w-full overflow-y-auto">
-          <div
-            class="cursor-pointer mx-2 mt-4 bg-gray-100 py-2 mb-4 px-4 border border-gray-300"
-            @click="moderationNotAvailable"
-          >
+          <div class="cursor-pointer mx-2 mt-4 bg-gray-100 py-2 mb-4 px-4 border border-gray-300"
+            @click="moderationNotAvailable">
             <div class="flex items-center">
-              <img
-                :src="currentUser.getAvatar()"
-                class="flex-wrap h-8 w-8 rounded-full"
-              >
+              <img :src="currentUser.getAvatar()" class="flex-wrap h-8 w-8 rounded-full">
               <div class="ml-2">
                 <p class="text-gray-500 text-xs">
                   Moderando
@@ -34,27 +26,17 @@
               </h3>
               <ul class="mb-8">
                 <template v-for="route in c.routes">
-                  <li
-                    v-if="route.enabled"
-                    class="mb-2"
-                  >
-                    <NuxtLink
-                      :to="route.to"
+                  <li v-if="route.enabled" class="mb-2">
+                    <NuxtLink :to="route.to"
                       class="w-full px-2 py-2.5 rounded-md flex items-center gap-6 text-gray-600 hover:bg-blue-50 hover:text-blue-500 transition-colors duration-200 ease-in-out"
-                      active-class="bg-blue-50 !text-blue-500"
-                    >
+                      active-class="bg-blue-50 !text-blue-500">
                       <div class="w-10 text-2xl flex items-center justify-center">
                         <UIcon :name="route.icon" />
                       </div>
                       <span class="text-sm font-jost">{{ route.label }}</span>
-                      <span
-                        v-if="route.newFeature"
-                        class="bg-blue-500 text-white text-xs rounded-full px-2 py-1 flex items-center uppercase"
-                      >
-                        <UIcon
-                          name="i-mdi-stars-outline"
-                          class="w-4 h-4 inline-block mr-1"
-                        /> Nuevo
+                      <span v-if="route.newFeature"
+                        class="bg-blue-500 text-white text-xs rounded-full px-2 py-1 flex items-center uppercase">
+                        <UIcon name="i-mdi-stars-outline" class="w-4 h-4 inline-block mr-1" /> Nuevo
                       </span>
                     </NuxtLink>
                   </li>
@@ -68,11 +50,9 @@
               <ul class="mb-8">
                 <template v-for="route in adminRoutes">
                   <li class="mb-2">
-                    <NuxtLink
-                      :to="route.to"
+                    <NuxtLink :to="route.to"
                       class="w-full px-2 py-2.5 rounded-md flex items-center gap-6 text-gray-600 hover:bg-blue-50 hover:text-blue-500 transition-colors duration-200 ease-in-out"
-                      active-class="bg-blue-50 !text-blue-500"
-                    >
+                      active-class="bg-blue-50 !text-blue-500">
                       <div class="w-10 text-2xl flex items-center justify-center">
                         <UIcon :name="route.icon" />
                       </div>
@@ -106,6 +86,13 @@ const menuCategories = ref([
         icon: 'i-ph-grid-four',
         to: '/dashboard',
         enabled: true
+      },
+      {
+        icon: 'i-lucide-clapperboard',
+        label: 'Stream Manager',
+        to: '/dashboard/stream-manager',
+        enabled: process.env.NODE_ENV === 'development',
+        newFeature: true
       },
       {
         label: 'Comandos',
@@ -206,4 +193,3 @@ onMounted(async () => {
   await getModeratedChannels()
 })
 </script>
-

@@ -13,10 +13,10 @@
       <div class="mx-auto w-full">
         <div class="flex flex-col flex-1 w-full">
           <DashboardHeader />
-          <main class="relative z-0 max-w-7xl xl:px-10 px-4">
+          <main class="relative z-0 max-w-7xl xl:px-10 px-4 mx-auto">
             <slot />
           </main>
-          <LazyDashboardQuickActions />
+          <DashboardQuickActions />
         </div>
       </div>
     </div>

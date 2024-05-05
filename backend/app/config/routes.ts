@@ -18,12 +18,14 @@ import { createSubscriptionsHooksRouter } from '@/app/config/routes/subscription
 import { createTwitchToolsRouter } from '@/app/config/routes/twitch-tools.router'
 import { createBillingRouter } from '@/app/config/routes/billing.router'
 import { createWidgetsRouter } from '@/app/config/routes/widgets.router'
+import { createStreamManagerRouter } from '@/app/config/routes/stream-manager.router'
 
 const router = Router()
 
 const authMiddleware = Passport.middleware
 
 router.use('/dashboard', authMiddleware, createDashboardRouter())
+router.use('/stream-manager', authMiddleware, createStreamManagerRouter())
 
 router.get('/ping', (req, res) => {
   res.status(200).send('PONG')

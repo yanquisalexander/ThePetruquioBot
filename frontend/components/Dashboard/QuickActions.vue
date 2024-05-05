@@ -1,6 +1,6 @@
 <template>
   <UModal v-model="isOpen">
-    <UCommandPalette :placeholder="t('dashboard.command_palette.search_placeholder')" :groups="groups"
+    <UCommandPalette :placeholder="t('dashboard.command_palette.search_placeholder')" :groups="groups" :ui="uiParams"
       :autoselect="false" @update:model-value="onCommand">
     </UCommandPalette>
   </UModal>
@@ -13,8 +13,15 @@ const isOpen = ref(false)
 const router = useRouter()
 const { t } = useI18n()
 
-const protocol = computed(() => window.location.protocol)
 const hasCommunityMapEnabled = computed(() => rawUser().channel.preferences.enableCommunityMap)
+
+const uiParams = {
+  group: {
+    command: {
+      label: 'text-normal pl-2'
+    }
+  }
+}
 
 const actions = computed(() => {
   const baseActions = [
@@ -25,6 +32,14 @@ const actions = computed(() => {
       click: () => {
         router.push('/dashboard');
       }
+    },
+    {
+      id: 'stream-manager',
+      label: 'Stream Manager',
+      icon: 'i-lucide-clapperboard',
+      click: () => {
+        router.push('/dashboard/stream-manager');
+      }
     }
   ];
 
@@ -34,7 +49,7 @@ const actions = computed(() => {
       label: 'View Community Map',
       icon: 'i-lucide-map',
       click: () => {
-        open(`${protocol.value}//${FRONTEND_URL}/${rawUser().channel.user.username}/map`, '_blank');
+        open(`/c/${rawUser().username}/map`, '_blank');
       }
     });
   }

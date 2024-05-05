@@ -1,14 +1,6 @@
 <template>
-  <div class="mx-auto md:px-4">
-    <div class="py-4 rounded-md mt-2 mx-auto">
-      <div class="pb-4">
-        <h2 class="text-2xl font-medium font-jost mb-4">
-          {{ $t('settings.title') }}
-        </h2>
-      </div>
-      <DashboardBreadcrumb />
-
-    </div>
+  <DashboardPageContainer>
+    <DashboardPageHeader title="settings.title" />
 
     <UAlert icon="i-heroicons-sparkles-solid" color="orange" variant="subtle" title="¡Novedades!">
       <template #description>
@@ -135,7 +127,7 @@
         </div>
       </UContainer>
     </div>
-  </div>
+  </DashboardPageContainer>
 </template>
 
 <script setup lang="ts">
