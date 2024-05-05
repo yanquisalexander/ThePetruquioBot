@@ -23,7 +23,7 @@ class User {
   birthday?: Date | null
   customIdPaypal: string
 
-  constructor (username: string, twitchId: number, email?: string, displayName?: string, avatar?: string, admin?: boolean, birthday?: Date) {
+  constructor(username: string, twitchId: number, email?: string, displayName?: string, avatar?: string, admin?: boolean, birthday?: Date) {
     this.username = username
     this.twitchId = twitchId
     this.email = email
@@ -34,7 +34,7 @@ class User {
     this.customIdPaypal = `P-${twitchId}`
   }
 
-  public static async findByUsername (username: string): Promise<User | null> {
+  public static async findByUsername(username: string): Promise<User | null> {
     const query = 'SELECT * FROM users WHERE username ILIKE $1'
     const values = [username]
     const result = await Database.query(query, values)
@@ -55,7 +55,7 @@ class User {
     }
   }
 
-  public static async findByTwitchId (twitchId: number): Promise<User | null> {
+  public static async findByTwitchId(twitchId: number): Promise<User | null> {
     const query = 'SELECT * FROM users WHERE twitch_id = $1'
     const values = [twitchId]
     const result = await Database.query(query, values)
@@ -76,7 +76,7 @@ class User {
     }
   }
 
-  public static async findAll (): Promise<User[]> {
+  public static async findAll(): Promise<User[]> {
     const query = 'SELECT * FROM users'
     const result = await Database.query(query)
 
@@ -96,27 +96,27 @@ class User {
     return users
   }
 
-  public async getChannel (): Promise<Channel | null> {
+  public async getChannel(): Promise<Channel | null> {
     return await Channel.findByTwitchId(this.twitchId)
   }
 
-  async getMessages (): Promise<any[]> {
+  async getMessages(): Promise<any[]> {
     return await MessageLogger.getByUser(this)
   }
 
-  async isPatron (): Promise<boolean> {
+  async isPatron(): Promise<boolean> {
     return await Patreon.isUserSubscribed(this)
   }
 
-  async isSuscribed (): Promise<boolean> {
+  async isSuscribed(): Promise<boolean> {
     return await paypalService.isSubscriptionActive(this.customIdPaypal)
   }
 
-  public async getGreetingsData (): Promise<any> {
+  public async getGreetingsData(): Promise<any> {
     return await Greeting.getByUser(this)
   }
 
-  async createChannelWithPreferences (): Promise<Channel> {
+  async createChannelWithPreferences(): Promise<Channel> {
     const channel = await Channel.findByTwitchId(this.twitchId)
     if (!channel) {
       const newChannel = new Channel(this.twitchId, false, defaultChannelPreferences, this)
@@ -126,7 +126,7 @@ class User {
     return channel
   }
 
-  public async save (): Promise<void> {
+  public async save(): Promise<void> {
     const query = 'INSERT INTO users (username, twitch_id, email, display_name, avatar, birthday_date) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (twitch_id) DO UPDATE SET username = $1, email = $3, display_name = $4, avatar = $5, birthday_date = $6 RETURNING twitch_id'
     const values = [this.username, this.twitchId, this.email, this.displayName, this.avatar, this.birthday]
     try {
@@ -138,7 +138,7 @@ class User {
     }
   }
 
-  isBirthdayToday (): boolean {
+  isBirthdayToday(): boolean {
     if (!this.birthday) {
       return false
     }
@@ -146,11 +146,11 @@ class User {
     return this.birthday.getDate() === today.getDate() && this.birthday.getMonth() === today.getMonth()
   }
 
-  hasHelixToken (): boolean {
+  hasHelixToken(): boolean {
     return TwitchAuthenticator.RefreshingAuthProvider.hasUser(this.twitchId)
   }
 
-  async fromHelix (): Promise<HelixUser | null> {
+  async fromHelix(): Promise<HelixUser | null> {
     try {
       const user = await Twitch.getUser(this.username)
       return user
@@ -160,7 +160,7 @@ class User {
     }
   }
 
-  static async count (): Promise<number> {
+  static async count(): Promise<number> {
     try {
       const result = await Database.query('SELECT COUNT(*) FROM users')
       return parseInt(result.rows[0].count)
@@ -170,23 +170,23 @@ class User {
     }
   }
 
-  async getLinkedAccounts (): Promise<ExternalAccount[]> {
+  async getLinkedAccounts(): Promise<ExternalAccount[]> {
     return await ExternalAccount.findByUser(this)
   }
 
-  async getLinkedAccount (provider: ExternalAccountProvider): Promise<ExternalAccount | null> {
+  async getLinkedAccount(provider: ExternalAccountProvider): Promise<ExternalAccount | null> {
     return await ExternalAccount.findByProviderAndUser(provider, this)
   }
 
-  async getUnreadNotificationsCount (): Promise<number> {
+  async getUnreadNotificationsCount(): Promise<number> {
     return await Notification.getUnreadCount(this)
   }
 
-  async getNotifications (): Promise<Notification[]> {
+  async getNotifications(): Promise<Notification[]> {
     return await Notification.findByUser(this)
   }
 
-  async generateApiToken (): Promise<string> {
+  async generateApiToken(): Promise<string> {
     try {
       // Genera un nuevo token
       const customToken = jwt.sign({
@@ -215,7 +215,7 @@ class User {
     }
   }
 
-  static async isTokenRevoked (token: string): Promise<boolean> {
+  static async isTokenRevoked(token: string): Promise<boolean> {
     // Check if token is revoked
     const revoked = await Database.query('SELECT * FROM revoked_api_tokens WHERE api_token = $1', [token])
     if (revoked.rows.length > 0) {
@@ -225,7 +225,7 @@ class User {
     }
   }
 
-  async getApiToken (): Promise<string | null> {
+  async getApiToken(): Promise<string | null> {
     try {
       const tokenQueryResult = await Database.query('SELECT api_token FROM users WHERE twitch_id = $1', [this.twitchId])
 
@@ -244,23 +244,28 @@ class User {
     }
   }
 
-  async getModeratedChannels (): Promise<any[] | unknown> {
-    if (!this.hasHelixToken()) {
-      return []
+  async getModeratedChannels(): Promise<any[] | unknown> {
+    try {
+      const res = await Twitch.Helix.asUser(this.twitchId, async ctx => {
+        return await ctx.moderation.getModeratedChannels(this.twitchId);
+      });
+
+      const moderatedChannels = await Promise.all(res.data.map(async (channel) => {
+        const broadcaster = await channel.getBroadcaster();
+        return {
+          id: channel.id,
+          displayName: channel.displayName,
+          avatar: broadcaster.profilePictureUrl,
+        };
+      }));
+
+      return moderatedChannels;
+    } catch (error) {
+      console.error("Error fetching moderated channels:", error);
+      return []; // O devuelve algún valor por defecto
     }
-
-    const helixUser = await this.fromHelix()
-    if (!helixUser) {
-      return []
-    }
-
-    const moderatedChannels = await Twitch.Helix.asUser(helixUser, async ctx => {
-      const res = await ctx.moderation.getModeratedChannels(helixUser.id)
-      return res
-    })
-
-    return moderatedChannels.data
   }
+
 }
 
 export default User
