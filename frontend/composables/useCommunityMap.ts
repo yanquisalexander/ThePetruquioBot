@@ -26,13 +26,21 @@ export const useCommunityMap = () => {
         .addTo(map)
     }
 
-    const createMarker = async (map: L.Map, lat: string, lng: string) => {
+    const createMarker = async (map: L.Map, lat: string, lng: string, options?: any) => {
         const L = (await import('leaflet')).default;
         const latitude = parseFloat(lat) + (Math.random() - 0.5) * 0.02;
         const longitude = parseFloat(lng) + (Math.random() - 0.5) * 0.02;
+        const marker = L.marker([latitude, longitude])
+        Object
+            .entries(options)
+            .forEach(([key, value]) => {
+                // @ts-ignore
+                marker.options[key] = value
+            })
+
 
         // Don't add to map yet, because we want to customize the marker first
-        return L.marker([latitude, longitude])
+        return marker
     }
 
     return {

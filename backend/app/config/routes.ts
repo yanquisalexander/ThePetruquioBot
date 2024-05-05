@@ -58,6 +58,7 @@ router.get('/channel/preferences', Passport.getPassport().authenticate('jwt', { 
 router.put('/channel/preferences', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.updatePreferences)
 router.get('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.getCommands)
 router.put('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.editCommand)
+router.put('/channel/commands/:commandId/toggle', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.toggleCommand)
 router.post('/channel/commands', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.createCommand)
 router.delete('/channel/commands/:commandId', Passport.getPassport().authenticate('jwt', { session: false }), CommandsController.deleteCommand)
 router.get('/channel/twitch-channel-points', Passport.getPassport().authenticate('jwt', { session: false }), ChannelsController.getTwitchChannelsPoints)

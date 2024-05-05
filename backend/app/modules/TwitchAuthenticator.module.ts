@@ -18,6 +18,7 @@ export const TWITCH_SCOPES = [
   'user:read:broadcast',
   'chat:read',
   'chat:edit',
+  
   'channel:moderate',
   'channel:read:subscriptions',
   'whispers:read',
@@ -64,7 +65,8 @@ export const TWITCH_SCOPES = [
   'channel:bot',
   'chat:edit',
   'user:bot',
-  'user:read:moderated_channels'
+  'user:read:moderated_channels',
+  'user:write:chat'
 ]
 
 class TwitchAuthenticator {

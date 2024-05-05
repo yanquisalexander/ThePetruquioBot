@@ -13,6 +13,7 @@ import { handleChatMessage } from './app/bot/message-handler'
 import { noticeHandler } from './app/bot/notice-handler'
 import { pongHandler } from './app/bot/pong-handler'
 import MessageLogger from './app/models/MessageLogger.model'
+import TwitchAuthenticator from "./app/modules/TwitchAuthenticator.module"
 
 const bootedAt = Date.now()
 
@@ -25,35 +26,6 @@ const EventHandlers = {
   notice: noticeHandler
 }
 
-class ChannelBotInstance {
-  public channel: Channel
-  public bot: tmi.Client | null = null
-
-  constructor (channel: Channel) {
-    this.channel = channel
-  }
-
-  public async initializeBot (): Promise<void> {
-    const token = await UserToken.findByUserId(this.channel.twitchId)
-    if (!token) {
-      throw new Error('User token not found')
-    }
-
-    console.log(chalk.green('[BOT]'), chalk.white('Initializing bot instance for channel #'), chalk.green(this.channel.user.username))
-    this.bot = new tmi.Client({
-      identity: {
-        username: this.channel.user.username,
-        password: `oauth:${token.tokenData.accessToken}`
-      },
-      channels: [this.channel.user.username]
-    })
-
-    this.bot.connect().catch((error) => {
-      console.error(chalk.red('[BOT]'), chalk.white('Error connecting bot:'), error)
-      this.bot = null // Reset bot instance
-    })
-  }
-}
 
 export enum Platform {
   TWITCH = 'twitch',
@@ -64,10 +36,9 @@ export class Bot {
   private static instance: Bot
   private readonly client: tmi.Client
   private channels: string[] = []
-  private static readonly channelInstances = new Map<number, ChannelBotInstance>()
   private BotUserInstance: User | null = null
 
-  private constructor () {
+  private constructor() {
     this.client = new tmi.Client({
       identity: {
         username: Configuration.BOT_NAME,
@@ -77,7 +48,7 @@ export class Bot {
     })
   }
 
-  public static async getInstance (): Promise<Bot> {
+  public static async getInstance(): Promise<Bot> {
     if (!this.instance) {
       this.instance = new Bot()
       await this.instance.initialize()
@@ -85,7 +56,7 @@ export class Bot {
     return this.instance
   }
 
-  private async initialize (): Promise<void> {
+  private async initialize(): Promise<void> {
     this.channels = await this.autoJoinChannels()
     for (const event of Object.keys(EventHandlers) as Array<keyof typeof EventHandlers>) {
       console.log(chalk.bgCyan.bold('[Bot EventHandlers]'), chalk.white(`Registering event handler for ${event}`))
@@ -103,7 +74,7 @@ export class Bot {
     }
   }
 
-  private async initializeBotAccount (): Promise<void> {
+  private async initializeBotAccount(): Promise<void> {
     const user = await User.findByUsername(Configuration.BOT_NAME.toLowerCase())
 
     if (!user) {
@@ -121,7 +92,7 @@ export class Bot {
     }
   }
 
-  private async createBotAccount (): Promise<void> {
+  private async createBotAccount(): Promise<void> {
     const botUsername = Configuration.BOT_NAME.toLowerCase()
     const botUserId = Configuration.TWITCH_USER_ID
 
@@ -142,7 +113,7 @@ export class Bot {
     }
   }
 
-  private async autoJoinChannels (): Promise<string[]> {
+  private async autoJoinChannels(): Promise<string[]> {
     if (process.env.NODE_ENV === 'development') {
       console.log(chalk.green('[BOT]'), chalk.white('Development mode enabled. Joining development channels.'))
       const developmentChannels = Configuration.DEVELOPMENT_CHANNELS
@@ -153,7 +124,7 @@ export class Bot {
     return channels.map((channel) => channel.user.username)
   }
 
-  public async sendMessage (channel: Channel, message: string, platform: Platform = Platform.TWITCH): Promise<void> {
+  public async sendMessage(channel: Channel, message: string, platform: Platform = Platform.TWITCH): Promise<void> {
     const sendTwitchMessage = async (target: string): Promise<void> => {
       try {
         await this.client.say(target, message)
@@ -187,30 +158,27 @@ export class Bot {
       }
 
       if (channel.preferences.useStreamerAccount?.value) {
-        const instance = Bot.getStreamerBotInstance(channel)
-        if (instance && instance.bot) {
-          try {
-            await instance.bot?.say(channel.user.username, message)
-          } catch (error) {
-            console.error(chalk.red('[BOT]'), chalk.white('Error sending message:'), error)
-            await sendTwitchMessage(channel.user.username)
-          }
-          return
-        } else {
-          Bot.channelInstances.delete(channel.twitchId)
-        }
-
-        console.log(chalk.yellow('[BOT]'), chalk.white('Bot instance not found for channel #'), chalk.green(channel.user.username))
-        const newInstance = new ChannelBotInstance(channel)
-        this.initializeBotInstance(newInstance)
+        const userId = channel.user.twitchId;
         try {
-          await newInstance.bot?.say(channel.user.username, message)
+            if (!TwitchAuthenticator.RefreshingAuthProvider.hasUser(userId)) {
+                throw new Error('User not found in RefreshingAuthProvider');
+            }
+    
+            const userScopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(userId);
+            if (!userScopes.includes('user:write:chat')) {
+                throw new Error('User does not have user:write:chat scope');
+            }
+    
+            await Twitch.Helix.asUser(userId, async client => {
+                await client.chat.sendChatMessage(userId, message);
+            });
+            return;
         } catch (error) {
-          console.error(chalk.red('[BOT]'), chalk.white('Error sending message:'), error)
-          await sendTwitchMessage(channel.user.username)
-          return
+            console.error(chalk.red('[BOT]'), chalk.white('Error sending message as streamer:'), error);
+            return sendTwitchMessage(channel.user.username);
         }
-      }
+    }
+    
 
       await sendTwitchMessage(channel.user.username)
       return
@@ -222,7 +190,7 @@ export class Bot {
     }
   }
 
-  private handleAnnouncement (channel: Channel, message: string): void {
+  private handleAnnouncement(channel: Channel, message: string): void {
     const announcePattern = /\/announce(\w*)\s(.+)/
     const match = message.match(announcePattern)
 
@@ -242,18 +210,13 @@ export class Bot {
     }
   }
 
-  private initializeBotInstance (instance: ChannelBotInstance): void {
-    Bot.channelInstances.set(instance.channel.twitchId, instance)
-    instance.initializeBot().catch((error) => {
-      console.error(chalk.red('[BOT]'), chalk.white('Error initializing bot instance:'), error)
-    })
-  }
 
-  public getBotClient (): tmi.Client {
+
+  public getBotClient(): tmi.Client {
     return this.client
   }
 
-  public async joinChannel (channel: string): Promise<void> {
+  public async joinChannel(channel: string): Promise<void> {
     try {
       await this.client.join(channel)
     } catch (error) {
@@ -261,19 +224,15 @@ export class Bot {
     }
   }
 
-  get joinedChannels (): string[] {
+  get joinedChannels(): string[] {
     return this.client.getChannels().map((channel) => channel.replace('#', ''))
   }
 
-  public bootedAt (): number {
+  public bootedAt(): number {
     return bootedAt
   }
 
-  public static get username (): string {
+  public static get username(): string {
     return Configuration.BOT_NAME.toLowerCase()
-  }
-
-  public static getStreamerBotInstance (channel: Channel): ChannelBotInstance | null {
-    return Bot.channelInstances.get(channel.twitchId) ?? null
   }
 }

@@ -17,8 +17,5 @@ export default defineNuxtPlugin(({ vueApp }) => {
         }
     })
 
-    console.log('i18n', i18n)
-    console.log('i18n.locale', i18n.global.locale.value)
-
     vueApp.use(i18n)
 })

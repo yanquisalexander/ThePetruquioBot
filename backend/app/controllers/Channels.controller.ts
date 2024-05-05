@@ -138,7 +138,7 @@ class ChannelsController {
         return res.status(400).json({ error: 'TWITCH_TOKEN_NOT_FOUND', message: 'Your Twitch account session has expired, please authorize again' })
       }
       const scopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(channel.twitchId)
-      if (!scopes.includes('chat:edit') || !scopes.includes('channel:bot') || !scopes.includes('user:bot')) {
+      if (!scopes.includes('user:write:chat')) {
         {
           return res.status(400).json({ error: 'INSUFFICIENT_SCOPES', message: 'The user does not have the required scopes to use this feature' })
         }

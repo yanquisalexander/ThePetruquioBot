@@ -19,18 +19,8 @@
       sort-desc-icon="i-heroicons-arrow-down-20-solid"
       :sort-button="{ icon: 'i-heroicons-sparkles-20-solid', color: 'primary', variant: 'outline', size: '2xs', square: false, ui: { rounded: 'rounded-full' } }">
       <template #actions-data="{ row }">
-        <div class="flex items-center space-x-2">
-          <UTooltip :text="$t('commands.edit')">
-            <UButton variant="soft" color="blue" class="text-lg" @click="showEditDialog(row)">
-              <UIcon name="i-mdi-pencil" />
-            </UButton>
-          </UTooltip>
-          <UTooltip :text="$t('commands.delete')">
-            <UButton variant="soft" color="red" class="text-lg" @click="showDeleteDialog(row)">
-              <UIcon name="i-mdi-delete" />
-            </UButton>
-          </UTooltip>
-        </div>
+        <LazyDashboardCommandsContextualMenu :command="row" @editCommand="showEditDialog"
+          @deleteCommand="showDeleteDialog" @toggle-command-enabled="toggleCommandEnabled" />
       </template>
 
       <template #response-data="{ row }">
@@ -217,21 +207,13 @@ const variableInjectorOpened = ref(false);
 const editCommandResponse = ref();
 import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
-
+const client = useAuthenticatedRequest();
+const { CommandPermission, getCommands, toggleCommand, editCommand: editCommandHook } = useCommands();
 
 useHead({
   title: 'Comandos'
 })
 
-const CommandPermission = {
-  EVERYONE: 'everyone',
-  VIEWER: 'viewer',
-  FOLLOWER: 'follower',
-  SUBSCRIBER: 'subscriber',
-  VIP: 'vip',
-  MODERATOR: 'moderator',
-  BROADCASTER: 'broadcaster',
-}
 
 const injectVariable = (variable) => {
   if (newCommand.value) {
@@ -352,57 +334,30 @@ const addCommand = async () => {
   }
 };
 
-const editCommand = async () => {
+const toggleCommandEnabled = async (command) => {
   try {
+    await toggleCommand(command.id);
+    await fetchCommands();
 
-    if (selectedCommand.value.name.length === 0 || selectedCommand.value.response.length === 0) {
-      toast.add({
-        type: 'error',
-        title: 'Error',
-        description: 'Command and response cannot be empty'
-      });
-      return;
-    }
-
-    alias.value = '';
-
-    let permissions = selectedCommand.value.permissions;
-    if (permissions.includes(CommandPermission.EVERYONE)) {
-      permissions = [CommandPermission.EVERYONE];
-    } else {
-      permissions = permissions.filter((permission) => permission !== CommandPermission.EVERYONE);
-    }
-    const response = await useFetch(`${API_ENDPOINT}/channel/commands/${selectedCommand.value.id}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${currentUser.getToken()}`,
-      },
-      body: {
-        name: selectedCommand.value.name,
-        response: selectedCommand.value.response,
-        aliases: selectedCommand.value.preferences?.aliases,
-        permissions,
-        enabled: selectedCommand.value.enabled,
-      },
-    });
-
-    if (response.data.value.success) {
-      editDialog.value = false;
-      await fetchCommands();
-      toast.add({
-        type: 'success',
-        title: 'Comando editado',
-        description: 'El comando se ha editado correctamente',
-        icon: 'i-heroicons-check-20-solid',
-      });
-    }
   } catch (error) {
     console.log(error);
-    toast.add({
-      type: 'error',
-      title: 'Error',
-      description: 'Ha ocurrido un error al editar el comando'
+
+    commands.value = commands.value.map((c) => {
+      if (c.id === command.id) {
+        c.enabled = !c.enabled;
+      }
+      return c;
     });
+  }
+};
+
+const editCommand = async () => {
+  try {
+    await editCommandHook(selectedCommand.value);
+    editDialog.value = false;
+    await fetchCommands();
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -424,19 +379,16 @@ const headers = ref([
     key: 'response'
   },
   {
-    label: i18n.t('commands.actions'),
     key: 'actions'
   },
 ])
 
 const fetchCommands = async () => {
-  const response = await useFetch(`${API_ENDPOINT}/channel/commands`, {
-    headers: {
-      Authorization: `Bearer ${currentUser.getToken()}`,
-    },
-  });
+  try {
+    commands.value = await getCommands()
+  } catch (error) {
 
-  commands.value = response.data.value.data.commands;
+  }
 };
 
 const deleteCommand = async (id) => {

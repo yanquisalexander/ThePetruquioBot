@@ -184,6 +184,52 @@ class CommandsController {
         });
     }
 
+    public static async toggleCommand(req: Request, res: Response) {
+        const currentUser = req.user as ExpressUser;
+
+        if (!currentUser) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const session = await Session.findBySessionId(currentUser.session.sessionId);
+
+        if (!session) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        const user = await User.findByTwitchId(parseInt(currentUser.twitchId));
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const channel = await user.getChannel();
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' });
+        }
+
+        const { commandId } = req.params as unknown as { commandId: number };
+
+        if (!commandId) {
+            return res.status(400).json({ error: 'Command is required' });
+        }
+
+        const command = await Command.findByIdAndChannel(commandId, channel);
+
+        if (!command) {
+            return res.status(404).json({ error: 'Command not found' });
+        }
+
+        command.enabled = !command.enabled;
+
+        await command.save(channel);
+
+        return res.json({
+            success: true
+        });
+    }
+
     public static async createCommand(req: Request, res: Response) {
         const currentUser = req.user as ExpressUser;
 

@@ -1,58 +1,59 @@
 <template>
   <div class="bg-white">
     <div class="map-parent">
-      <MapWelcomeDialog ref="welcomeDialog" :channelName="channelName" />
+      <MapWelcomeDialog ref="welcomeDialog" :channelName="channelName.toString()" />
       <div id="map" class="map-container" v-if="mapMarkers.length > 0"></div>
-      <div v-else class="flex items-center justify-center h-[calc(100vh-48px)] w-full text-gray-500 text-2xl font-medium">
+      <div v-else
+        class="flex items-center justify-center h-[calc(100vh-48px)] w-full text-gray-500 text-2xl font-medium">
         <span class="animate-pulse">Cargando mapa...</span>
       </div>
       <div id="map-actions" v-if="mapMarkers.length > 0"
-          :class="`mx-auto z-[1999] fixed flex justify-center bottom-8 items-center w-full duration-700 transition-all ${!showMapActions ? 'translate-y-24' : ''} ${(snackbar && !playingFindViewerGame) ? '-translate-y-14' : ''}`">
-          <button class="pixelated-btn is-icon" @click="getRandomMarker">
-            <DicesIcon />
-            <v-tooltip class="rounded-none" activator="parent" location="top">
-              Al azar
-            </v-tooltip>
-          </button>
-          <button class="pixelated-btn featured" @click="reloadMap">
-            <RefreshCwIcon />
-            Recargar mapa
-          </button>
-          <v-menu>
-            <template v-slot:activator="{ props }">
-              <button class="pixelated-btn is-icon" v-bind="props" @click="Sounds.buttonClick">
-                <MoreHorizontalIcon />
-                <v-tooltip class="rounded-none" activator="parent" location="top">
-                  Más
-                </v-tooltip>
-              </button>
-            </template>
-            <v-list>
-              <v-list-item href="https://twitch.tv/alexitoo_uy" target="_blank">
-                <template v-slot:prepend>
-                  <v-avatar :size="28">
-                    <img
-                      :src="`https://static-cdn.jtvnw.net/jtv_user_pictures/42194d28-626c-4242-b5c7-6d71d07a1511-profile_image-300x300.jpeg`" />
-                  </v-avatar>
-                </template>
-                <v-list-item-title>
-                  Creado por Alexitoo_UY
-                </v-list-item-title>
-              </v-list-item>
-              <v-list-item href="https://www.yanquisalexander.me/contact" target="_blank">
-                <template v-slot:prepend>
-                  <v-icon color="black">
-                    mdi-bug
-                  </v-icon>
-                </template>
-                <v-list-item-title>
-                  Reportar un error
-                </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+        :class="`mx-auto z-[1999] fixed flex justify-center bottom-8 items-center w-full duration-700 transition-all ${!showMapActions ? 'translate-y-24' : ''} ${!playingFindViewerGame ? '-translate-y-14' : ''}`">
+        <button class="pixelated-btn is-icon" @click="getRandomMarker">
+          <DicesIcon />
+          <v-tooltip class="rounded-none" activator="parent" location="top">
+            Al azar
+          </v-tooltip>
+        </button>
+        <button class="pixelated-btn featured" @click="reloadMap">
+          <RefreshCwIcon />
+          Recargar mapa
+        </button>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <button class="pixelated-btn is-icon" v-bind="props" @click="Sounds.BUTTON_CLICK">
+              <MoreHorizontalIcon />
+              <v-tooltip class="rounded-none" activator="parent" location="top">
+                Más
+              </v-tooltip>
+            </button>
+          </template>
+          <v-list>
+            <v-list-item href="https://twitch.tv/alexitoo_uy" target="_blank">
+              <template v-slot:prepend>
+                <v-avatar :size="28">
+                  <img
+                    :src="`https://static-cdn.jtvnw.net/jtv_user_pictures/42194d28-626c-4242-b5c7-6d71d07a1511-profile_image-300x300.jpeg`" />
+                </v-avatar>
+              </template>
+              <v-list-item-title>
+                Creado por Alexitoo_UY
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item href="https://www.yanquisalexander.me/contact" target="_blank">
+              <template v-slot:prepend>
+                <v-icon color="black">
+                  mdi-bug
+                </v-icon>
+              </template>
+              <v-list-item-title>
+                Reportar un error
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
 
-        </div>
+      </div>
     </div>
     <aside>
       <v-navigation-drawer v-model="showMarkerInfo" permanent location="left"
@@ -124,9 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
 import SoundManager, { Sounds } from '../../../utils/SoundManager';
-import { useRoute } from "vue-router";
 import "leaflet/dist/leaflet.css";
 import { clearError, createError, useFetch } from "nuxt/app";
 import { BadgeCheckIcon, DicesIcon, RefreshCwIcon, MoreHorizontalIcon } from "lucide-vue-next";
@@ -134,7 +133,7 @@ const soundManager = SoundManager.getInstance();
 const { $moment } = useNuxtApp();
 import { io, Socket } from 'socket.io-client';
 import type { LatLngExpression, LayerGroup, Marker, Map } from "leaflet";
-const { showSnackbar, snackbar } = useSnackbar();
+const toast = useToast();
 const { fetchMapData, createMap, createTileLayer, createMarker: createMarkerInstance } = useCommunityMap();
 
 
@@ -168,7 +167,7 @@ const fetchMap = async () => {
   try {
     const response = await fetchMapData(channelName.toString())
     // @ts-ignore
-    
+
     const data = response.data;
     console.log(data);
     mapMarkers.value = data.worldMap;
@@ -197,17 +196,17 @@ const initializeMap = async () => {
   let resizeHandler: any = null;
 
   if (mapMarkers.value) {
-    if(!map.value) {
+    if (!map.value) {
       map.value = await createMap(document.getElementById('map') as HTMLElement)
     }
-    
+
     map.value.setView(center.value, zoom.value);
     map.value.whenReady(() => {
       console.log('[Map] Petroquio.LIVE Map ready');
     });
     map.value.getContainer().classList.add('petruquio-community-map');
     const tileLayer = await createTileLayer(map.value);
-   
+
     if (!map.value) return;
 
     map.value.on('moveend', (e: any) => {
@@ -282,16 +281,15 @@ const createMarker = async (L: any, markerData: any) => {
     iconAnchor: [16, 32]
   });
 
-  const marker: Marker = await createMarkerInstance(map.value, markerData.latitude, markerData.longitude)
+  const marker: Marker = await createMarkerInstance(map.value, markerData.latitude, markerData.longitude, {
+    username: markerData.user_username,
+    user_display_name: markerData.user_display_name,
+    user_avatar: markerData.user_avatar,
+    last_seen: markerData.last_seen,
+    pin_message: markerData.pin_message,
+    isStreamer: markerData.isStreamer,
+  });
   marker.setIcon(emoteIcon);
-  marker.options
-  marker.options.username = markerData.user_username;
-  marker.options.user_display_name = markerData.user_display_name;
-  marker.options.user_avatar = markerData.user_avatar;
-  marker.options.pin_message = markerData.pin_message;
-  marker.options.isStreamer = markerData.isStreamer;
-  marker.options.last_seen = markerData.last_seen;
-
   marker.bindTooltip(markerData.user_display_name, { direction: 'top', className: 'text-black rounded-lg py-2 px-4 text-base font-gabarito transition-opacity duration-300', opacity: 1.0 });
 
   marker.on('click', async (e: any) => {
@@ -339,8 +337,14 @@ const getRandomMarker = async () => {
   if (!map.value) return;
   if (!markerLayer.value) return;
   soundManager.playSound(Sounds.BUTTON_CLICK);
-  if(mapMarkers.value.length === 0) {
-    showSnackbar("Good try, but there's no one in the map yet")
+  if (mapMarkers.value.length === 0) {
+    toast
+      .add({
+        title: 'No hay marcadores',
+        description: 'Buen intento, pero aún no hay nadie en el mapa',
+        color: 'red',
+        timeout: 5000,
+      });
     return;
   }
 
@@ -386,7 +390,13 @@ const fetchUserCard = async (username: string) => {
     const data = response.data.value?.data;
 
     if (!data || response.error.value?.statusCode === 404) {
-      showSnackbar(`No se pudo obtener la información de ${username}`);
+      toast
+        .add({
+          title: 'Error',
+          description: `No se pudo obtener la información de ${username}`,
+          color: 'red',
+          timeout: 5000,
+        });
       currentSelectedMarker.value = null;
       currentSelectedMarkerInfo.value = null;
       showMarkerInfo.value = false;
@@ -422,7 +432,14 @@ const initializeSocket = async () => {
       case 'location':
         if (targetMarker) {
           targetMarker.setLatLng([data.latitude, data.longitude])
-          showSnackbar(`📍 ${data.username} se ha movido en el mapa`);
+          toast
+            .add({
+              title: 'Ubicación actualizada',
+              icon: 'i-mdi-map-marker',
+              description: `${data.username} se ha movido en el mapa`,
+              color: 'green',
+              timeout: 5000,
+            });
         }
         break;
       case 'emote':
@@ -433,22 +450,42 @@ const initializeSocket = async () => {
             iconAnchor: [16, 32]
           });
           targetMarker.setIcon(emoteIcon);
-          showSnackbar(`📌 ${data.username} ha cambiado su pin`);
+          toast
+            .add({
+              title: 'Emote actualizado',
+              icon: 'i-i-mdi-emoticon',
+              description: `${data.username} ha cambiado su emote`,
+              color: 'green',
+              timeout: 5000,
+            });
         }
         break;
-      case 'show':
         if (!targetMarker) {
           const newMarker = await createMarker(L, data);
           if (!newMarker) return;
           if (!markerLayer.value) return;
           markerLayer.value.addLayer(newMarker);
-          showSnackbar(`📌 ${data.username} ha aparecido en el mapa`);
+          toast
+            .add({
+              title: 'Nuevo marcador',
+              icon: 'i-mdi-map-marker-plus',
+              description: `${data.username} ha aparecido en el mapa`,
+              color: 'green',
+              timeout: 5000,
+            });
         }
         break;
       case 'mask':
         if (targetMarker) {
           markerLayer.value?.removeLayer(targetMarker);
-          showSnackbar(`📌 ${data.username} ha desaparecido del mapa`);
+          toast
+            .add({
+              title: 'Marcador eliminado',
+              icon: 'i-mdi-map-marker-remove',
+              description: `${data.username} ha desaparecido del mapa`,
+              color: 'red',
+              timeout: 5000,
+            });
         }
         break;
       default:
@@ -463,12 +500,12 @@ useHead({
 
 
 onMounted(async () => {
-  if(!welcomeDialog.value) {
+  if (!welcomeDialog.value) {
     return;
   }
   // @ts-ignore
   welcomeDialog.value.openModal();
-  if(!mapMarkers.value) {
+  if (!mapMarkers.value) {
     await fetchMap();
   }
   await initializeMap();
