@@ -57,6 +57,12 @@ class CurrentUser {
 
     return session ? await User.findByTwitchId(userId) : null
   }
+
+  async getSession (): Promise<Session | null> {
+    const { sessionId } = this.expressUser.session
+
+    return await Session.findBySessionId(sessionId)
+  }
 }
 
 export default CurrentUser

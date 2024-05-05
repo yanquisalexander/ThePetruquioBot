@@ -6,7 +6,7 @@
       <div class="flex h-screen flex-col">
         <div class="relative h-full w-full overflow-y-auto">
           <div class="cursor-pointer mx-2 mt-4 bg-gray-100 py-2 mb-4 px-4 border border-gray-300"
-            @click="moderationNotAvailable">
+            @click="showModeratorAccountChooser = true">
             <div class="flex items-center">
               <img :src="currentUser.getAvatar()" class="flex-wrap h-8 w-8 rounded-full">
               <div class="ml-2">
@@ -66,13 +66,18 @@
         </div>
       </div>
     </div>
+    <DashboardModeratorAccountChooser :moderatedChannels="moderatedChannels" @chooseAccount="chooseAccount"
+      v-model="showModeratorAccountChooser" />
   </aside>
 </template>
 
 <script lang="ts" setup>
+const { getSession } = useAuth()
 const currentUser = useCurrentUser()
 const sidebar = useSidebar()
 const toast = useToast()
+const moderatedChannels = ref([])
+const showModeratorAccountChooser = ref(false)
 
 import axios from "axios";
 
@@ -170,13 +175,32 @@ const adminRoutes = ref([
     to: '/dashboard/admin/users'
   }
 ])
-const moderationNotAvailable = () => {
-  toast.add({
-    title: 'Función no disponible',
-    description: 'La moderación de otros canales no está disponible en este momento.',
-    icon: 'i-heroicons-information-circle-20-solid',
-    color: 'orange'
-  })
+
+const chooseAccount = async (channelId: string) => {
+  console.log('Channel ID:', channelId)
+  try {
+    await axios.post(`${API_ENDPOINT}/dashboard/moderate/${channelId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${currentUser.getToken()}`
+      }
+    })
+    toast.add({
+      title: 'Cuenta de moderador seleccionada',
+      description: 'Ahora estás moderando el canal seleccionado.',
+      color: 'green',
+      timeout: 5000
+    })
+    await getSession()
+    showModeratorAccountChooser.value = false
+
+  } catch (error) {
+    toast.add({
+      title: 'Error al seleccionar cuenta de moderador',
+      description: (error as Error).message,
+      color: 'red',
+      timeout: 5000
+    })
+  }
 }
 
 const getModeratedChannels = async () => {
@@ -185,11 +209,10 @@ const getModeratedChannels = async () => {
       Authorization: `Bearer ${currentUser.getToken()}`
     }
   })
-  console.log(data)
-  return data
+  return data.data
 }
 
 onMounted(async () => {
-  await getModeratedChannels()
+  moderatedChannels.value = await getModeratedChannels()
 })
 </script>

@@ -12,6 +12,7 @@ export const createDashboardRouter = (): Router => {
   router.post('/toggle-mute', dashboardController.toggleMute)
   router.post('/send-message', dashboardController.sendMessageAsBot)
   router.get('/moderated-channels', dashboardController.getModeratedChannels)
+  router.post('/moderate/:userId', dashboardController.impersonateUser)
   router.get('/notifications', dashboardController.getNotifications)
   router.put('/notifications/:id/mark-as-read', dashboardController.markNotificationAsRead)
 

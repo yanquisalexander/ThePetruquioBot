@@ -238,6 +238,49 @@ export class DashboardController {
 
     const channels = await user.getModeratedChannels()
 
+    // Add self to the list
+    channels.push({
+      id: user.twitchId.toString(),
+      displayName: user.displayName ?? user.username,
+      avatar: user.avatar ?? ''
+    
+    })
+
     return res.json({ data: channels })
+  }
+
+  async impersonateUser (req: Request, res: Response): Promise<Response> {
+    const currentUser = new CurrentUser(req.user as ExpressUser)
+
+    const user = await currentUser.getCurrentUser()
+    const session = await currentUser.getSession()
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+
+    const userId = req.params.userId
+
+    if (!session) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const moderatedChannels = await user.getModeratedChannels()
+
+    // Check if userId is present in the moderated channels
+
+
+    if (!moderatedChannels.find((channel) => channel.id === userId)) {
+      return res.status(403).json({ error: 'You are not a moderator of this channel' })
+    }
+
+    try {
+      await session.setImpersonate(parseInt(userId))
+      return res.json({ data: { success: true } })
+    } catch (error) {
+      console.error(error)
+      return res.status(500).json({ error: 'Internal server error' })
+    }
   }
 }

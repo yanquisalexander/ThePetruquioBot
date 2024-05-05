@@ -13,6 +13,12 @@ import Patreon from '../modules/Patreon.module'
 import TwitchAuthenticator from '../modules/TwitchAuthenticator.module'
 import { paypalService } from '../services/PayPal'
 
+interface ModeratedChannel {
+  id: string
+  displayName: string
+  avatar: string
+}
+
 class User {
   username: string
   twitchId: number
@@ -244,7 +250,7 @@ class User {
     }
   }
 
-  async getModeratedChannels(): Promise<any[] | unknown> {
+  async getModeratedChannels(): Promise<ModeratedChannel[]> {
     try {
       const res = await Twitch.Helix.asUser(this.twitchId, async ctx => {
         return await ctx.moderation.getModeratedChannels(this.twitchId);
