@@ -6,6 +6,15 @@ interface Scene {
     sceneUuid: string;
 }
 
+interface SpecialInputs {
+    desktop1: string;
+    desktop2: string;
+    mic1: string;
+    mic2: string;
+    mic3: string;
+    mic4: string;
+}
+
 export default class OBSManager {
     private obs: OBSWebSocket | null = null;
 
@@ -63,6 +72,35 @@ export default class OBSManager {
         }
     }
 
+    async getInputList(): Promise<any[]> {
+        if (this.obs) {
+            try {
+                const response = await this.obs.call('GetInputList');
+                return response.inputs
+            } catch (error) {
+                console.error('Error fetching input list from OBS Studio', error);
+                throw error;
+            }
+        } else {
+            throw new Error('Not connected to OBS Studio');
+        }
+    }
+
+    async getSpecialInputList(): Promise<SpecialInputs> {
+        if (this.obs) {
+            try {
+                const response = await this.obs.call('GetSpecialInputs');
+                return response
+            } catch (error) {
+                console.error('Error fetching special input list from OBS Studio', error);
+                throw error;
+            }
+        } else {
+            throw new Error('Not connected to OBS Studio');
+        }
+    }
+
+
     async changeScene(sceneUuid: string): Promise<void> {
         if (this.obs) {
             try {
@@ -71,6 +109,20 @@ export default class OBSManager {
                 });
             } catch (error) {
                 console.error('Error changing scene in OBS Studio', error);
+                throw error;
+            }
+        } else {
+            throw new Error('Not connected to OBS Studio');
+        }
+    }
+
+    async getStats(): Promise<any> {
+        if (this.obs) {
+            try {
+                const response = await this.obs.call('GetStats');
+                return response;
+            } catch (error) {
+                console.error('Error fetching stats from OBS Studio', error);
                 throw error;
             }
         } else {
