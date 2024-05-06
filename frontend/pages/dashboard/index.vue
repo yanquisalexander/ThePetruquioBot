@@ -26,7 +26,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- Estado del bot -->
       <div v-if="dashboardData.bot" class="col-span-1 md:col-span-2 lg:col-span-1">
-        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <UCard>
           <template #header>
             <div class="flex items-center">
               <BotIcon class="w-8 mr-2" />
@@ -80,7 +80,7 @@
 
       <!-- Enviar Mensaje -->
       <div class="col-span-1 md:col-span-1 lg:col-span-2">
-        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <UCard>
           <template #header>
             <div class="flex items-center">
               <MessageCircleIcon class="w-8 mr-2" />
@@ -110,7 +110,7 @@
         </UCard>
       </div>
       <div class="col-span-1 md:col-span-2 lg:col-span-2 my-4">
-        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <UCard>
           <template #header>
             <div class="flex items-center">
               <h4 class="font-medium text-xl flex items-center">
@@ -131,7 +131,7 @@
       <!-- chat embeded -->
       <!-- Chat Embedido -->
       <div class="col-span-1 md:col-span-2 lg:col-span-1 my-4">
-        <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+        <UCard>
           <template #header>
             <div class="flex items-center">
               <h4 class="font-medium text-xl flex items-center">
