@@ -69,7 +69,7 @@
                 type="number" step="1" min="0" :placeholder="$t(`settings.${settingKey}.title`)" class="mt-2" />
             </template>
             <template v-else-if="setting.field_type === 'input'">
-              <v-text-field :id="`${settingKey}-value`" v-model="settings[settingKey].value"
+              <UInput :id="`${settingKey}-value`" v-model="settings[settingKey].value" variant="outline" size="lg"
                 :placeholder="$t(`settings.${settingKey}.title`)" class="mt-2" />
             </template>
             <template v-else-if="setting.field_type === 'channel_point' && channelPointRewards">

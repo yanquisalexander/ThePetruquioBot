@@ -7,7 +7,7 @@
                 <template #header>
                     <div class="flex items-center justify-between flex-col md:flex-row">
                         <h2 class="text-xl font-medium font-jost">Stream Manager</h2>
-                        <StreamManagerHeader :data="streamData" />
+                        <StreamManagerHeader :data="streamData?.data" />
                     </div>
                 </template>
 
@@ -24,6 +24,9 @@
                         </div>
                         <LazyStreamManagerSonglist v-if="streamData?.data?.songlist" class="md:col-span-5"
                             :songlistUserId="streamData.data.songlist.id" />
+
+                        <LazyStreamManagerOBSControl v-if="rawUser().channel.preferences.enableObsControl.value"
+                            class="md:col-span-7" />
                     </div>
 
 
@@ -39,7 +42,7 @@ import io from 'socket.io-client'
 const { rawUser } = useCurrentUser()
 const sidebar = useSidebar()
 const toast = useToast()
-const { getStream } = useStreamManager()
+const { getStream, handleSocketEvent } = useStreamManager()
 
 const streamData = ref(null)
 
@@ -61,24 +64,10 @@ const connectSocket = () => {
     socket.value.emit('subscribeChannel', `stream-manager:${rawUser().twitchId}`)
 
 
-    socket.value.on('stream:updated', (data) => {
-        streamData.value = data
-    })
 
-    socket.value.on('channel-point-redemption', (data) => {
-        console.log('channel-point-redemption', data)
-        toast.add({
-            id: data.eventId,
-            title: 'Nuevo canje de puntos de canal',
-            color: 'blue',
-            description: `<b>${data.user.displayName}</b> canjeó <b>${data.rewardName}</b> por ${data.rewardCost} puntos.`,
-            icon: 'i-lucide-gift',
-            timeout: 6000,
-            avatar: {
-                src: data.user.avatar ?? data.rewardIcon,
-            }
-        })
-        SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+    socket.value.on('channel-point-redemption', async (data: any) => {
+        await handleSocketEvent('channel-point-redemption', data)
+
     })
 
     socket.value.on('chat-cleared', () => {

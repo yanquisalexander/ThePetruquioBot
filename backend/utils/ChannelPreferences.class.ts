@@ -42,7 +42,10 @@ const createDefaultChannelPreferences = () => ({
     firstRankingRedeemedMessage: createChannelPreference("", FieldTypes.TEXT),
     showSongRequestsOnMap: createChannelPreference(false, FieldTypes.BOOLEAN),
     communityWallCanvasSize: createChannelPreference("600x600", FieldTypes.INPUT, true, false),
-    enableLightsControl: createChannelPreference(false, FieldTypes.BOOLEAN, true, true)
+    enableLightsControl: createChannelPreference(false, FieldTypes.BOOLEAN, true, true),
+    enableObsControl: createChannelPreference(false, FieldTypes.BOOLEAN, false, true),
+    obsWebsocketUrl: createChannelPreference("127.0.0.1:4455", FieldTypes.INPUT, false, false),
+    obsWebsocketPassword: createChannelPreference("", FieldTypes.INPUT, false, false),
 } as const);
 
 const defaultChannelPreferences = createDefaultChannelPreferences();

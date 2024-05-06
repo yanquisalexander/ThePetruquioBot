@@ -1,25 +1,12 @@
 <template>
   <div class="min-h-screen">
     <div class="flex flex-col items-center justify-center min-h-screen">
-      <a
-        href="/"
-        title="Go to homepage"
-      >
-        <h1
-          class="font-inter text-lg md:text-xl font-medium my-4"
-          translate="no"
-        >
-          Petruquio.<span
-            class="text-blue-500 font-bold"
-            translate="no"
-          >LIVE</span>
+      <a href="/" title="Go to homepage">
+        <h1 class="font-inter text-lg md:text-xl font-medium my-4" translate="no">
+          Petruquio.<span class="text-blue-500 font-bold" translate="no">LIVE</span>
         </h1>
       </a>
-      <img
-        :src="getImagePath()"
-        :alt="`Error ${error.statusCode}`"
-        class="h-32 md:h-64"
-      >
+      <img :src="getImagePath()" :alt="`Error ${error.statusCode}`" class="h-32 md:h-64">
       <h1 class="text-4xl font-bold">
         {{ error.statusCode }}
       </h1>
@@ -33,7 +20,7 @@
           Here's a random cat fact:
         </p>
         <p class="text-sm">
-          {{ randomCatFact.fact }}
+          {{ randomCatFact?.fact }}
         </p>
       </div>
     </div>
@@ -54,7 +41,7 @@ useHead({
 })
 
 console.log("--- 🚀 error ---")
-console.warn("Stack trace:", error.value.stack  || "No stack trace available")
+console.warn("Stack trace:", error.value.stack || "No stack trace available")
 
 const { data: randomCatFact } = useFetch<CatFact>("https://catfact.ninja/fact?max_length=50");
 

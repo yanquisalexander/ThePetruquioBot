@@ -49,6 +49,9 @@ export interface Preferences {
   canvasSize: CanvasSize
   listenToEvents: ListenToEvents
   enableTransitions: EnableTransitions
+  enableObsControl: EnableObsControl
+  obsWebsocketUrl: ObsWebsocketUrl
+  obsWebsocketPassword: ObsWebsocketPassword
 }
 
 export interface BotMuted {
@@ -163,5 +166,20 @@ export interface ListenToEvents {
 
 export interface EnableTransitions {
   value: boolean
+  field_type: string
+}
+
+export interface EnableObsControl {
+  value: boolean
+  field_type: string
+}
+
+export interface ObsWebsocketUrl {
+  value: string
+  field_type: string
+}
+
+export interface ObsWebsocketPassword {
+  value: string
   field_type: string
 }
