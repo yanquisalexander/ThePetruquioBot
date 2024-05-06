@@ -44,9 +44,10 @@
               <h3 class="text-xl font-semibold">
                 {{ $t(`settings.${settingKey}.title`) }}
               </h3>
-              <span class="flex text-gray-500 !font-normal">{{ $t(`settings.${settingKey}.description`) }}</span>
+              <span class="flex text-gray-500 !font-normal whitespace-pre-wrap">{{
+                $t(`settings.${settingKey}.description`) }}</span>
               <UBadge v-if="setting.patreon_required" color="orange" class="mt-2">
-                <font-awesome-icon :icon="['fab', 'patreon']" class="text-white mr-1" />
+                <UIcon name="i-lucide-patreon" class="text-white mr-1" />
                 <span class="text-sm font-medium">{{ $t('settings.patreon_exclusive') }}</span>
               </UBadge>
             </template>

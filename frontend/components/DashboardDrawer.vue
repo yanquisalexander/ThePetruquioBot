@@ -88,7 +88,7 @@ const menuCategories = ref([
     routes: [
       {
         label: 'Dashboard',
-        icon: 'i-ph-grid-four',
+        icon: 'i-lucide-layout-panel-top',
         to: '/dashboard',
         enabled: true
       },
@@ -101,7 +101,7 @@ const menuCategories = ref([
       },
       {
         label: 'Comandos',
-        icon: 'i-ph-chats',
+        icon: 'i-lucide-bot-message-square',
         to: '/dashboard/commands',
         enabled: true
       },
@@ -119,27 +119,27 @@ const menuCategories = ref([
       },
       {
         label: 'Widgets',
-        icon: 'i-ph-swatches',
+        icon: 'i-lucide-package-open',
         to: '/dashboard/widgets',
         enabled: process.env.NODE_ENV === 'development',
         newFeature: true
       },
       {
         label: 'Configuración del Bot',
-        icon: 'i-ph-gear',
+        icon: 'i-lucide-settings-2',
         to: '/dashboard/preferences',
         enabled: true,
       },
       {
         label: 'Workflows',
-        icon: 'i-ph-brackets-curly',
+        icon: 'i-lucide-git-branch',
         to: '/dashboard/workflows',
         enabled: true,
         newFeature: true
       },
       {
         label: 'Community',
-        icon: 'i-ph-circles-three',
+        icon: 'i-lucide-users-round',
         to: '/dashboard/community',
         enabled: currentUser.rawUser()?.admin
       }
@@ -150,7 +150,7 @@ const menuCategories = ref([
     routes: [
       {
         label: 'Auditoría',
-        icon: 'i-ph-shield-check',
+        icon: 'i-lucide-shield-check',
         to: '/dashboard/audit',
         enabled: true
       }

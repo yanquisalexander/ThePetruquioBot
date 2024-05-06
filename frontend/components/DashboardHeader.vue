@@ -1,10 +1,15 @@
 <template>
   <header class="top-0 z-[8] mb-5 flex h-16 items-center gap-2 sticky px-4 bg-white border-b-[1px] border-gray-200">
     <div class="flex items-center">
-      <button class="btn btn-ghost btn-circle" @click="sidebar.toggleSidebar()">
-        <AlignLeftIcon class="w-5 h-5 text-black" />
-      </button>
+      <UButton variant="ghost" @click="sidebar.toggleSidebar()">
+        <UIcon name="i-lucide-align-left" class="w-5 h-5 text-black" />
+      </UButton>
     </div>
+
+    <NuxtLink to="/dashboard" class="flex items-center gap-2">
+      <SiteLogo />
+    </NuxtLink>
+
 
     <div class="flex-1" />
 
@@ -22,7 +27,6 @@
 </template>
 
 <script lang="ts" setup>
-import { AlignLeftIcon } from 'lucide-vue-next';
 import { useI18n } from 'vue-i18n';
 const cookie = useCookie('language');
 const sidebar = useSidebar();

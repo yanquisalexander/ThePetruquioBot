@@ -15,9 +15,7 @@
                 <div class="grid">
                     <div class="grid md:grid-cols-12 gap-4">
                         <!-- Esto va a la izquierda -->
-                        <div class="md:col-span-8">
-                            <LazyStreamManagerPreview />
-                        </div>
+                        <LazyStreamManagerPreview v-if="configuration.showStreamPreview" />
                         <!-- Esto va a la derecha -->
                         <div class="md:col-span-4">
                             <LazyStreamManagerChat />
@@ -27,11 +25,14 @@
 
                         <LazyStreamManagerOBSControl v-if="rawUser().channel.preferences.enableObsControl.value"
                             class="md:col-span-7" />
+
+                        <UButton @click="showConfig = true" color="blue" variant="soft" class="md:col-span-12">
+                            Configuración
+                        </UButton>
                     </div>
-
-
                 </div>
             </UCard>
+            <StreamManagerConfig v-model="showConfig" />
         </UContainer>
     </DashboardPageContainer>
 </template>
@@ -42,9 +43,12 @@ import io from 'socket.io-client'
 const { rawUser } = useCurrentUser()
 const sidebar = useSidebar()
 const toast = useToast()
-const { getStream, handleSocketEvent } = useStreamManager()
+const { getStream, handleSocketEvent, configuration } = useStreamManager()
+const { initializeConfigFromLocalStorage } = useStreamManagerStore()
+
 
 const streamData = ref(null)
+const showConfig = ref(false)
 
 const socket = ref<typeof io.Socket | null>(null)
 
@@ -100,7 +104,7 @@ onMounted(async () => {
             timeout: 15000
         })
     }
-
+    initializeConfigFromLocalStorage()
     connectSocket()
 
 })

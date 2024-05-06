@@ -31,19 +31,15 @@ export default defineNuxtConfig({
     '@nuxtjs/device',
     '@vueuse/nuxt'
   ],
-  device: {
-    refreshOnResize: true
-  },
   i18n: {
     vueI18n: './i18n.config.ts',
   },
   ui: {
     global: true,
-    icons: ['heroicons', 'lucide', 'ph', 'mdi'],
+    icons: ['heroicons', 'lucide', 'fa6-brands', 'mdi'],
   },
   css: [
     '~/assets/styles/_petruquiolive.css',
-    '@fortawesome/fontawesome-svg-core/styles.css'
   ],
   devtools: { enabled: false },
   typescript: {
@@ -54,9 +50,7 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: [
-      '@fortawesome/fontawesome-svg-core',
-      '@fortawesome/free-brands-svg-icons',
-      '@fortawesome/vue-fontawesome',
+
     ]
   },
   auth: {

@@ -7,10 +7,7 @@
     </div>
     <div class="mt-2 bg-white rounded-md pt-4 px-4 w-full mb-8">
       <div class="flex usercard">
-        <img
-          :src="user.avatar"
-          class="rounded-full h-24 w-24"
-        >
+        <img :src="user.avatar" class="rounded-full h-24 w-24">
         <div class="ml-4 flex flex-col justify-center items-left">
           <h3 class="text-lg font-medium">
             {{ user.display_name || user.email }}
@@ -24,27 +21,15 @@
 
     <!--RouterView /-->
 
-    <UContainer
-      v-if="accountData"
-      class="my-8"
-    >
+    <UContainer v-if="accountData" class="my-8">
       <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
         <template #header>
           <div class="text-lg font-medium flex items-center">
             Seguridad
-            <UIcon
-              name="i-mdi-lock-outline"
-              class="ml-2"
-            />
+            <UIcon name="i-mdi-lock-outline" class="ml-2" />
           </div>
         </template>
-        <UAlert
-          color="red"
-          variant="subtle"
-          class="mt-4 mb-4"
-          title="¡Atención!"
-          icon="i-mdi-alert-outline"
-        >
+        <UAlert color="red" variant="subtle" class="mt-4 mb-4" title="¡Atención!" icon="i-mdi-alert-outline">
           <template #description>
             <p>
               El token de acceso personal es una clave privada que te permite acceder a la API de Petruquio.LIVE, y
@@ -56,40 +41,19 @@
         </UAlert>
         <UFormGroup label="Token de Acceso Personal">
           <div class="flex items-center w-full">
-            <UInput
-              v-model="accountData.security.api_token"
-              :type="showApiToken ? 'text' : 'password'"
-              size="lg"
-              class="flex-grow"
-              readonly
-            />
+            <UInput v-model="accountData.security.api_token" :type="showApiToken ? 'text' : 'password'" size="lg"
+              class="flex-grow" readonly />
             <div class="flex items-center">
-              <UButton
-                color="gray"
-                variant="ghost"
-                :icon="showApiToken ? 'i-mdi-eye-off-outline' : 'i-mdi-eye-outline'"
-                @click="toggleApiToken"
-              />
-              <UButton
-                color="primary"
-                variant="soft"
-                icon
-                class="ml-2"
-                @click="copyToken"
-              >
+              <UButton color="gray" variant="ghost" :icon="showApiToken ? 'i-mdi-eye-off-outline' : 'i-mdi-eye-outline'"
+                @click="toggleApiToken" />
+              <UButton color="primary" variant="soft" icon class="ml-2" @click="copyToken">
                 <UIcon name="i-mdi-content-copy" />
                 Copiar
               </UButton>
             </div>
           </div>
           <div class="mt-2 flex justify-end">
-            <UButton
-              color="orange"
-              variant="soft"
-              icon
-              class="ml-2"
-              @click="regenerateTokenModal = true"
-            >
+            <UButton color="orange" variant="soft" icon class="ml-2" @click="regenerateTokenModal = true">
               <UIcon name="i-mdi-refresh" />
               Regenerar
             </UButton>
@@ -101,39 +65,23 @@
         <template #header>
           <div class="text-lg font-medium flex items-center">
             Cuentas vinculadas
-            <UIcon
-              name="i-mdi-link-variant"
-              class="ml-2"
-            />
+            <UIcon name="i-mdi-link-variant" class="ml-2" />
           </div>
         </template>
 
-        <div
-          id="connected-accounts"
-          class="mt-6 mb-12"
-        >
+        <div id="connected-accounts" class="mt-6 mb-12">
           <div class="mx-4">
-            <template
-              v-for="provider in providers"
-              :key="provider"
-            >
+            <template v-for="provider in providers" :key="provider">
               <!-- Variable to check if the provider is linked -->
               <div v-if="isProviderLinked(provider)">
                 <!-- Loop for linked accounts -->
-                <div
-                  v-for="account in user.linkedAccounts"
-                  :key="account.provider"
-                >
-                  <div
-                    v-if="account.provider === provider"
-                    class="py-4 border-b-2 border-gray-100 last-of-type:border-0"
-                  >
+                <div v-for="account in user.linkedAccounts" :key="account.provider">
+                  <div v-if="account.provider === provider"
+                    class="py-4 border-b-2 border-gray-100 last-of-type:border-0">
                     <div class="flex items-center">
-                      <font-awesome-icon
-                        :icon="['fa-brands', getLogoUrl(provider).icon]"
-                        :style="{ color: getLogoUrl(provider).color }"
-                        class="text-2xl"
-                      />
+                      <UIcon :name="getLogoUrl(provider).icon" class="text-2xl"
+                        :style="{ color: getLogoUrl(provider).color }" />
+
 
                       <div class="ml-4 flex flex-col justify-center items-left">
                         <h3 class="text-lg font-medium">
@@ -146,23 +94,14 @@
                     </div>
                     <div class="flex justify-end">
                       <!-- Botón "Desvincular" -->
-                      <button
-                        class="btn btn-secondary"
-                        @click="unlinkAccount(provider)"
-                      >
+                      <button class="btn btn-secondary" @click="unlinkAccount(provider)">
                         <span class="text-sm font-medium text-gray-500">
                           Desvincular
                         </span>
                       </button>
                     </div>
-                    <UAlert
-                      v-if="provider === 'patreon'"
-                      color="orange"
-                      variant="subtle"
-                      class="ml-4"
-                      title="Tu cuenta de Patreon está vinculada"
-                      icon="i-mdi-star-outline"
-                    >
+                    <UAlert v-if="provider === 'patreon'" color="orange" variant="subtle" class="ml-4"
+                      title="Tu cuenta de Patreon está vinculada" icon="i-mdi-star-outline">
                       <template #description>
                         <p>
                           Si eres un patrocinador de Petruquio.LIVE,
@@ -177,11 +116,8 @@
               <div v-else>
                 <div class="py-4 border-b-2 border-gray-100 last-of-type:border-0">
                   <div class="flex items-center">
-                    <font-awesome-icon
-                      :icon="['fa-brands', getLogoUrl(provider).icon]"
-                      :style="{ color: getLogoUrl(provider).color }"
-                      class="text-2xl"
-                    />
+                    <font-awesome-icon :icon="['fa-brands', getLogoUrl(provider).icon]"
+                      :style="{ color: getLogoUrl(provider).color }" class="text-2xl" />
 
                     <div class="ml-4 flex flex-col justify-center items-left">
                       <h3 class="text-lg font-medium">
@@ -194,23 +130,14 @@
                   </div>
                   <div class="flex justify-end">
                     <!-- Botón "Vincular" -->
-                    <button
-                      class="btn btn-secondary"
-                      @click="linkAccount(provider)"
-                    >
+                    <button class="btn btn-secondary" @click="linkAccount(provider)">
                       <span class="text-sm font-medium text-gray-500">
                         Vincular
                       </span>
                     </button>
                   </div>
-                  <UAlert
-                    v-if="provider === 'patreon'"
-                    color="blue"
-                    variant="subtle"
-                    class="ml-4"
-                    title="¿Sabías que...?"
-                    icon="i-mdi-information-outline"
-                  >
+                  <UAlert v-if="provider === 'patreon'" color="blue" variant="subtle" class="ml-4"
+                    title="¿Sabías que...?" icon="i-mdi-information-outline">
                     <template #description>
                       <p>
                         Vinculando tu cuenta de Patreon puedes acceder a características exclusivas de Petruquio.LIVE
@@ -226,10 +153,7 @@
     </UContainer>
     <div v-else-if="!accountData">
       <div class="flex justify-center items-center h-64">
-        <UIcon
-          name="i-mdi-loading"
-          class="animate-spin text-4xl"
-        />
+        <UIcon name="i-mdi-loading" class="animate-spin text-4xl" />
       </div>
     </div>
 
@@ -244,22 +168,10 @@
         Si regeneras el token, las integraciones que lo estén utilizando dejarán de funcionar.
         <template #footer>
           <div class="flex justify-end">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon
-              leading-icon="i-mdi-close"
-              @click="regenerateTokenModal = false"
-            >
+            <UButton color="gray" variant="ghost" icon leading-icon="i-mdi-close" @click="regenerateTokenModal = false">
               Cancelar
             </UButton>
-            <UButton
-              color="primary"
-              variant="soft"
-              icon
-              leading-icon="i-mdi-check"
-              @click="regenerateToken"
-            >
+            <UButton color="primary" variant="soft" icon leading-icon="i-mdi-check" @click="regenerateToken">
               Regenerar
             </UButton>
           </div>
@@ -268,8 +180,8 @@
     </UModal>
   </div>
 </template>
-  
-  
+
+
 <script setup>
 import axios from 'axios';
 const currentUser = useCurrentUser()
@@ -323,17 +235,17 @@ const getLogoUrl = (provider) => {
   switch (provider) {
     case 'discord':
       return {
-        icon: 'fa-discord',
+        icon: 'i-fa6-brands-discord',
         color: '#7289da',
       }
     case 'spotify':
       return {
-        icon: 'fa-spotify',
+        icon: 'i-fa6-brands-spotify',
         color: '#1db954',
       }
     case 'patreon':
       return {
-        icon: 'fa-patreon',
+        icon: 'i-fa6-brands-patreon',
         color: '#f96854',
       }
     default:
@@ -436,4 +348,3 @@ onMounted(() => {
   fetchAccount()
 })
 </script>
-  

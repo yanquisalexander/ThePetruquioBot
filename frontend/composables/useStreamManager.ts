@@ -1,8 +1,52 @@
 import { AxiosError } from "axios";
+import { defineStore } from 'pinia';
+
+interface StreamManagerConfig {
+    showStreamPreview: boolean;
+}
+
+const defaultConfig: StreamManagerConfig = {
+    showStreamPreview: true,
+};
+
+export const useStreamManagerStore = defineStore({
+    id: 'stream-manager',
+    state: () => ({
+        config: { ...defaultConfig },
+    }),
+    getters: {
+        configuration: (state) => state.config,
+    },
+    actions: {
+        initializeConfigFromLocalStorage() {
+            const localStorageValue = localStorage.getItem('sm-config');
+            try {
+                const parsedLocalStorage = JSON.parse(localStorageValue || '{}');
+                console.log('Parsed localStorage:', parsedLocalStorage);
+
+                this.config = { ...this.config, ...parsedLocalStorage };
+            } catch (error) {
+                console.error('Error parsing localStorage value:', error);
+                this.config = { ...defaultConfig, ...this.config };
+            }
+        },
+        saveConfigToLocalStorage() {
+            console.log('Saving config to localStorage', this.config);
+            localStorage.setItem('sm-config', JSON.stringify(this.config));
+            console.log('Saved to localStorage');
+        },
+        updateConfig(newConfig: Partial<StreamManagerConfig>) {
+            console.log('Updating config', newConfig);
+            this.config = { ...this.config, ...newConfig };
+            this.saveConfigToLocalStorage();
+        },
+    },
+});
 
 export const useStreamManager = () => {
     const toast = useToast();
     const client = useAuthenticatedRequest();
+
 
     const getStream = async () => {
         try {
@@ -46,9 +90,16 @@ export const useStreamManager = () => {
         }
     }
 
+
+
+    const { updateConfig, configuration } = useStreamManagerStore();
+
+
     return {
         getStream,
         generateClip,
-        handleSocketEvent
+        handleSocketEvent,
+        updateConfig,
+        configuration
     }
 }

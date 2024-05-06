@@ -7,7 +7,7 @@
         </template>
 
         <iframe :src="`https://www.twitch.tv/embed/${currentUser.getUsername()}/chat?parent=${FRONTEND_URL}`"
-            frameborder="0" scrolling="no" allowfullscreen="true" class="w-full h-96"></iframe>
+            frameborder="0" scrolling="no" allowfullscreen="true" class="w-full h-svh"></iframe>
     </UCard>
 </template>
 

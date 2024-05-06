@@ -119,6 +119,10 @@
       "description": "Notifica al chat cuando el canal esté en directo",
       "title": "Habilitar notificación en vivo"
     },
+    "enableObsControl": {
+      "description": "Permite controlar OBS Studio a través del Stream Manager.",
+      "title": "Habilitar el control de OBS"
+    },
     "enableRaidAlerts": {
       "description": "Muestra un mensaje en el chat y realiza una mención al raider cuando recibe una raid.",
       "title": "Activar alertas de Raid"
@@ -183,6 +187,14 @@
     "minRaidViewers": {
       "description": "El número mínimo de espectadores que debe tener el raider para activar una alerta de Raid.",
       "title": "Número mínimo de espectadores para Raid"
+    },
+    "obsWebsocketPassword": {
+      "description": "La contraseña utilizada para conectarse a OBS Studio.",
+      "title": "Contraseña de OBS Websocket"
+    },
+    "obsWebsocketUrl": {
+      "description": "La URL para conectarse a OBS Studio. Debe tener el formato: localhost:4455\nSi utilizas OBS Studio en un ordenador diferente, debes utilizar la dirección IP del ordenador en el que se ejecuta OBS Studio.",
+      "title": "URL de Websocket de OBS"
     },
     "patreon_exclusive": "Exclusivo para Patreons",
     "raidAlertMessage": {

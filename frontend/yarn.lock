@@ -653,30 +653,6 @@
   resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.1.tgz#b9da6a878a371829a0502c9b6c1c143ef6663f4d"
   integrity sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==
 
-"@fortawesome/fontawesome-common-types@6.5.1":
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.1.tgz#fdb1ec4952b689f5f7aa0bffe46180bb35490032"
-  integrity sha512-GkWzv+L6d2bI5f/Vk6ikJ9xtl7dfXtoRu3YGE6nq0p/FFqA1ebMOAWg3XgRyb0I6LYyYkiAo+3/KrwuBp8xG7A==
-
-"@fortawesome/fontawesome-svg-core@^6.5.1":
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-6.5.1.tgz#9d56d46bddad78a7ebb2043a97957039fcebcf0a"
-  integrity sha512-MfRCYlQPXoLlpem+egxjfkEuP9UQswTrlCOsknus/NcMoblTH2g0jPrapbcIb04KGA7E2GZxbAccGZfWoYgsrQ==
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.1"
-
-"@fortawesome/free-brands-svg-icons@^6.5.1":
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-6.5.1.tgz#e948cc02404277cb8ad40fe3573ca75f2830e876"
-  integrity sha512-093l7DAkx0aEtBq66Sf19MgoZewv1zeY9/4C7vSKPO4qMwEsW/2VYTUTpBtLwfb9T2R73tXaRDPmE4UqLCYHfg==
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.1"
-
-"@fortawesome/vue-fontawesome@^3.0.5":
-  version "3.0.6"
-  resolved "https://registry.yarnpkg.com/@fortawesome/vue-fontawesome/-/vue-fontawesome-3.0.6.tgz#c5e627475c10869a091280610c96411d18206f3a"
-  integrity sha512-akrL7lTroyNpPkoHtvK2UpsMzJr6jXdHaQ0YdcwqDsB8jdwlpNHZYijpOUd9KJsARr+VB3WXY4EyObepqJ4ytQ==
-
 "@guolao/vue-monaco-editor@^1.4.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@guolao/vue-monaco-editor/-/vue-monaco-editor-1.5.1.tgz#ce07358d842ee99f02aa315e0940f6009dca1eab"
@@ -721,6 +697,13 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-2.0.2.tgz#d9fae00a2d5cb40f92cfe64b47ad749fbc38f917"
   integrity sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==
 
+"@iconify-json/fa6-brands@^1.1.11":
+  version "1.1.19"
+  resolved "https://registry.yarnpkg.com/@iconify-json/fa6-brands/-/fa6-brands-1.1.19.tgz#dfbc859e1e24cf357687623893bb71af8636110c"
+  integrity sha512-3Dl0D1gtFwIj7/GT2xJbkM9D/LjuozsgfLrqRWP6B5xuajtsyEvR1wD0Z06y3iaNtASpgWPWyYbml+AHQ3Hw0g==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/fluent@^1.1.45":
   version "1.1.50"
   resolved "https://registry.yarnpkg.com/@iconify-json/fluent/-/fluent-1.1.50.tgz#447d5d925716042f58afbff4f82dae1c22cacf2e"
@@ -746,13 +729,6 @@
   version "1.1.64"
   resolved "https://registry.yarnpkg.com/@iconify-json/mdi/-/mdi-1.1.64.tgz#ef734e33161106485e36b0f92222babe506d3a8d"
   integrity sha512-zGeo5TjhNFAY6FmSDBLAzDO811t77r6v/mDi7CAL9w5eXqKez6bIjk8R9AL/RHIeq44ALP4Ozr4lMqFTkHr7ug==
-  dependencies:
-    "@iconify/types" "*"
-
-"@iconify-json/ph@^1.1.11":
-  version "1.1.11"
-  resolved "https://registry.yarnpkg.com/@iconify-json/ph/-/ph-1.1.11.tgz#e60d32cde75ebb6b2fcff0557e5037ed75dcb3ff"
-  integrity sha512-izLvLZrU7WM03zNwNWNrAySv3i45hM3D3K6USjCGBSQMUG0HB8zxwrMf4O0leDrganmuQBH7Z0DWTgyH1ET/fg==
   dependencies:
     "@iconify/types" "*"
 
