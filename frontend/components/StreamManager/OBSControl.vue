@@ -6,13 +6,13 @@
         <div class="flex items-center gap-2 flex-col md:flex-row">
           <UTooltip text="Uso de CPU" placement="bottom">
             <UButton variant="soft" icon="i-lucide-cpu">
-              {{ stats.cpuUsage.toFixed(2) }}%
+              {{ stats?.cpuUsage?.toFixed(2) }}%
             </UButton>
           </UTooltip>
 
           <UTooltip text="FPS activos">
             <UButton variant="soft" icon="i-lucide-gauge">
-              {{ stats.activeFps.toFixed(2) }} FPS
+              {{ stats?.activeFps?.toFixed(2) }} FPS
             </UButton>
           </UTooltip>
 

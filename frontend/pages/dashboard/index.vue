@@ -123,7 +123,6 @@
             Estadísticas de los últimos 30 días.
           </p>
           <div class="flex w-full h-56">
-            {{ chartData }}
             <StatsChart v-if="chartData" class="w-full" :chart-data="chartData" :chart-options="chartOptions"
               chart-type="line" height="100%" />
           </div>
