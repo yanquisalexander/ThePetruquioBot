@@ -128,6 +128,8 @@
           </div>
         </UCard>
       </div>
+
+      <LazyDashboardStatsRedeemStats :dashboardData="dashboardData" />
       <!-- chat embeded -->
       <!-- Chat Embedido -->
       <div class="col-span-1 md:col-span-2 lg:col-span-1 my-4">

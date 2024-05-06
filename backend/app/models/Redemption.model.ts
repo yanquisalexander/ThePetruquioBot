@@ -195,8 +195,34 @@ class Redemption {
     }
   }
 
+  static async getLast30DaysByChannel(channel: Channel, timezone?: string): Promise<any[]> {
+    if (!timezone || timezone === '') {
+      timezone = 'UTC';
+    }
+    try {
+      const query = `
+      SELECT
+      DATE_TRUNC('day', redemption_date AT TIME ZONE $2) AS day,
+      CAST(COUNT(*) AS INT) AS redemption_count
+  FROM
+      redemption_history
+  WHERE
+      redemption_date >= CURRENT_TIMESTAMP AT TIME ZONE $2 - INTERVAL '30 days' AND channel_id = $1
+  GROUP BY
+      day
+  ORDER BY
+      day;
+      `;
 
+      const values = [channel.twitchId, timezone];
 
+      const result = await Database.query(query, values);
+      return result.rows;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
+  
 }
 
 export default Redemption;

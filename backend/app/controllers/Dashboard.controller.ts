@@ -4,6 +4,7 @@ import { Bot } from '../../bot'
 import CurrentUser from '../../lib/CurrentUser'
 import MessageLogger from '../models/MessageLogger.model'
 import Notification from '../models/Notification.model'
+import Redemption from "../models/Redemption.model"
 
 export class DashboardController {
   async index(req: Request, res: Response): Promise<Response> {
@@ -25,10 +26,13 @@ export class DashboardController {
     const bot = await Bot.getInstance()
     const timezone = req.query.tz as string || 'UTC'
     const last30DaysMessageCount = await MessageLogger.getLast30DaysByChannel(channel, timezone)
+    const redemptionLast30Days = await Redemption.getLast30DaysByChannel(channel, timezone)
     const stats = {
       top_chatters: await MessageLogger.getTop10ByChannel(channel),
       last_30_days_messages: last30DaysMessageCount,
-      average_messages_per_day: last30DaysMessageCount.map((day) => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length
+      last_30_days_redemptions: redemptionLast30Days,
+      average_messages_per_day: last30DaysMessageCount.map((day) => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length,
+      average_redemptions_per_day: redemptionLast30Days.map((day) => day.redemption_count).reduce((a, b) => a + b, 0) / redemptionLast30Days.length
     }
 
     const isBotJoined = bot.joinedChannels.includes(channel.user.username)
