@@ -6,7 +6,7 @@ import MessageLogger from '../models/MessageLogger.model'
 import Notification from '../models/Notification.model'
 
 export class DashboardController {
-  async index (req: Request, res: Response): Promise<Response> {
+  async index(req: Request, res: Response): Promise<Response> {
     // Here we return bot status (Joined, muted, etc) and recommendations
 
     const currentUser = new CurrentUser(req.user as ExpressUser)
@@ -48,7 +48,7 @@ export class DashboardController {
     })
   }
 
-  async getNotifications (req: Request, res: Response): Promise<Response> {
+  async getNotifications(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -62,7 +62,7 @@ export class DashboardController {
     return res.status(200).json({ data: notifications })
   }
 
-  async markNotificationAsRead (req: Request, res: Response): Promise<Response> {
+  async markNotificationAsRead(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -92,7 +92,7 @@ export class DashboardController {
     }
   }
 
-  async sendMessageAsBot (req: Request, res: Response): Promise<Response> {
+  async sendMessageAsBot(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -127,7 +127,7 @@ export class DashboardController {
     return res.json({ data: { success: true } })
   }
 
-  async toggleMute (req: Request, res: Response): Promise<Response> {
+  async toggleMute(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -158,7 +158,7 @@ export class DashboardController {
     return res.json({ data: { success: true } })
   }
 
-  async join (req: Request, res: Response): Promise<Response> {
+  async join(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -193,7 +193,7 @@ export class DashboardController {
     return res.json({ data: { success: true } })
   }
 
-  async part (req: Request, res: Response): Promise<Response> {
+  async part(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -227,10 +227,10 @@ export class DashboardController {
     return res.json({ data: { success: true } })
   }
 
-  async getModeratedChannels (req: Request, res: Response): Promise<Response> {
+  async getModeratedChannels(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
-    const user = await currentUser.getCurrentUser()
+    const user = await currentUser.getOriginalUser()
 
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' })
@@ -243,13 +243,13 @@ export class DashboardController {
       id: user.twitchId.toString(),
       displayName: user.displayName ?? user.username,
       avatar: user.avatar ?? ''
-    
+
     })
 
     return res.json({ data: channels })
   }
 
-  async impersonateUser (req: Request, res: Response): Promise<Response> {
+  async impersonateUser(req: Request, res: Response): Promise<Response> {
     const currentUser = new CurrentUser(req.user as ExpressUser)
 
     const user = await currentUser.getCurrentUser()
@@ -271,8 +271,11 @@ export class DashboardController {
     // Check if userId is present in the moderated channels
 
 
-    if (!moderatedChannels.find((channel) => channel.id === userId)) {
-      return res.status(403).json({ error: 'You are not a moderator of this channel' })
+    if (
+      !moderatedChannels.find((channel) => channel.id === userId) &&
+      userId !== user.twitchId.toString()
+    ) {
+      return res.status(403).json({ error: 'You are not a moderator of this channel' });
     }
 
     try {

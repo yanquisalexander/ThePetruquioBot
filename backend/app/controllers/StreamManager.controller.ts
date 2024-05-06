@@ -5,6 +5,7 @@ import CurrentUser from '../../lib/CurrentUser'
 import MessageLogger from '../models/MessageLogger.model'
 import Notification from '../models/Notification.model'
 import Twitch from "../modules/Twitch.module"
+import StreamerSonglist from "../modules/StreamerSonglist.module"
 
 export class StreamManagerController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -29,14 +30,21 @@ export class StreamManagerController {
             return res.status(404).json({ error: 'Channel not found' })
         }
 
+        let songlistInfo = null
+
+        if(channel.preferences.showSongRequestsOnMap?.value){
+            songlistInfo = await StreamerSonglist.getChannel(user.username)
+        }
+
         const helixUser = await user.fromHelix()
-        const channelFollowers = await helixUser?.getChannelFollowers()
+        const channelFollowers = await helixUser?.getChannelFollowers().catch(() => null)
         const stream = await helixUser?.getStream()
 
         return res.json({
             data: {
                 stream: stream,
-                followers: channelFollowers?.total ?? 0
+                followers: channelFollowers?.total ?? 0,
+                songlist: songlistInfo
             }
         })
 

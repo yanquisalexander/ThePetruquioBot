@@ -8,18 +8,18 @@
             </template>
 
             <!-- Lista de canales -->
-            <div class="grid grid-cols-1 gap-4">
+            <div class="grid grid-cols-1">
                 <div v-for="channel in props.moderatedChannels" :key="channel.id"
-                    class="flex items-center justify-between py-4">
+                    class="flex items-center justify-between py-4 border-b border-gray-100 dark:border-gray-800">
                     <div class="flex items-center gap-4">
-                        <img :src="channel.avatar" alt="Channel profile image" class="w-10 h-10 rounded-full">
+                        <img :src="channel.avatar" alt="Channel profile image" class="w-8 h-8 rounded-full">
                         <div>
                             <h3 class="text-lg font-jost">{{ channel.displayName }}</h3>
                             <p class="text-sm text-gray-500">{{ channel.name }}</p>
                         </div>
                     </div>
                     <UButton @click="() => emit('chooseAccount', channel.id)" color="blue" variant="soft"
-                        icon="i-lucide-checkmark">
+                        icon="i-lucide-check">
                         {{ $t('dashboard.moderator_account_chooser.choose') }}
                     </UButton>
                 </div>

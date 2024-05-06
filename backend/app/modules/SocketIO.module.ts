@@ -16,7 +16,10 @@ export class SocketIO {
       connectionStateRecovery: {},
       cors: {
         origin: '*',
+        credentials: true,
       },
+      allowEIO3: true,
+      
     });
 
     this.setupSocketEvents();

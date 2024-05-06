@@ -16,13 +16,17 @@
                     <div class="grid md:grid-cols-12 gap-4">
                         <!-- Esto va a la izquierda -->
                         <div class="md:col-span-8">
-                            <StreamManagerPreview />
+                            <LazyStreamManagerPreview />
                         </div>
                         <!-- Esto va a la derecha -->
                         <div class="md:col-span-4">
                             <LazyStreamManagerChat />
                         </div>
+                        <LazyStreamManagerSonglist v-if="streamData?.data?.songlist" class="md:col-span-5"
+                            :songlistUserId="streamData.data.songlist.id" />
                     </div>
+
+
                 </div>
             </UCard>
         </UContainer>
@@ -30,20 +34,21 @@
 </template>
 
 <script lang="ts" setup>
-import { type Socket, io } from "socket.io-client";
+import io from 'socket.io-client'
 
 const { rawUser } = useCurrentUser()
-const client = useAuthenticatedRequest()
 const sidebar = useSidebar()
 const toast = useToast()
 const { getStream } = useStreamManager()
 
 const streamData = ref(null)
 
-const socket = ref<Socket | null>(null)
+const socket = ref<typeof io.Socket | null>(null)
 
 const connectSocket = () => {
-    socket.value = io(SOCKET_ENDPOINT)
+    socket.value = io(SOCKET_ENDPOINT, {
+        transports: ['websocket'],
+    })
 
     socket.value.on('connect', () => {
         console.log('Connected to socket')

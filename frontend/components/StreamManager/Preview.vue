@@ -11,7 +11,7 @@
 
         <template #footer>
             <div class="flex justify-end gap-4">
-                <UButton @click="startStream" color="blue" variant="soft" icon="i-lucide-play" disabled>
+                <UButton @click="console.log" color="blue" variant="soft" icon="i-lucide-play" disabled>
                     Iniciar stream
                 </UButton>
                 <UButton @click="createClip" color="twitch" variant="soft" icon="i-lucide-clapperboard"

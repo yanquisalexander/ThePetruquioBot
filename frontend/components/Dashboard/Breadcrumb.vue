@@ -27,7 +27,6 @@ const getBreadcrumbs = () => {
 
 const breadcrumbs = ref(getBreadcrumbs())
 
-console.log('breadcrumbs', breadcrumbs)
 
 watch(() => route.path, () => {
   breadcrumbs.value = getBreadcrumbs()

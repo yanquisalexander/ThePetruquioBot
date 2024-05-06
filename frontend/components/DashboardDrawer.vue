@@ -185,8 +185,9 @@ const chooseAccount = async (channelId: string) => {
       }
     })
     toast.add({
+      icon: 'i-lucide-shield-check',
       title: 'Cuenta de moderador seleccionada',
-      description: 'Ahora estás moderando el canal seleccionado.',
+      description: `Ahora estás moderando el canal de ${moderatedChannels.value.find(c => c.id === channelId)?.displayName}`,
       color: 'green',
       timeout: 5000
     })
