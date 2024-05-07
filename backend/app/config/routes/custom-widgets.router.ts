@@ -7,7 +7,7 @@ export const createCustomWidgetRouter = (): Router => {
     const customWidgetController = new CustomWidgetsController()
 
     router.get('/', customWidgetController.getWidgets)
-    router.post('/', customWidgetController.updateWidget)
+    router.post('/', customWidgetController.createWidget)
     router.get('/templates', customWidgetController.findTemplates)
     router.put('/:id', customWidgetController.updateWidget)
     router.get('/:id', customWidgetController.getWidget)
