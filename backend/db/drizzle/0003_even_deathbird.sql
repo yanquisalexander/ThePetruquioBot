@@ -1,0 +1,1 @@
+ALTER TABLE "custom_widgets" ADD COLUMN "widget_description" text;

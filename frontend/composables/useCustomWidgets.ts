@@ -83,6 +83,27 @@ export const useCustomWidgets = () => {
         }
     }
 
+    const createFromTemplate = async (templateId: string) => {
+        try {
+            const response = await client.post(`${API_ENDPOINT}/custom-widgets?templateId=${templateId}`);
+            toast.add({
+                title: 'Success',
+                description: 'Widget created successfully',
+                icon: 'i-lucide-check',
+                color: 'green',
+            });
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            toast.add({
+                title: 'Error',
+                description: 'Failed to create widget from template',
+                icon: 'i-lucide-information-circle',
+                color: 'red',
+            });
+        }
+    }
+
     return {
         fetchWidgets,
         fetchWidget,
@@ -90,5 +111,6 @@ export const useCustomWidgets = () => {
         updateWidget,
         deleteWidget,
         searchTemplates,
+        createFromTemplate,
     }
 }

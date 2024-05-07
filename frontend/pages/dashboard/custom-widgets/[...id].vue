@@ -56,6 +56,13 @@
                 <UInput v-model="widget.widget_name" />
               </UFormGroup>
 
+              <UFormGroup label="Widget description">
+                <UTextarea v-model="widget.widget_description" />
+              </UFormGroup>
+
+              <UFormGroup label="Publicar como plantilla" description="Define si el widget se publicará como plantilla">
+                <UToggle v-model="widget.published_as_template" />
+              </UFormGroup>
 
               <UFormGroup label="Include Tailwind CSS" description="Esta propiedad incluirá Tailwind CSS en el widget">
                 <UToggle v-model="widget.properties.includeTailwind" />

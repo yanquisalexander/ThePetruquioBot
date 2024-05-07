@@ -6,6 +6,7 @@ import Channel from './Channel.model';
 import chalk from 'chalk';
 import { Bot } from '../../bot';
 import WorkflowLog from './WorkflowLog.model';
+import SocketIO from "../modules/SocketIO.module";
 
 export enum EventType {
     OnStreamStarted = 'ON_STREAM_STARTED',
@@ -69,6 +70,7 @@ class Workflow {
             sandbox: {
                 data,
                 channel: this.channel,
+                emitToWidget: (data: any) => SocketIO.getInstance().emitEvent(`events:channel.${this.channel.twitchId}`, 'workflow-data', data),
                 axios,
                 console: {
                     log: (...args: any[]) => {

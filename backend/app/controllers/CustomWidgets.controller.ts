@@ -100,6 +100,7 @@ export class CustomWidgetsController {
                 return res.status(404).json({ error: 'Widget not found' })
             }
 
+
             const twitchToken = TwitchAuthenticator.RefreshingAuthProvider.hasUser(user.twitchId) ? await TwitchAuthenticator.RefreshingAuthProvider.getAccessTokenForUser(user.twitchId) : null
 
             return res.json({
@@ -107,7 +108,8 @@ export class CustomWidgetsController {
                     widget: widget.data,
                     env_info: {
                         twitch_client_id: Configuration.TWITCH_CLIENT_ID,
-                        twitch_token: twitchToken?.accessToken
+                        twitch_token: twitchToken?.accessToken,
+                        user
                     }
                 }
             })
@@ -131,10 +133,39 @@ export class CustomWidgetsController {
             return res.status(404).json({ error: 'Channel not found' })
         }
 
+        if (req.query.templateId) {
+            const templateId = req.query.templateId.toString()
+            const template = await CustomWidget.getById(templateId)
+
+            if (!template) {
+                return res.status(404).json({ error: 'Template not found' })
+            }
+
+            const widget = new CustomWidget({
+                ...template.data,
+                ...req.body,
+                id: crypto.randomUUID().toString(),
+                widget_name: `${template.data.widget_name} - Copy`,
+                channel_id: channel.twitchId as number,
+                published_as_template: false,
+                created_at: new Date(),
+                updated_at: new Date(),
+            })
+
+            await widget.save()
+
+            return res.json({
+                data: {
+                    widget
+                }
+            })
+        }
+
         const widget = new CustomWidget({
             id: crypto.randomUUID().toString(),
-            channel_id: channel.id as number,
-            ...req.body
+            channel_id: channel.twitchId as number,
+            widget_name: req.body.widget_name,
+            ...req.body,
         })
 
         await widget.save()
@@ -148,12 +179,6 @@ export class CustomWidgetsController {
     }
 
     async findTemplates(req: Request, res: Response): Promise<Response> {
-        const currentUser = new CurrentUser(req.user as ExpressUser)
-
-        const user = await currentUser.getCurrentUser()
-        if (!user) {
-            return res.status(401).json({ error: 'Unauthorized' })
-        }
         try {
             const widgets = await CustomWidget.searchTemplates(req.query.q?.toString() || '')
 
@@ -163,6 +188,7 @@ export class CustomWidgetsController {
                 }
             })
         } catch (error) {
+            console.error(error)
             return res.status(500).json({ error: 'An error occurred while searching for templates' })
         }
     }

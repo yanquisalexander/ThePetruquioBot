@@ -1,12 +1,13 @@
 import { CustomWidgetsTable } from '@/db/schema'
 import { dbService } from '../services/Database'
 import Channel from './Channel.model'
-import { eq, like } from 'drizzle-orm'
+import { and, eq, ilike, like } from 'drizzle-orm'
 
 interface CustomWidgetData {
     id: string
     channel_id: number
     widget_name: string
+    widget_description?: string | null
     custom_html?: string | null
     custom_css?: string | null
     custom_js?: string | null
@@ -27,6 +28,7 @@ export class CustomWidget {
         const data = await dbService.select({
             id: CustomWidgetsTable.id,
             name: CustomWidgetsTable.widget_name,
+            description: CustomWidgetsTable.widget_description,
             created_at: CustomWidgetsTable.created_at,
             updated_at: CustomWidgetsTable.updated_at,
         })
@@ -54,34 +56,27 @@ export class CustomWidget {
     }
 
     static async searchTemplates(query: string): Promise<any[]> {
-        // Search, and do a join with the channel table to get the channel name
-        // Drizzle
-        const data = await dbService.query.CustomWidgetsTable
-            .findMany({
-                where: like(CustomWidgetsTable.widget_name, `%${query.toLowerCase()}%`),
-            })
+        // Buscar widgets personalizados que coincidan con el query y estén publicados como plantillas
+        const widgets = await dbService.query.CustomWidgetsTable.findMany({
+            where: and(ilike(CustomWidgetsTable.widget_name, `%${query.toLowerCase()}%`), eq(CustomWidgetsTable.published_as_template, true)),
+            limit: 20
+        });
 
-        const publishedBy = []
-        const findedChannels: Channel[] = []
+        // Obtener los nombres de los canales asociados a cada widget
+        const channelIds = widgets.map(widget => widget.channel_id);
+        const channels = await Promise.all(channelIds.map(channelId => Channel.findByTwitchId(channelId)));
 
-        for (const widget of data) {
-            if (!findedChannels.find(channel => channel.twitchId === widget.channel_id)) {
-                const channel = await Channel.findByTwitchId(widget.channel_id)
-                if (!channel) {
-                    continue
-                }
-                findedChannels.push(channel)
-            }
+        // Asociar cada widget con su respectivo canal
+        const widgetsWithChannelName = widgets.map(widget => {
+            const channel = channels.find(channel => channel?.twitchId === widget.channel_id);
+            const publishedBy = channel ? channel : null;
+            return { ...widget, published_by: publishedBy?.user };
+        });
 
-            publishedBy.push(findedChannels.find(channel => channel.twitchId === widget.channel_id))
-        }
-
-        if (!data) {
-            return []
-        }
-
-        return data
+        return widgetsWithChannelName;
     }
+
+
 
 
     async save(): Promise<CustomWidget> {

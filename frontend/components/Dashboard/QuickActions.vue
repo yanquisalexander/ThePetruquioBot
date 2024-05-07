@@ -34,6 +34,14 @@ const actions = computed(() => {
       }
     },
     {
+      id: 'my-account',
+      label: 'My Account',
+      icon: 'i-lucide-user',
+      click: () => {
+        router.push('/account');
+      }
+    },
+    {
       id: 'stream-manager',
       label: 'Stream Manager',
       icon: 'i-lucide-clapperboard',

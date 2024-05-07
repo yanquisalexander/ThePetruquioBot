@@ -15,6 +15,20 @@
       "when": 1715035435262,
       "tag": "0001_deep_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1715087535626,
+      "tag": "0002_short_talon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1715091850022,
+      "tag": "0003_even_deathbird",
+      "breakpoints": true
     }
   ]
 }

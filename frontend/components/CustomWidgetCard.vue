@@ -6,6 +6,9 @@
             </h2>
         </template>
 
+        <p class="text-sm" v-if="props.widget.widget_description">
+            {{ props.widget.widget_description }}
+        </p>
         <template #footer>
             <div class="flex justify-end gap-2">
                 <UButton color="blue" @click="copyWidgetUrl" variant="soft" icon="i-lucide-copy">

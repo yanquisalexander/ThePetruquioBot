@@ -175,6 +175,7 @@ export const CustomWidgetsTable = pgTable('custom_widgets', {
   id: uuid('id').primaryKey(),
   channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id).notNull(),
   widget_name: text('widget_name').notNull(),
+  widget_description: text('widget_description'),
   custom_html: text('custom_html'),
   custom_css: text('custom_css'),
   custom_js: text('custom_js'),

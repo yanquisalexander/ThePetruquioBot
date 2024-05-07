@@ -18,7 +18,7 @@
       </template>
 
       <template v-else-if="!loading && widgets">
-        <div class="flex w-full justify-end gap-4 my-2">
+        <div class="flex w-full justify-end gap-4 my-4">
           <UButton color="gray" variant="soft" @click="showTemplateSearch = true" icon="i-lucide-book-dashed">
             Plantillas
           </UButton>
@@ -34,13 +34,13 @@
         </div>
       </template>
     </UContainer>
-    <CustomWidgetTemplateSearch v-model="showTemplateSearch" />
+    <CustomWidgetTemplateSearch v-model="showTemplateSearch" @select="handleSelectTemplate" />
   </DashboardPageContainer>
 </template>
 
 <script lang="ts" setup>
 const { rawUser } = useCurrentUser()
-const { fetchWidgets } = useCustomWidgets()
+const { fetchWidgets, createFromTemplate } = useCustomWidgets()
 
 const loading = ref(false)
 const widgets = ref<any[]>([])
@@ -66,6 +66,17 @@ const fetchCustomWidgets = async () => {
     loading.value = false
   } catch (error) {
 
+  }
+}
+
+const handleSelectTemplate = async (template: any) => {
+  try {
+    console.log('Trying to clone template', template.id)
+    await createFromTemplate(template.id)
+    await fetchCustomWidgets()
+    showTemplateSearch.value = false
+  } catch (error) {
+    console.error('Error cloning template', error)
   }
 }
 
