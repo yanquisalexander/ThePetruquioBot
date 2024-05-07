@@ -188,11 +188,15 @@ const renderActionIcon = (action) => {
         icon: 'i-lucide-key-round',
         colorClass: 'text-blue-600 bg-blue-100',
       };
-    // Agregar más casos según las acciones y los íconos y colores correspondientes
+    case 'COMMAND_CREATED':
+      return {
+        icon: 'i-lucide-plus',
+        colorClass: 'text-twitch-600 bg-twitch-100',
+      };
     default:
       return {
-        icon: 'i-lucide-question-mark-circle',
-        colorClass: 'text-gray-100 bg-gray-500',
+        icon: 'i-lucide-circle-help',
+        colorClass: 'text-gray-600 bg-gray-100',
       };
   }
 };

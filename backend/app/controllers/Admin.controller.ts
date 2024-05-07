@@ -176,7 +176,7 @@ class AdminController {
 
         const audit = new Audit({
             channel,
-            user: user,
+            user,
             type: AuditType.IMPERSONATED_BY_ADMIN,
             data: {}
         });

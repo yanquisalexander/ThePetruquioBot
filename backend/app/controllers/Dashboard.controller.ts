@@ -5,6 +5,9 @@ import CurrentUser from '../../lib/CurrentUser'
 import MessageLogger from '../models/MessageLogger.model'
 import Notification from '../models/Notification.model'
 import Redemption from "../models/Redemption.model"
+import Audit, { AuditType } from "../models/Audit.model"
+import User from "../models/User.model"
+import Channel from "../models/Channel.model"
 
 export class DashboardController {
   async index(req: Request, res: Response): Promise<Response> {
@@ -263,6 +266,8 @@ export class DashboardController {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
+    const currentUserChannel = await user.getChannel()
+
 
     const userId = req.params.userId
 
@@ -282,8 +287,35 @@ export class DashboardController {
       return res.status(403).json({ error: 'You are not a moderator of this channel' });
     }
 
+    const channelToImpersonate = await Channel.findByTwitchId(parseInt(userId))
+
+    const auditForStreamer = new Audit({
+      channel: channelToImpersonate as Channel,
+      user,
+      type: AuditType.IMPERSONATED_BY_MODERATOR,
+      data: {
+        moderator_name: user.displayName ?? user.username,
+      }
+    });
+
+    const auditForModerator = new Audit({
+      channel: currentUserChannel as Channel,
+      user: channelToImpersonate?.user as User,
+      type: AuditType.IMPERSONED_MODERATED_CHANNEL,
+      data: {
+        channel_name: channelToImpersonate?.user.displayName,
+      }
+    });
+
     try {
       await session.setImpersonate(parseInt(userId))
+
+      try {
+        await auditForStreamer.save()
+        await auditForModerator.save()
+      } catch (error) {
+        console.error(error)
+      }
       return res.json({ data: { success: true } })
     } catch (error) {
       console.error(error)
