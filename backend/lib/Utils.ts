@@ -43,7 +43,7 @@ const replaceSpotifyVariables = async (command: string, channel: Channel): Promi
       console.log('spotifySong is null')
     }
 
-    function formatPosition (positionInMilliseconds: number) {
+    function formatPosition(positionInMilliseconds: number) {
       const seconds = Math.floor(positionInMilliseconds / 1000)
       const minutes = Math.floor(seconds / 60)
       const remainingSeconds = seconds % 60
@@ -92,18 +92,18 @@ const replaceSpotifyVariables = async (command: string, channel: Channel): Promi
 }
 
 class Utils {
-  constructor () {
+  constructor() {
     throw new Error('This class cannot be instantiated')
   }
 
-  public static emptyString (string: string | undefined): boolean {
+  public static emptyString(string: string | undefined): boolean {
     if (string === undefined) return true
     if (string === '') return true
     if (string.trim() === '') return true
     return false
   }
 
-  public static async replaceVariables (message: string, channel: Channel, user: User, args?: string[]): Promise<string> {
+  public static async replaceVariables(message: string, channel: Channel, user: User, args?: string[]): Promise<string> {
     let toUser = ''
     if (args) {
       toUser = args[0]
@@ -190,7 +190,7 @@ class Utils {
     return message
   }
 
-  public static async refreshSpotifyToken (channel: Channel): Promise<void> {
+  public static async refreshSpotifyToken(channel: Channel): Promise<void> {
     const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
     if (!spotifyAccount) return
     console.log(chalk.yellow('[SPOTIFY]'), chalk.white(`Trying to refresh Spotify access token for user ${channel.user.username}`))
@@ -213,11 +213,12 @@ class Utils {
     console.log(response)
 
     const newAccessToken = response.data.access_token
+    console.log(chalk.yellow('[SPOTIFY]'), chalk.white(`New access token: ${newAccessToken}`))
 
     await spotifyAccount.update(newAccessToken)
   }
 
-  public static async importModule (filePath: string): Promise<any> {
+  public static async importModule(filePath: string): Promise<any> {
     try {
       /*       if (os.platform() === 'win32') {
         filePath = `file:///${filePath}`

@@ -58,7 +58,7 @@
         <div class="p-4">
           <pre>{{ selectedWidget }}</pre>
 
-          <UForm v-if="selectedWidget" :model="selectedWidget.preferences">
+          <UForm v-if="selectedWidget" v-model="selectedWidget.preferences">
             <UInput v-model="selectedWidget.preferences.messageDisplayDuration" label="Message Display Duration" />
             <UInput v-model="selectedWidget.preferences.messageLimit" label="Message Limit" />
             <UTextarea v-model="selectedWidget.preferences.customCss" label="Custom CSS" />

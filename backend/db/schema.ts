@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid, unique } from 'drizzle-orm/pg-core'
+import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid, unique, json } from 'drizzle-orm/pg-core'
 
 export const UsersTable = pgTable('users', {
   twitch_id: integer('twitch_id').primaryKey(),
@@ -169,4 +169,16 @@ export const CoreWidgetsTable = pgTable('core_widgets', {
   return {
     unique: unique().on(table.channel_id, table.widget_type)
   }
+})
+
+export const CustomWidgetsTable = pgTable('custom_widgets', {
+  id: uuid('id').primaryKey(),
+  channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id).notNull(),
+  widget_name: text('widget_name').notNull(),
+  custom_html: text('custom_html'),
+  custom_css: text('custom_css'),
+  custom_js: text('custom_js'),
+  properties: json('properties').default('{}'),
+  created_at: timestamp('created_at').default(sql.raw('now()')),
+  updated_at: timestamp('updated_at').default(sql.raw('now()'))
 })

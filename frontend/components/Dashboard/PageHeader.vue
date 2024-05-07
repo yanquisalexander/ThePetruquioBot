@@ -5,7 +5,7 @@
                 {{ t(title) }}
             </h2>
         </div>
-        <DashboardBreadcrumb />
+        <DashboardBreadcrumb v-if="!props.disableBreadcrumb" />
     </div>
 </template>
 
@@ -13,7 +13,8 @@
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
-    title: string
+    title: string,
+    disableBreadcrumb?: boolean
 }>()
 
 const { t } = useI18n()

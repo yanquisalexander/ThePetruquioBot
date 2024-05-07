@@ -11,14 +11,13 @@ import CommunityBooksController from '../controllers/CommunityBooks.controller'
 import WorkflowsController from '../controllers/Workflows.controller'
 import CommunityWallController from '../controllers/CommunityWall.controller'
 import ExtrasController from '../controllers/Extras.controller'
-import WidgetsController from '../controllers/Widgets.controller'
 import DecksController from '../controllers/Decks.controller'
 import { createDashboardRouter } from '@/app/config/routes/dashboard.router'
 import { createSubscriptionsHooksRouter } from '@/app/config/routes/subscriptions-hooks.router'
 import { createTwitchToolsRouter } from '@/app/config/routes/twitch-tools.router'
 import { createBillingRouter } from '@/app/config/routes/billing.router'
-import { createWidgetsRouter } from '@/app/config/routes/widgets.router'
 import { createStreamManagerRouter } from '@/app/config/routes/stream-manager.router'
+import { createCustomWidgetRouter } from "./routes/custom-widgets.router"
 
 const router = Router()
 
@@ -26,6 +25,7 @@ const authMiddleware = Passport.middleware
 
 router.use('/dashboard', authMiddleware, createDashboardRouter())
 router.use('/stream-manager', authMiddleware, createStreamManagerRouter())
+router.use('/custom-widgets', authMiddleware, createCustomWidgetRouter())
 
 router.get('/ping', (req, res) => {
   res.status(200).send('PONG')
@@ -37,7 +37,6 @@ router.get('/ping', (req, res) => {
 router.use('/subscriptions-hooks', createSubscriptionsHooksRouter())
 router.use('/twitch-tools', createTwitchToolsRouter())
 router.use('/billing', authMiddleware, createBillingRouter())
-router.use('/widgets', authMiddleware, createWidgetsRouter())
 
 router.post('/accounts/getToken', AccountsController.getToken)
 router.post('/accounts/token', AccountsController.getToken)
@@ -83,10 +82,6 @@ router.delete('/workflows/:event_type', Passport.getPassport().authenticate('jwt
 router.get('/workflows/logs', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.getLogs)
 router.delete('/workflows/logs/:log_id', Passport.getPassport().authenticate('jwt', { session: false }), WorkflowsController.deleteLog)
 
-router.post('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.createWidget)
-router.get('/channel/widgets', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.getWidgets)
-router.get('/channel/widgets/:widgetId', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.getWidget)
-router.put('/channel/widgets/:widgetId', Passport.getPassport().authenticate('jwt', { session: false }), WidgetsController.updateWidget)
 
 router.get('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.getShoutouts)
 router.post('/channel/community/shoutouts', Passport.getPassport().authenticate('jwt', { session: false }), CommunitiesController.createShoutout)
@@ -126,7 +121,6 @@ router.get('/extras/:channelName/got-talent', ExtrasController.getGotTalentConfi
 router.post('/extras/:channelName/got-talent/red-button', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.addCrossTalentJudge)
 router.post('/extras/:channelName/got-talent/golden-buzzer', Passport.getPassport().authenticate('jwt', { session: false }), ExtrasController.goldenBuzzerTalentJudge)
 
-router.get('/widgets/:widgetId', WidgetsController.getWidgetConfig)
 
 // Decks
 

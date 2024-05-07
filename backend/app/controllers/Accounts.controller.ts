@@ -13,7 +13,7 @@ import Audit, { AuditType } from '../models/Audit.model'
 import Notification, { NotificationType } from '../models/Notification.model'
 
 class AccountsController {
-  static async getToken (req: Request, res: Response) {
+  static async getToken(req: Request, res: Response) {
     try {
       const { code } = req.body
       if (!code) {
@@ -121,16 +121,16 @@ class AccountsController {
     }
   }
 
-  static async currentUser (req: Request, res: Response) {
+  static async currentUser(req: Request, res: Response) {
     const user = req.user as ExpressUser
-
+    console.log(user)
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
     res.json({ user })
   }
 
-  static async currentSession (req: Request, res: Response) {
+  static async currentSession(req: Request, res: Response) {
     let user = req.user as ExpressUser
 
     if (!user) {
@@ -183,7 +183,7 @@ class AccountsController {
     return res.json({ user, session })
   }
 
-  static async destroySession (req: Request, res: Response) {
+  static async destroySession(req: Request, res: Response) {
     const user = req.user as ExpressUser
 
     const session = await Session.findBySessionId(user.session.sessionId)
@@ -197,7 +197,7 @@ class AccountsController {
     res.json({ message: 'Session destroyed' })
   }
 
-  static async getGreetingsData (req: Request, res: Response) {
+  static async getGreetingsData(req: Request, res: Response) {
     const currentUser = req.user as ExpressUser
 
     if (!currentUser) {
@@ -219,7 +219,7 @@ class AccountsController {
     })
   }
 
-  static async getMessages (req: Request, res: Response) {
+  static async getMessages(req: Request, res: Response) {
     const currentUser = req.user as ExpressUser
 
     if (!currentUser) {
@@ -241,7 +241,7 @@ class AccountsController {
     })
   }
 
-  static startLoginFlow (req: Request, res: Response) {
+  static startLoginFlow(req: Request, res: Response) {
     console.log(req.query)
     const { redirect_uri } = req.query
 
@@ -254,7 +254,7 @@ class AccountsController {
     res.redirect(url)
   }
 
-  private static async handleLinkAccount (
+  private static async handleLinkAccount(
     userAccount: User,
     provider: ExternalAccountProvider,
     strategy: string,
@@ -299,7 +299,7 @@ class AccountsController {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  static async linkExternalAccount (req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+  static async linkExternalAccount(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const user = req.user as ExpressUser
 
     if (!user) {
@@ -357,7 +357,7 @@ class AccountsController {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  static async linkExternalAccountCallback (req: Request, res: Response): Promise<Response | void> {
+  static async linkExternalAccountCallback(req: Request, res: Response): Promise<Response | void> {
     try {
       const user = new CurrentUser(req.user as ExpressUser)
 
@@ -396,7 +396,7 @@ class AccountsController {
     }
   }
 
-  static async unlinkExternalAccount (req: Request, res: Response): Promise<Response> {
+  static async unlinkExternalAccount(req: Request, res: Response): Promise<Response> {
     try {
       const user = new CurrentUser(req.user as ExpressUser)
 
@@ -431,7 +431,7 @@ class AccountsController {
     }
   }
 
-  static async generateApiToken (req: Request, res: Response) {
+  static async generateApiToken(req: Request, res: Response) {
     try {
       const user = new CurrentUser(req.user as ExpressUser)
 
@@ -454,7 +454,7 @@ class AccountsController {
     }
   }
 
-  static async getAccount (req: Request, res: Response) {
+  static async getAccount(req: Request, res: Response) {
     try {
       const user = new CurrentUser(req.user as ExpressUser)
 

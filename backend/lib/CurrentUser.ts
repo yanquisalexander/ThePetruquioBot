@@ -6,19 +6,19 @@ import type Channel from '../app/models/Channel.model'
 class CurrentUser {
   private readonly expressUser: ExpressUser
 
-  constructor (expressUser: ExpressUser) {
+  constructor(expressUser: ExpressUser) {
     this.expressUser = expressUser
   }
 
-  async getCurrentUser (): Promise<User | null> {
+  async getCurrentUser(): Promise<User | null> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { system_token, twitchId, session: { sessionId } } = this.expressUser
-
+    const { system_token, twitchId, session: sessionType } = this.expressUser
+    console.log('system_token', system_token)
     if (system_token) {
       return await User.findByTwitchId(parseInt(twitchId)) ?? null
     }
 
-    const session = await Session.findBySessionId(sessionId)
+    const session = await Session.findBySessionId(sessionType?.sessionId ?? '')
 
     if (!session) {
       return null
@@ -31,7 +31,7 @@ class CurrentUser {
     return await User.findByTwitchId(parseInt(twitchId)) ?? null
   }
 
-  async getCurrentChannel (): Promise<Channel | null> {
+  async getCurrentChannel(): Promise<Channel | null> {
     const user = await this.getCurrentUser()
 
     if (!user) {
@@ -41,24 +41,24 @@ class CurrentUser {
     return await user.getChannel() ?? null
   }
 
-  async getCurrentPreferences (): Promise<Record<string, any> | null> {
+  async getCurrentPreferences(): Promise<Record<string, any> | null> {
     const channel = await this.getCurrentChannel()
 
     return channel ? channel.preferences : null
   }
 
-  get isImpersonating (): boolean {
+  get isImpersonating(): boolean {
     return !!this.expressUser.session.impersonatedUserId
   }
 
-  async getOriginalUser (): Promise<User | null> {
+  async getOriginalUser(): Promise<User | null> {
     const { sessionId, userId } = this.expressUser.session
     const session = await Session.findBySessionId(sessionId)
 
     return session ? await User.findByTwitchId(userId) : null
   }
 
-  async getSession (): Promise<Session | null> {
+  async getSession(): Promise<Session | null> {
     const { sessionId } = this.expressUser.session
 
     return await Session.findBySessionId(sessionId)
