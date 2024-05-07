@@ -6,7 +6,7 @@
     <UAlert color="red" icon="i-mdi-alert-circle-outline" variant="soft" title="BREADCRUMBS_ERROR">
       <template #description>
         <p class="text-sm font-medium">
-          Cannot render breadcrumbs for this page.
+          No se pueden mostrar las migas de pan para esta página.
         </p>
       </template>
     </UAlert>
@@ -14,27 +14,16 @@
 </template>
 
 <script lang="ts" setup>
-import { DASHBOARD_BREADCRUMBS } from "@/data/dashboardBreadcrumbs";
+import { useBreadcrumb } from "@/composables/useBreadcrumb";
+
 const route = useRoute();
 const currentPath = route.path
 
-console.log('currentPath', currentPath)
+const { buildBreadcrumb } = useBreadcrumb()
 
-const getBreadcrumbs = () => {
-  const breadcrumbs = DASHBOARD_BREADCRUMBS.find(entry => entry.path === currentPath);
-  return breadcrumbs ? breadcrumbs.crumbs : [];
-}
-
-const breadcrumbs = ref(getBreadcrumbs())
+const breadcrumbs = buildBreadcrumb(currentPath)
 
 
-watch(() => route.path, () => {
-  breadcrumbs.value = getBreadcrumbs()
-})
-
-watch(breadcrumbs, (newVal) => {
-  console.log('breadcrumbs', newVal)
-})
 </script>
 
 <style></style>

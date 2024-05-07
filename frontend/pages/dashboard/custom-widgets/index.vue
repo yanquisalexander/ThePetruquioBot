@@ -18,6 +18,15 @@
       </template>
 
       <template v-else-if="!loading && widgets">
+        <div class="flex w-full justify-end gap-4 my-2">
+          <UButton color="gray" variant="soft" @click="router.push('/dashboard')" icon="i-lucide-book-dashed">
+            Plantillas
+          </UButton>
+          <UButton color="blue" variant="soft" @click="router.push('/dashboard/custom-widgets/new')"
+            icon="i-lucide-plus">
+            Nuevo Widget
+          </UButton>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <template v-for="widget in widgets" :key="widget.id">
             <CustomWidgetCard :widget="widget" :userApiKey="userApiKey" />
