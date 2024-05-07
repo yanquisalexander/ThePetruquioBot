@@ -6,8 +6,8 @@
             </h2>
         </template>
 
-        <p class="text-sm" v-if="props.widget.widget_description">
-            {{ props.widget.widget_description }}
+        <p class="text-sm" v-if="props.widget.description">
+            {{ props.widget.description }}
         </p>
         <template #footer>
             <div class="flex justify-end gap-2">
