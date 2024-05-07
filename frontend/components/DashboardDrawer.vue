@@ -135,7 +135,6 @@ const menuCategories = ref([
         icon: 'i-lucide-git-branch',
         to: '/dashboard/workflows',
         enabled: true,
-        newFeature: true
       },
       {
         label: 'Community',

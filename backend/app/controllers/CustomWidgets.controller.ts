@@ -6,6 +6,7 @@ import { CustomWidget } from "../models/CustomWidget.model"
 import SocketIO from "../modules/SocketIO.module"
 import { Configuration } from "../config"
 import TwitchAuthenticator from "../modules/TwitchAuthenticator.module"
+import { Upload, UploadData } from "../models/Upload.model"
 
 export class CustomWidgetsController {
 
@@ -100,6 +101,16 @@ export class CustomWidgetsController {
                 return res.status(404).json({ error: 'Widget not found' })
             }
 
+            let uploads: UploadData[] = []
+
+            const injectUploads = widget.data.properties?.injectUploads || false
+
+            if (injectUploads) {
+                const result = await user.getUploads()
+                uploads = result.map(upload => upload.data)
+                console.log(uploads)
+            }
+
 
             const twitchToken = TwitchAuthenticator.RefreshingAuthProvider.hasUser(user.twitchId) ? await TwitchAuthenticator.RefreshingAuthProvider.getAccessTokenForUser(user.twitchId) : null
 
@@ -110,7 +121,8 @@ export class CustomWidgetsController {
                         twitch_client_id: Configuration.TWITCH_CLIENT_ID,
                         twitch_token: twitchToken?.accessToken,
                         user
-                    }
+                    },
+                    assets: uploads
                 }
             })
 

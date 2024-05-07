@@ -277,8 +277,14 @@ export class DashboardController {
 
     const moderatedChannels = await user.getModeratedChannels()
 
-    // Check if userId is present in the moderated channels
 
+    moderatedChannels.push({
+      id: user.twitchId.toString(),
+      displayName: user.displayName ?? user.username,
+      avatar: user.avatar ?? ''
+    })
+
+    // Check if userId is present in the moderated channels
 
     if (
       !moderatedChannels.find((channel) => channel.id === userId) &&

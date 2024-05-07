@@ -66,5 +66,13 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/': { prerender: true },
+  },
+  vite: {
+    optimizeDeps: {
+      exclude: [
+        'monaco-editor',
+        'axios',
+      ]
+    }
   }
 })

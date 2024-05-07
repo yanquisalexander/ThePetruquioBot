@@ -20,10 +20,20 @@
   },
   "audit": {
     "actions": {
+      "API_TOKEN_GENERATED": "API token generated",
+      "COMMAND_CREATED": "Command created",
       "IMPERSONATED_BY_ADMIN": "Impersonated by admin",
+      "IMPERSONATED_BY_MODERATOR": "Impersonated by moderator",
+      "IMPERSONATED_MODERATED_CHANNEL": "Impersonated moderated channel",
       "LOGIN_SUCCESS": "Login success",
       "SETTING_UPDATED": "Setting updated",
       "TOKEN_REFRESHED_BY_SYSTEM": "Token refreshed by System"
+    },
+    "details": {
+      "IMPERSONATED_BY_ADMIN": "Admins can impersonate users to help them with their issues.",
+      "IMPERSONATED_BY_MODERATOR": "A moderator can take actions on behalf of the channel owner to help with moderation.",
+      "IMPERSONATED_MODERATED_CHANNEL": "You have impersonated a channel to help with moderation.",
+      "TOKEN_REFRESHED_BY_SYSTEM": "To prevent losing access to Twitch API, we automatically refresh your token."
     },
     "title": "Audits"
   },

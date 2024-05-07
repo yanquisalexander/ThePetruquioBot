@@ -28,7 +28,7 @@
 
           <template v-if="currentTab === 0">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_html" language="html" theme="vs-dark" :options="MONACO_OPTIONS"
+              <vue-monaco-editor :value="widget.custom_html" language="html" theme="Dracula" :options="MONACO_OPTIONS"
                 height="350px" width="100%" @update:value="widget.custom_html = $event" />
 
 
@@ -37,14 +37,14 @@
 
           <template v-else-if="currentTab === 1">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_css" language="css" theme="vs-dark" :options="MONACO_OPTIONS"
+              <vue-monaco-editor :value="widget.custom_css" language="css" theme="Dracula" :options="MONACO_OPTIONS"
                 height="350px" width="100%" @update:value="widget.custom_css = $event" />
             </div>
           </template>
 
           <template v-else-if="currentTab === 2">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_js" language="javascript" theme="vs-dark"
+              <vue-monaco-editor :value="widget.custom_js" language="javascript" theme="Dracula"
                 :options="MONACO_OPTIONS" height="350px" width="100%" @update:value="widget.custom_js = $event" />
             </div>
           </template>
@@ -68,10 +68,15 @@
                 <UToggle v-model="widget.properties.includeTailwind" />
               </UFormGroup>
 
+              <UFormGroup label="Usar archivos cargados"
+                description="Esta propiedad permitirá al widget usar archivos que has cargado en Media Manager">
+                <UToggle v-model="widget.properties.injectUploads" />
+              </UFormGroup>
+
               <UFormGroup label="Custom properties"
                 description="Datos personalizados que se pueden utilizar en el widget">
 
-                <vue-monaco-editor :value="widget.properties.custom_data" language="json" theme="vs-dark"
+                <vue-monaco-editor :value="widget.properties.custom_data" language="json" theme="Dracula"
                   :options="MONACO_OPTIONS" height="350px" width="100%"
                   @update:value="widget.properties.custom_data = $event" />
               </UFormGroup>
@@ -108,6 +113,7 @@ const MONACO_OPTIONS = {
   automaticLayout: true,
   formatOnType: true,
 }
+
 
 definePageMeta({
   layout: 'dashboard',

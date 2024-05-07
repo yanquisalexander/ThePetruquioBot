@@ -51,7 +51,7 @@ class WorkflowLog {
     }
 
     static async findAll(channel: Channel): Promise<WorkflowLog[]> {
-        const result = await Database.query('SELECT * FROM workflow_logs WHERE channel_id = $1', [channel.twitchId]);
+        const result = await Database.query('SELECT * FROM workflow_logs WHERE channel_id = $1 ORDER BY created_at DESC', [channel.twitchId]);
         const workflowLogs: WorkflowLog[] = [];
         for (const workflowLogData of result.rows) {
             workflowLogs.push(new WorkflowLog(workflowLogData.id, workflowLogData.execution_id, workflowLogData.event_type, workflowLogData.script, workflowLogData.success, channel, workflowLogData.created_at, workflowLogData.updated_at, workflowLogData.execution_log));

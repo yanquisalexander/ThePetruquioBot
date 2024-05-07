@@ -31,4 +31,9 @@ export const Configuration = {
   PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET ?? '',
   PAYPAL_SUBSCRIPTION_PLAN_ID: process.env.PAYPAL_SUBSCRIPTION_PLAN_ID ?? '',
   HUGGING_FACE_API_KEY: process.env.HUGGING_FACE_API_KEY ?? '',
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME ?? '',
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID ?? '',
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+  AWS_REGION: process.env.AWS_REGION ?? '',
+  AWS_ENDPOINT: process.env.AWS_ENDPOINT ?? '',
 }

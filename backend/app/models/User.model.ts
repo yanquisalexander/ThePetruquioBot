@@ -12,6 +12,7 @@ import Utils from '../../lib/Utils'
 import Patreon from '../modules/Patreon.module'
 import TwitchAuthenticator from '../modules/TwitchAuthenticator.module'
 import { paypalService } from '../services/PayPal'
+import { Upload } from "./Upload.model"
 
 interface ModeratedChannel {
   id: string
@@ -219,6 +220,10 @@ class User {
       console.error('Error al generar el token API:', error)
       throw error
     }
+  }
+
+  async getUploads(): Promise<Upload[]> {
+    return await Upload.getByUserId(this)
   }
 
   static async isTokenRevoked(token: string): Promise<boolean> {

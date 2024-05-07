@@ -233,10 +233,12 @@ class WorkflowsController {
                 });
             } else {
                 await workflow.execute({
+                    original_url: req.originalUrl,
                     payload: req.body,
                     headers: req.headers,
                     origin: req.hostname,
                     query: req.query,
+                    url: req.url,
                 });
                 return res.status(200).json({
                     success: true,

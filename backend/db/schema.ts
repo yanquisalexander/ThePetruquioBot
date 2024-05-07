@@ -184,3 +184,15 @@ export const CustomWidgetsTable = pgTable('custom_widgets', {
   created_at: timestamp('created_at').default(sql.raw('now()')),
   updated_at: timestamp('updated_at').default(sql.raw('now()'))
 })
+
+
+export const UploadsTable = pgTable('uploads', {
+  id: uuid('id').primaryKey(),
+  filename: text('filename').notNull(),
+  path: text('path').notNull(),
+  size: integer('size').notNull(),
+  mimetype: text('mimetype').notNull(),
+  uploaded_by: integer('uploaded_by').references(() => UsersTable.twitch_id),
+  uploaded_at: timestamp('uploaded_at').default(sql.raw('now()')),
+  key: text('key')
+})

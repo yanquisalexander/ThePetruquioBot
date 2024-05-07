@@ -18,6 +18,7 @@ import { createTwitchToolsRouter } from '@/app/config/routes/twitch-tools.router
 import { createBillingRouter } from '@/app/config/routes/billing.router'
 import { createStreamManagerRouter } from '@/app/config/routes/stream-manager.router'
 import { createCustomWidgetRouter } from "./routes/custom-widgets.router"
+import { createUploadsRouter } from "./routes/uploads.router"
 
 const router = Router()
 
@@ -26,6 +27,7 @@ const authMiddleware = Passport.middleware
 router.use('/dashboard', authMiddleware, createDashboardRouter())
 router.use('/stream-manager', authMiddleware, createStreamManagerRouter())
 router.use('/custom-widgets', authMiddleware, createCustomWidgetRouter())
+router.use('/uploads', authMiddleware, createUploadsRouter())
 
 router.get('/ping', (req, res) => {
   res.status(200).send('PONG')

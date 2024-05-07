@@ -23,6 +23,7 @@ const widgetId = ref(route.params.widgetId)
 const user = ref(null)
 const widget = ref(null)
 const envInfo = ref(null)
+const assets = ref(null)
 const clientMounted = ref(false)
 
 const socket = ref<typeof io.Socket | null>(null)
@@ -54,6 +55,7 @@ const fetchWidget = async () => {
         })
         widget.value = response.data.data.widget
         envInfo.value = response.data.data.env_info
+        assets.value = response.data.data.assets
     } catch (error) {
         console.error('Error fetching widget', error)
         throw createError({
@@ -93,6 +95,8 @@ const createSocket = () => {
     globalThis.widgetCustomData = { ...widget.value.properties }
     // @ts-ignore
     globalThis.envInfo = { ...envInfo.value }
+    // @ts-ignore
+    globalThis.assets = [...assets.value]
     clientMounted.value = true
 }
 

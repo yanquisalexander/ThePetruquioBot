@@ -20,10 +20,20 @@
   },
   "audit": {
     "actions": {
+      "API_TOKEN_GENERATED": "Token de API generado",
+      "COMMAND_CREATED": "Comando creado",
       "IMPERSONATED_BY_ADMIN": "Suplantado por el administrador",
+      "IMPERSONATED_BY_MODERATOR": "Suplantado por el moderador",
+      "IMPERSONATED_MODERATED_CHANNEL": "Canal moderado suplantado",
       "LOGIN_SUCCESS": "Inicio de sesión exitoso",
       "SETTING_UPDATED": "Ajuste actualizado",
       "TOKEN_REFRESHED_BY_SYSTEM": "Token actualizado por el sistema"
+    },
+    "details": {
+      "IMPERSONATED_BY_ADMIN": "Los administradores pueden hacerse pasar por usuarios para ayudarlos con sus problemas.",
+      "IMPERSONATED_BY_MODERATOR": "Un moderador puede tomar medidas en nombre del propietario del canal para ayudar a moderar.",
+      "IMPERSONATED_MODERATED_CHANNEL": "Te has hecho pasar por un canal para facilitar la moderación.",
+      "TOKEN_REFRESHED_BY_SYSTEM": "Para evitar perder el acceso a la API de Twitch, actualizamos automáticamente tu token."
     },
     "title": "Auditorías"
   },

@@ -61,8 +61,8 @@
         <div class="flex items-center space-x-2">
           <div class="flex-shrink-0">
             <div class="flex items-center justify-center w-8 h-8 rounded-full"
-              :class="renderActionIcon(row.type).colorClass">
-              <UIcon :name="renderActionIcon(row.type).icon" size="sm" class="text-lg" />
+              :class="getAuditType(row.type).colorClass">
+              <UIcon :name="getAuditType(row.type).icon" size="sm" class="text-lg" />
             </div>
           </div>
 
@@ -70,11 +70,8 @@
             <span>
               {{ $t(`audit.actions.${row.type}`) }}
             </span>
-            <p v-if="row.type === 'IMPERSONATED_BY_ADMIN'" class="text-xs text-gray-700">
-              Admins can impersonate users to help them with their issues.
-            </p>
-            <p v-if="row.type === 'TOKEN_REFRESHED_BY_SYSTEM'" class="text-xs text-gray-700">
-              To prevent losing access to Twitch API, we automatically refresh your token.
+            <p class="text-xs text-gray-500">
+              {{ getActionDescription(row.type) }}
             </p>
           </div>
         </div>
@@ -133,11 +130,11 @@
 
 <script setup>
 import { useI18n } from "vue-i18n";
-import { ShieldCheckIcon, KeyRoundIcon, ArrowUpDownIcon } from 'lucide-vue-next';
 const { $moment } = useNuxtApp();
 const toast = useToast();
 const currentUser = useCurrentUser();
 const i18n = useI18n();
+const { getAuditType, getActionDescription } = useAudits();
 
 
 
@@ -161,45 +158,7 @@ const search = ref('');
 const selectedAudit = ref(null);
 const auditDetailsModal = ref(false);
 
-const renderActionIcon = (action) => {
-  switch (action) {
-    case 'SETTING_UPDATED':
-      return {
-        icon: 'i-lucide-wrench',
-        colorClass: 'text-yellow-600 bg-yellow-100',
-      };
-    case 'IMPERSONATED_BY_ADMIN':
-      return {
-        icon: 'i-lucide-shield-check',
-        colorClass: 'text-green-600 bg-green-100',
-      };
-    case 'LOGIN_SUCCESS':
-      return {
-        icon: 'i-lucide-key-round',
-        colorClass: 'text-green-600 bg-green-100',
-      };
-    case 'TOKEN_REFRESHED_BY_SYSTEM':
-      return {
-        icon: 'i-lucide-arrow-up-down',
-        colorClass: 'text-blue-600 bg-blue-100',
-      };
-    case 'API_TOKEN_GENERATED':
-      return {
-        icon: 'i-lucide-key-round',
-        colorClass: 'text-blue-600 bg-blue-100',
-      };
-    case 'COMMAND_CREATED':
-      return {
-        icon: 'i-lucide-plus',
-        colorClass: 'text-twitch-600 bg-twitch-100',
-      };
-    default:
-      return {
-        icon: 'i-lucide-circle-help',
-        colorClass: 'text-gray-600 bg-gray-100',
-      };
-  }
-};
+
 
 const showAudit = (audit) => {
   selectedAudit.value = audit
@@ -236,10 +195,14 @@ const fetchAudits = async () => {
 
 const filteredAudits = computed(() => {
   return auditories.value.filter((audit) => {
-    return audit.username.toLowerCase().includes(search.value.toLowerCase()) ||
-      audit.type.toLowerCase().includes(search.value.toLowerCase())
-  })
-})
+    const searchData = JSON.stringify(audit.data).toLowerCase();
+    const searchTerm = search.value.toLowerCase();
+    return audit.username.toLowerCase().includes(searchTerm) ||
+      audit.type.toLowerCase().includes(searchTerm) ||
+      searchData.includes(searchTerm);
+  });
+});
+
 
 const displayedAudits = computed(() => {
   return filteredAudits.value.slice((auditsCurrentPage.value - 1) * 8, auditsCurrentPage.value * 8)

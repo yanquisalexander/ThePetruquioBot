@@ -7,9 +7,10 @@ import TwitchEvents from './TwitchEvents.module'
 import Passport from '../../lib/Passport'
 import http from 'http'
 import SocketIO from './SocketIO.module'
+import multer from 'multer'
 
 class WebServer {
-  constructor () {
+  constructor() {
     throw new Error('This class cannot be instantiated')
   }
 
@@ -18,7 +19,7 @@ class WebServer {
   public static isRunning: boolean = false
   public static ioServer: http.Server
 
-  public static async setup (): Promise<void> {
+  public static async setup(): Promise<void> {
     const app = express()
     this.port = Number(process.env.PORT) || 3000
 
@@ -27,7 +28,7 @@ class WebServer {
     app.use(cors({
       origin: '*'
     }))
-    app.use('/v2/', bodyParser.json(), bodyParser.urlencoded({ extended: true }), router)
+    app.use('/v2/', bodyParser.json(), bodyParser.urlencoded({ extended: true }), multer().any(), router)
     app.get('/v1/*', (req, res) => {
       res.status(410).json({
         error_type: 'deprecated',
@@ -67,7 +68,7 @@ class WebServer {
     console.log('[WEB SERVER] Finished setting up web server.')
   }
 
-  public static async boot (): Promise<void> {
+  public static async boot(): Promise<void> {
     await this.setup()
     TwitchEvents.middleware.apply(this.app)
     const ioServer = http.createServer(this.app)
