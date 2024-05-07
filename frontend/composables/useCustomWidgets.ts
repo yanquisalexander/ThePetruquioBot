@@ -74,11 +74,21 @@ export const useCustomWidgets = () => {
         }
     }
 
+    const searchTemplates = async (query: string) => {
+        try {
+            const response = await client(`${API_ENDPOINT}/custom-widgets/templates?q=${query}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return {
         fetchWidgets,
         fetchWidget,
         createWidget,
         updateWidget,
         deleteWidget,
+        searchTemplates,
     }
 }

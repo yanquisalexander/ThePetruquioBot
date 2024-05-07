@@ -46,7 +46,7 @@ const strategyCanBeConfigured = (strategy: string) => {
 }
 
 class Passport {
-  constructor () {
+  constructor() {
     throw new Error('This class cannot be instantiated')
   }
 
@@ -57,7 +57,7 @@ class Passport {
     passReqToCallback: true
   }
 
-  public static async setup (): Promise<void> {
+  public static async setup(): Promise<void> {
     console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('Setting up passport...'))
     console.log(chalk.bgCyan.bold('[PASSPORT]'), chalk.white('Setting up JWT strategy...'))
     // @ts-expect-error
@@ -119,7 +119,7 @@ class Passport {
         return done(null, userData)
       } catch (error) {
         console.error(error)
-        return done(error, false, { message: 'Internal server error' })
+        return done(error, false, { message: 'An error occurred while authenticating' })
       }
     }))
 
@@ -133,15 +133,15 @@ class Passport {
         scope: Scopes.SPOTIFY,
         showDialog: true
       },
-      // @ts-expect-error
-      async (accessToken, refreshToken, expires_in, profile, done) => {
-        try {
-          return done(null, profile, { accessToken, refreshToken, expires_in })
-        } catch (error) {
-          console.error(error)
-          return done(error, false, { message: 'Internal server error' })
-        }
-      }))
+        // @ts-expect-error
+        async (accessToken, refreshToken, expires_in, profile, done) => {
+          try {
+            return done(null, profile, { accessToken, refreshToken, expires_in })
+          } catch (error) {
+            console.error(error)
+            return done(error, false, { message: 'An error occurred while authenticating' })
+          }
+        }))
       console.log('[PASSPORT] Spotify strategy configured.')
     }
 
@@ -155,15 +155,15 @@ class Passport {
         scope: Scopes.DISCORD,
         prompt: 'consent'
       },
-      // @ts-expect-error
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          return done(null, profile, { accessToken, refreshToken })
-        } catch (error) {
-          console.error(error)
-          return done(error, false, { message: 'Internal server error' })
-        }
-      }))
+        // @ts-expect-error
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            return done(null, profile, { accessToken, refreshToken })
+          } catch (error) {
+            console.error(error)
+            return done(error, false, { message: 'An error occurred while authenticating' })
+          }
+        }))
       console.log('[PASSPORT] Discord strategy configured.')
     }
 
@@ -177,26 +177,26 @@ class Passport {
         scope: Scopes.PATREON,
         prompt: 'consent'
       },
-      // @ts-expect-error
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          return done(null, profile, { accessToken, refreshToken })
-        } catch (error) {
-          console.error(error)
-          return done(error, false, { message: 'Internal server error' })
-        }
-      }))
+        // @ts-expect-error
+        async (accessToken, refreshToken, profile, done) => {
+          try {
+            return done(null, profile, { accessToken, refreshToken })
+          } catch (error) {
+            console.error(error)
+            return done(error, false, { message: 'Internal server error' })
+          }
+        }))
       console.log('[PASSPORT] Patreon strategy configured.')
     }
 
     console.log('[PASSPORT] Finished setting up passport.')
   }
 
-  public static getPassport (): typeof passport {
+  public static getPassport(): typeof passport {
     return this.passport
   }
 
-  public static async middleware (req: Request, res: Response, next: NextFunction): Promise<void> {
+  public static async middleware(req: Request, res: Response, next: NextFunction): Promise<void> {
     passport.authenticate('jwt', { session: false }, (err: Error, user: User) => {
       if (err || !user) {
         console.error(chalk.red('[PASSPORT]'), err)

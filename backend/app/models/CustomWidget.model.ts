@@ -1,7 +1,7 @@
 import { CustomWidgetsTable } from '@/db/schema'
 import { dbService } from '../services/Database'
 import Channel from './Channel.model'
-import { eq } from 'drizzle-orm'
+import { eq, like } from 'drizzle-orm'
 
 interface CustomWidgetData {
     id: string
@@ -11,6 +11,7 @@ interface CustomWidgetData {
     custom_css?: string | null
     custom_js?: string | null
     properties?: any
+    published_as_template?: boolean | null
     created_at?: Date | null
     updated_at?: Date | null
 }
@@ -52,6 +53,37 @@ export class CustomWidget {
         return new CustomWidget(data)
     }
 
+    static async searchTemplates(query: string): Promise<any[]> {
+        // Search, and do a join with the channel table to get the channel name
+        // Drizzle
+        const data = await dbService.query.CustomWidgetsTable
+            .findMany({
+                where: like(CustomWidgetsTable.widget_name, `%${query.toLowerCase()}%`),
+            })
+
+        const publishedBy = []
+        const findedChannels: Channel[] = []
+
+        for (const widget of data) {
+            if (!findedChannels.find(channel => channel.twitchId === widget.channel_id)) {
+                const channel = await Channel.findByTwitchId(widget.channel_id)
+                if (!channel) {
+                    continue
+                }
+                findedChannels.push(channel)
+            }
+
+            publishedBy.push(findedChannels.find(channel => channel.twitchId === widget.channel_id))
+        }
+
+        if (!data) {
+            return []
+        }
+
+        return data
+    }
+
+
     async save(): Promise<CustomWidget> {
         const data = await dbService.insert(CustomWidgetsTable)
             .values(this.data)
@@ -62,4 +94,21 @@ export class CustomWidget {
 
         return new CustomWidget(this.data)
     }
+
+    async delete(): Promise<void> {
+        await dbService.delete(CustomWidgetsTable)
+            .where(eq(CustomWidgetsTable.id, this.data.id))
+    }
+
+    async publishAsTemplate(): Promise<CustomWidget> {
+        this.data.published_as_template = true
+        return await this.save()
+    }
+
+    async unpublishAsTemplate(): Promise<CustomWidget> {
+        this.data.published_as_template = false
+        return await this.save()
+    }
+
+
 }

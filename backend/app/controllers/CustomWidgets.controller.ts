@@ -147,4 +147,23 @@ export class CustomWidgetsController {
 
     }
 
+    async findTemplates(req: Request, res: Response): Promise<Response> {
+        const currentUser = new CurrentUser(req.user as ExpressUser)
+
+        const user = await currentUser.getCurrentUser()
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+        try {
+            const widgets = await CustomWidget.searchTemplates(req.query.q?.toString() || '')
+
+            return res.json({
+                data: {
+                    widgets
+                }
+            })
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred while searching for templates' })
+        }
+    }
 }

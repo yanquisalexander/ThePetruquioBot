@@ -19,7 +19,7 @@
 
       <template v-else-if="!loading && widgets">
         <div class="flex w-full justify-end gap-4 my-2">
-          <UButton color="gray" variant="soft" @click="router.push('/dashboard')" icon="i-lucide-book-dashed">
+          <UButton color="gray" variant="soft" @click="showTemplateSearch = true" icon="i-lucide-book-dashed">
             Plantillas
           </UButton>
           <UButton color="blue" variant="soft" @click="router.push('/dashboard/custom-widgets/new')"
@@ -34,7 +34,7 @@
         </div>
       </template>
     </UContainer>
-
+    <CustomWidgetTemplateSearch v-model="showTemplateSearch" />
   </DashboardPageContainer>
 </template>
 
@@ -45,6 +45,7 @@ const { fetchWidgets } = useCustomWidgets()
 const loading = ref(false)
 const widgets = ref<any[]>([])
 const userApiKey = ref(null)
+const showTemplateSearch = ref(false)
 
 definePageMeta({
   layout: 'dashboard',

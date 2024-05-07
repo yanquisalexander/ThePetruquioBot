@@ -8,8 +8,9 @@ export const createCustomWidgetRouter = (): Router => {
 
     router.get('/', customWidgetController.getWidgets)
     router.post('/', customWidgetController.updateWidget)
-    router.get('/:id', customWidgetController.getWidget)
+    router.get('/templates', customWidgetController.findTemplates)
     router.put('/:id', customWidgetController.updateWidget)
+    router.get('/:id', customWidgetController.getWidget)
 
     console.log(chalk.bgGreenBright('[ROUTER]'), 'Custom Widget router created')
     return router

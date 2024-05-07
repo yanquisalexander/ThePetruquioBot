@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid, unique, json } from 'drizzle-orm/pg-core'
 
 export const UsersTable = pgTable('users', {
@@ -179,6 +179,7 @@ export const CustomWidgetsTable = pgTable('custom_widgets', {
   custom_css: text('custom_css'),
   custom_js: text('custom_js'),
   properties: json('properties').default('{}'),
+  published_as_template: boolean('published_as_template').default(false),
   created_at: timestamp('created_at').default(sql.raw('now()')),
   updated_at: timestamp('updated_at').default(sql.raw('now()'))
 })
