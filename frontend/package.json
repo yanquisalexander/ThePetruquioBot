@@ -34,7 +34,7 @@
     "vue-tsc": "^1.8.25"
   },
   "dependencies": {
-    "@guolao/vue-monaco-editor": "^1.4.1",
+    "@guolao/vue-monaco-editor": "1.5.1",
     "@heroicons/vue": "^2.0.18",
     "@iconify-json/fluent": "^1.1.45",
     "@iconify-json/lucide": "^1.1.148",

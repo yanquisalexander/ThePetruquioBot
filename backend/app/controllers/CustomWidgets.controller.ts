@@ -4,6 +4,8 @@ import CurrentUser from '../../lib/CurrentUser'
 import Twitch from "../modules/Twitch.module"
 import { CustomWidget } from "../models/CustomWidget.model"
 import SocketIO from "../modules/SocketIO.module"
+import { Configuration } from "../config"
+import TwitchAuthenticator from "../modules/TwitchAuthenticator.module"
 
 export class CustomWidgetsController {
 
@@ -23,9 +25,12 @@ export class CustomWidgetsController {
 
         const widgets = await CustomWidget.getByChannel(channel)
 
+        const userApiKey = await user.getApiToken()
+
         return res.json({
             data: {
-                widgets: widgets
+                widgets,
+                user_api_key: userApiKey
             }
         })
 
@@ -95,9 +100,15 @@ export class CustomWidgetsController {
                 return res.status(404).json({ error: 'Widget not found' })
             }
 
+            const twitchToken = TwitchAuthenticator.RefreshingAuthProvider.hasUser(user.twitchId) ? await TwitchAuthenticator.RefreshingAuthProvider.getAccessTokenForUser(user.twitchId) : null
+
             return res.json({
                 data: {
-                    widget: widget.data
+                    widget: widget.data,
+                    env_info: {
+                        twitch_client_id: Configuration.TWITCH_CLIENT_ID,
+                        twitch_token: twitchToken?.accessToken
+                    }
                 }
             })
 

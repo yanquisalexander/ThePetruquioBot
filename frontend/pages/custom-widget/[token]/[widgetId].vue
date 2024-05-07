@@ -22,6 +22,7 @@ const token = ref(route.params.token)
 const widgetId = ref(route.params.widgetId)
 const user = ref(null)
 const widget = ref(null)
+const envInfo = ref(null)
 const clientMounted = ref(false)
 
 const socket = ref<typeof io.Socket | null>(null)
@@ -52,6 +53,7 @@ const fetchWidget = async () => {
             },
         })
         widget.value = response.data.data.widget
+        envInfo.value = response.data.data.env_info
     } catch (error) {
         console.error('Error fetching widget', error)
         throw createError({
@@ -89,6 +91,8 @@ const createSocket = () => {
     globalThis.Howler = Howler
     // @ts-ignore
     globalThis.widgetCustomData = { ...widget.value.properties }
+    // @ts-ignore
+    globalThis.envInfo = { ...envInfo.value }
     clientMounted.value = true
 }
 

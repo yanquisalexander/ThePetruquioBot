@@ -47,9 +47,21 @@ export const useCustomWidgets = () => {
     const updateWidget = async (widget: any) => {
         try {
             const response = await client.put(`${API_ENDPOINT}/custom-widgets/${widget.id}`, widget);
+            toast.add({
+                title: 'Success',
+                description: 'Widget updated successfully',
+                icon: 'i-lucide-check',
+                color: 'green',
+            });
             return response.data;
         } catch (error) {
             console.error(error);
+            toast.add({
+                title: 'Error',
+                description: 'Failed to update widget',
+                icon: 'i-lucide-information-circle',
+                color: 'red',
+            });
         }
     }
 

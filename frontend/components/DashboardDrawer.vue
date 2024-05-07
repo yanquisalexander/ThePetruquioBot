@@ -118,10 +118,10 @@ const menuCategories = ref([
         enabled: false
       },
       {
-        label: 'Widgets',
+        label: 'Custom Widgets',
         icon: 'i-lucide-package-open',
-        to: '/dashboard/widgets',
-        enabled: process.env.NODE_ENV === 'development',
+        to: '/dashboard/custom-widgets',
+        enabled: true,
         newFeature: true
       },
       {

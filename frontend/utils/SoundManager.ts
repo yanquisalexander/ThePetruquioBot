@@ -3,7 +3,6 @@ import { Howl, Howler } from 'howler';
 export enum Sounds {
   BUTTON_CLICK = '/assets/sounds/button-clicked.mp3',
   PIN_CLICK = '/assets/sounds/pin-select.mp3',
-  BACKGROUND_MUSIC = 'background_music.mp3',
   GOT_TALENT_RED_BUTTON = '/assets/sounds/got-talent-red-button.mp3',
   GOT_TALENT_RED_BUTTON_BACKDROP = '/assets/sounds/red-button-backdrop.mp3',
   GOLDEN_BUZZER = '/assets/sounds/celebration.mp3',

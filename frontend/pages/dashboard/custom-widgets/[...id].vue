@@ -25,13 +25,11 @@
             </template>
           </UTabs>
 
+
           <template v-if="currentTab === 0">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_html" language="html" theme="vs-dark" :options="{
-                minimap: {
-                  enabled: false,
-                },
-              }" height="350px" width="100%" @update:value="widget.custom_html = $event" />
+              <vue-monaco-editor :value="widget.custom_html" language="html" theme="vs-dark" :options="MONACO_OPTIONS"
+                height="350px" width="100%" @update:value="widget.custom_html = $event" />
 
 
             </div>
@@ -39,41 +37,42 @@
 
           <template v-else-if="currentTab === 1">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_css" language="css" theme="vs-dark" :options="{
-                minimap: {
-                  enabled: false,
-                },
-              }" height="350px" width="100%" @update:value="widget.custom_css = $event" />
+              <vue-monaco-editor :value="widget.custom_css" language="css" theme="vs-dark" :options="MONACO_OPTIONS"
+                height="350px" width="100%" @update:value="widget.custom_css = $event" />
             </div>
           </template>
 
           <template v-else-if="currentTab === 2">
             <div class="w-full">
-              <vue-monaco-editor :value="widget.custom_js" language="javascript" theme="vs-dark" :options="{
-                minimap: {
-                  enabled: false,
-                },
-              }" height="350px" width="100%" @update:value="widget.custom_js = $event" />
+              <vue-monaco-editor :value="widget.custom_js" language="javascript" theme="vs-dark"
+                :options="MONACO_OPTIONS" height="350px" width="100%" @update:value="widget.custom_js = $event" />
             </div>
           </template>
 
+
           <template v-else-if="currentTab === 3">
+            <div class="w-full space-y-4">
+              <UFormGroup label="Widget name">
+                <UInput v-model="widget.widget_name" />
+              </UFormGroup>
 
 
-            <div class="w-full">
-              <vue-monaco-editor :value="widget.properties" language="json" theme="vs-dark" :options="{
-                minimap: {
-                  enabled: false,
-                },
-              }" height="350px" width="100%" @update:value="widget.properties = $event" />
+              <UFormGroup label="Include Tailwind CSS" description="Esta propiedad incluirá Tailwind CSS en el widget">
+                <UToggle v-model="widget.properties.includeTailwind" />
+              </UFormGroup>
 
+              <UFormGroup label="Custom properties"
+                description="Datos personalizados que se pueden utilizar en el widget">
 
-
+                <vue-monaco-editor :value="widget.properties.custom_data" language="json" theme="vs-dark"
+                  :options="MONACO_OPTIONS" height="350px" width="100%"
+                  @update:value="widget.properties.custom_data = $event" />
+              </UFormGroup>
             </div>
           </template>
         </div>
 
-        <div class="flex justify-end gap-2 mt-4">
+        <div class="flex justify-end gap-2 my-8">
           <UButton color="gray" variant="soft" to="/dashboard/custom-widgets">
             Cancel
           </UButton>
@@ -95,6 +94,14 @@ const loading = ref(false)
 const widget = ref(null)
 const currentTab = ref(0)
 
+const MONACO_OPTIONS = {
+  minimap: {
+    enabled: false,
+  },
+  automaticLayout: true,
+  formatOnType: true,
+}
+
 definePageMeta({
   layout: 'dashboard',
   middleware: 'auth'
@@ -114,7 +121,7 @@ const sections = [{
   label: 'Javascript',
   icon: 'i-mdi-language-javascript',
 }, {
-  label: 'Preferences',
+  label: 'Properties',
   icon: 'i-mdi-cog',
 
 }]
