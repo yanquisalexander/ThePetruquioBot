@@ -11,6 +11,7 @@ import Passport from '../../lib/Passport'
 import CurrentUser from '../../lib/CurrentUser'
 import Audit, { AuditType } from '../models/Audit.model'
 import Notification, { NotificationType } from '../models/Notification.model'
+import Channel from "../models/Channel.model"
 
 class AccountsController {
   static async getToken(req: Request, res: Response) {
@@ -445,7 +446,25 @@ class AccountsController {
         return res.status(404).json({ error: 'User not found' })
       }
 
+      const channel = await userAccount.getChannel() as Channel
+
       const token = await userAccount.generateApiToken()
+
+      const audit = new Audit({
+        channel,
+        user: userAccount,
+        type: AuditType.API_TOKEN_GENERATED,
+        data: {
+          ip_address: (req.headers['x-envoy-external-address'] ?? req.headers['x-forwarded-for']) ?? req.socket.remoteAddress,
+          user_agent: req.headers['user-agent']
+        }
+      })
+
+      try {
+        await audit.save()
+      } catch (error) {
+        console.error(error)
+      }
 
       return res.status(200).json({ token })
     } catch (error) {

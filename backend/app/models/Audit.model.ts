@@ -16,7 +16,8 @@ export enum AuditType {
     WORKFLOW_DELETED = 'WORKFLOW_DELETED',
     LOGIN_SUCCESS = 'LOGIN_SUCCESS',
     IMPERSONATED_BY_ADMIN = 'IMPERSONATED_BY_ADMIN',
-    TOKEN_REFRESHED_BY_SYSTEM = 'TOKEN_REFRESHED_BY_SYSTEM'
+    TOKEN_REFRESHED_BY_SYSTEM = 'TOKEN_REFRESHED_BY_SYSTEM',
+    API_TOKEN_GENERATED = 'API_TOKEN_GENERATED',
 }
 
 export class AuditDTO {
@@ -49,7 +50,7 @@ interface AuditData {
 }
 
 class Audit {
-    public id?: number|undefined;
+    public id?: number | undefined;
     public channel: Channel;
     public user: User;
     public type: AuditType;
@@ -99,10 +100,10 @@ class Audit {
             WHERE audits.channel_id = $1 ORDER BY audits.created_at DESC
         `;
         const values = [channel.twitchId];
-    
+
         try {
             const result = await Database.query(query, values);
-    
+
             const audits: AuditDTO[] = result.rows.map((row: any) => {
                 return new AuditDTO({
                     id: row.id,
@@ -114,15 +115,13 @@ class Audit {
                     createdAt: row.created_at
                 });
             });
-    
+
             return audits;
         } catch (error) {
             console.error("Error retrieving audits:", error);
             return null;
         }
     }
-    
-    
 }
 
 export default Audit;

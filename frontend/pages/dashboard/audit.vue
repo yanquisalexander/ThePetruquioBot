@@ -1,11 +1,6 @@
 <template>
   <div class="mx-auto md:px-4 mb-16">
-    <UAlert
-      color="violet"
-      icon="i-mdi-shield-check-outline"
-      variant="soft"
-      title="¡Nos importa tu seguridad!"
-    >
+    <UAlert color="violet" icon="i-mdi-shield-check-outline" variant="soft" title="¡Nos importa tu seguridad!">
       <template #description>
         <p>
           Los registros de auditoría son una herramienta que te permite conocer las acciones que se realizan en tu
@@ -18,57 +13,31 @@
         {{ $t('audit.title') }}
       </h2>
     </div>
-    <UBreadcrumb
-      :links="breadcrum"
-      class="mt-2 mx-auto"
-    />
+    <UBreadcrumb :links="breadcrum" class="mt-2 mx-auto" />
     <div class="flex py-3.5 w-full">
-      <UInput
-        v-model="search"
-        :placeholder="$t('audit.search')"
-        size="lg"
-        leading-icon="i-heroicons-magnifying-glass-20-solid"
-      />
+      <UInput v-model="search" :placeholder="$t('audit.search')" size="lg"
+        leading-icon="i-heroicons-magnifying-glass-20-solid" />
       <div class="flex-grow" />
     </div>
-    <UTable
-      :rows="displayedAudits"
-      :columns="[
-        { label: 'Fecha', key: 'createdAt' },
-        { label: 'Usuario', key: 'user' },
-        { label: 'Acción', key: 'type' },
-        { label: 'Acciones', key: 'actions', sortable: false },
-      ]"
-      class="border-[1px] border-gray-300 border-solid rounded-md mt-2 mx-auto"
-      sort-asc-icon="i-heroicons-arrow-up-20-solid"
-      sort-desc-icon="i-heroicons-arrow-down-20-solid"
-      :sort-button="{ icon: 'i-heroicons-sparkles-20-solid', color: 'primary', variant: 'outline', size: '2xs', square: false, ui: { rounded: 'rounded-full' } }"
-    >
+    <UTable :rows="displayedAudits" :columns="[
+      { label: 'Fecha', key: 'createdAt' },
+      { label: 'Usuario', key: 'user' },
+      { label: 'Acción', key: 'type' },
+      { label: 'Acciones', key: 'actions', sortable: false },
+    ]" class="border-[1px] border-gray-300 border-solid rounded-md mt-2 mx-auto"
+      sort-asc-icon="i-heroicons-arrow-up-20-solid" sort-desc-icon="i-heroicons-arrow-down-20-solid"
+      :sort-button="{ icon: 'i-heroicons-sparkles-20-solid', color: 'primary', variant: 'outline', size: '2xs', square: false, ui: { rounded: 'rounded-full' } }">
       <template #user-data="{ row }">
         <div class="flex items-center space-x-2">
           <div class="flex-shrink-0">
-            <UAvatar
-              :src="row.avatar"
-              size="sm"
-            />
+            <UAvatar :src="row.avatar" size="sm" />
           </div>
           <div class="flex-grow flex-col flex">
             <span>{{ row.displayName || row.username }}</span>
             <span v-if="row.username === 'petruquiolive'">
-              <UTooltip
-                text="This is a System Account"
-                placement="top"
-              >
-                <UBadge
-                  color="primary"
-                  variant="soft"
-                  class="text-xs"
-                >
-                  <UIcon
-                    name="i-mdi-shield-check-outline"
-                    size="xs"
-                    class="mr-1"
-                  />
+              <UTooltip text="This is a System Account" placement="top">
+                <UBadge color="primary" variant="soft" class="text-xs">
+                  <UIcon name="i-mdi-shield-check-outline" size="xs" class="mr-1" />
                   System
                 </UBadge>
               </UTooltip>
@@ -81,17 +50,8 @@
       </template>
       <template #actions-data="{ row }">
         <div class="flex space-x-2">
-          <UTooltip
-            text="Ver detalles"
-            placement="top"
-          >
-            <UButton
-              color="primary"
-              variant="soft"
-              icon
-              leading-icon="i-mdi-eye-outline"
-              @click="showAudit(row)"
-            >
+          <UTooltip text="Ver detalles" placement="top">
+            <UButton color="primary" variant="soft" icon leading-icon="i-mdi-eye-outline" @click="showAudit(row)">
               Ver detalles
             </UButton>
           </UTooltip>
@@ -100,14 +60,9 @@
       <template #type-data="{ row }">
         <div class="flex items-center space-x-2">
           <div class="flex-shrink-0">
-            <div
-              class="flex items-center justify-center w-8 h-8 rounded-full"
-              :class="renderActionIcon(row.type).colorClass"
-            >
-              <component
-                :is="renderActionIcon(row.type).icon"
-                :size="20"
-              />
+            <div class="flex items-center justify-center w-8 h-8 rounded-full"
+              :class="renderActionIcon(row.type).colorClass">
+              <UIcon :name="renderActionIcon(row.type).icon" size="sm" class="text-lg" />
             </div>
           </div>
 
@@ -115,16 +70,10 @@
             <span>
               {{ $t(`audit.actions.${row.type}`) }}
             </span>
-            <p
-              v-if="row.type === 'IMPERSONATED_BY_ADMIN'"
-              class="text-xs text-gray-700"
-            >
+            <p v-if="row.type === 'IMPERSONATED_BY_ADMIN'" class="text-xs text-gray-700">
               Admins can impersonate users to help them with their issues.
             </p>
-            <p
-              v-if="row.type === 'TOKEN_REFRESHED_BY_SYSTEM'"
-              class="text-xs text-gray-700"
-            >
+            <p v-if="row.type === 'TOKEN_REFRESHED_BY_SYSTEM'" class="text-xs text-gray-700">
               To prevent losing access to Twitch API, we automatically refresh your token.
             </p>
           </div>
@@ -132,11 +81,7 @@
       </template>
     </UTable>
     <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination
-        v-model="auditsCurrentPage"
-        :total="filteredAudits.length"
-        page-count="8"
-      />
+      <UPagination v-model="auditsCurrentPage" :total="filteredAudits.length" page-count="8" />
     </div>
     <UModal v-model="auditDetailsModal">
       <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
@@ -171,16 +116,12 @@
             Detalles
           </div>
           <pre class="text-sm font-medium text-gray-700 overflow-x-auto">
-                        {{ JSON.stringify(selectedAudit.data, null, 2) }}
-                    </pre>
+        {{ JSON.stringify(selectedAudit.data, null, 2) }}
+      </pre>
         </div>
         <template #footer>
           <div class="flex justify-end space-x-2">
-            <UButton
-              color="primary"
-              variant="soft"
-              @click="auditDetailsModal = false"
-            >
+            <UButton color="primary" variant="soft" @click="auditDetailsModal = false">
               Cerrar
             </UButton>
           </div>
@@ -189,10 +130,9 @@
     </UModal>
   </div>
 </template>
-  
+
 <script setup>
 import { useI18n } from "vue-i18n";
-import { WrenchIcon } from 'lucide-vue-next';
 import { ShieldCheckIcon, KeyRoundIcon, ArrowUpDownIcon } from 'lucide-vue-next';
 const { $moment } = useNuxtApp();
 const toast = useToast();
@@ -202,16 +142,16 @@ const i18n = useI18n();
 
 
 const breadcrum = ref([
-    {
-        label: 'Dashboard',
-        icon: 'i-mdi-view-dashboard-outline',
-        to: '/dashboard'
-    },
-    {
-        label: 'Auditoría',
-        icon: 'i-mdi-shield-check-outline',
-        to: '/dashboard/audit',
-    },
+  {
+    label: 'Dashboard',
+    icon: 'i-mdi-view-dashboard-outline',
+    to: '/dashboard'
+  },
+  {
+    label: 'Auditoría',
+    icon: 'i-mdi-shield-check-outline',
+    to: '/dashboard/audit',
+  },
 ])
 
 const auditories = ref([])
@@ -222,87 +162,86 @@ const selectedAudit = ref(null);
 const auditDetailsModal = ref(false);
 
 const renderActionIcon = (action) => {
-    switch (action) {
-        case 'SETTING_UPDATED':
-            return {
-                icon: WrenchIcon,
-                colorClass: 'text-yellow-600 bg-yellow-100',
-            };
-        case 'IMPERSONATED_BY_ADMIN':
-            return {
-                icon: ShieldCheckIcon,
-                colorClass: 'text-green-600 bg-green-100',
-            };
-        case 'LOGIN_SUCCESS':
-            return {
-                icon: KeyRoundIcon,
-                colorClass: 'text-green-600 bg-green-100',
-            };
-        case 'SOME_OTHER_ACTION':
-            return {
-                icon: SomeOtherIcon,
-                colorClass: 'text-red-600 bg-red-100',
-            };
-        case 'TOKEN_REFRESHED_BY_SYSTEM':
-            return {
-                icon: ArrowUpDownIcon,
-                colorClass: 'text-blue-600 bg-blue-100',
-            };
-        // Agregar más casos según las acciones y los íconos y colores correspondientes
-        default:
-            return {
-                icon: null, // O el ícono por defecto que desees utilizar
-                colorClass: 'text-gray-100 bg-gray-500',
-            };
-    }
+  switch (action) {
+    case 'SETTING_UPDATED':
+      return {
+        icon: 'i-lucide-wrench',
+        colorClass: 'text-yellow-600 bg-yellow-100',
+      };
+    case 'IMPERSONATED_BY_ADMIN':
+      return {
+        icon: 'i-lucide-shield-check',
+        colorClass: 'text-green-600 bg-green-100',
+      };
+    case 'LOGIN_SUCCESS':
+      return {
+        icon: 'i-lucide-key-round',
+        colorClass: 'text-green-600 bg-green-100',
+      };
+    case 'TOKEN_REFRESHED_BY_SYSTEM':
+      return {
+        icon: 'i-lucide-arrow-up-down',
+        colorClass: 'text-blue-600 bg-blue-100',
+      };
+    case 'API_TOKEN_GENERATED':
+      return {
+        icon: 'i-lucide-key-round',
+        colorClass: 'text-blue-600 bg-blue-100',
+      };
+    // Agregar más casos según las acciones y los íconos y colores correspondientes
+    default:
+      return {
+        icon: 'i-lucide-question-mark-circle',
+        colorClass: 'text-gray-100 bg-gray-500',
+      };
+  }
 };
 
 const showAudit = (audit) => {
-    selectedAudit.value = audit
-    auditDetailsModal.value = true
+  selectedAudit.value = audit
+  auditDetailsModal.value = true
 }
 
 
 definePageMeta({
-    middleware: 'auth',
-    layout: 'dashboard',
+  middleware: 'auth',
+  layout: 'dashboard',
 })
 
 useHead({
-    title: i18n.t('audit.title'),
+  title: i18n.t('audit.title'),
 })
 
 const fetchAudits = async () => {
-    try {
-        const response = await useFetch(`${API_ENDPOINT}/audits`, {
-            headers: {
-                Authorization: `Bearer ${currentUser.getToken()}`,
-            }
-        })
-        auditories.value = response.data.value.data.audits
-    } catch (error) {
-        console.log(error)
-        toast.add({
-            color: 'red',
-            title: 'Error fetching audits',
-            description: error.message,
-        });
-    }
+  try {
+    const response = await useFetch(`${API_ENDPOINT}/audits`, {
+      headers: {
+        Authorization: `Bearer ${currentUser.getToken()}`,
+      }
+    })
+    auditories.value = response.data.value.data.audits
+  } catch (error) {
+    console.log(error)
+    toast.add({
+      color: 'red',
+      title: 'Error fetching audits',
+      description: error.message,
+    });
+  }
 }
 
 const filteredAudits = computed(() => {
-    return auditories.value.filter((audit) => {
-        return audit.username.toLowerCase().includes(search.value.toLowerCase()) ||
-            audit.type.toLowerCase().includes(search.value.toLowerCase())
-    })
+  return auditories.value.filter((audit) => {
+    return audit.username.toLowerCase().includes(search.value.toLowerCase()) ||
+      audit.type.toLowerCase().includes(search.value.toLowerCase())
+  })
 })
 
 const displayedAudits = computed(() => {
-    return filteredAudits.value.slice((auditsCurrentPage.value - 1) * 8, auditsCurrentPage.value * 8)
+  return filteredAudits.value.slice((auditsCurrentPage.value - 1) * 8, auditsCurrentPage.value * 8)
 });
 
 await fetchAudits()
 
 
 </script>
-  
