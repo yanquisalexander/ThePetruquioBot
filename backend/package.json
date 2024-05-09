@@ -51,6 +51,7 @@
     "google-it": "^1.6.4",
     "googleapis": "^122.0.0",
     "ioredis": "^5.3.2",
+    "isolated-vm": "^4.7.2",
     "jsonwebtoken": "^9.0.1",
     "lemonsqueezy.ts": "^0.1.7",
     "lodash-es": "^4.17.21",
