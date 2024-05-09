@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { defineStore } from 'pinia';
+import { useLocalStorage } from "@vueuse/core";
 
 interface StreamManagerConfig {
     showStreamPreview: boolean;
@@ -9,43 +10,14 @@ const defaultConfig: StreamManagerConfig = {
     showStreamPreview: true,
 };
 
-export const useStreamManagerStore = defineStore({
-    id: 'stream-manager',
-    state: () => ({
-        config: { ...defaultConfig },
-    }),
-    getters: {
-        configuration: (state) => state.config,
-    },
-    actions: {
-        initializeConfigFromLocalStorage() {
-            const localStorageValue = localStorage.getItem('sm-config');
-            try {
-                const parsedLocalStorage = JSON.parse(localStorageValue || '{}');
-                console.log('Parsed localStorage:', parsedLocalStorage);
-
-                this.config = { ...this.config, ...parsedLocalStorage };
-            } catch (error) {
-                console.error('Error parsing localStorage value:', error);
-                this.config = { ...defaultConfig, ...this.config };
-            }
-        },
-        saveConfigToLocalStorage() {
-            console.log('Saving config to localStorage', this.config);
-            localStorage.setItem('sm-config', JSON.stringify(this.config));
-            console.log('Saved to localStorage');
-        },
-        updateConfig(newConfig: Partial<StreamManagerConfig>) {
-            console.log('Updating config', newConfig);
-            this.config = { ...this.config, ...newConfig };
-            this.saveConfigToLocalStorage();
-        },
-    },
-});
 
 export const useStreamManager = () => {
     const toast = useToast();
     const client = useAuthenticatedRequest();
+    const currentConfig = ref<StreamManagerConfig>({
+        ...defaultConfig,
+        ...useLocalStorage('sm-config', defaultConfig).value
+    })
 
 
     const getStream = async () => {
@@ -91,15 +63,30 @@ export const useStreamManager = () => {
     }
 
 
+    const configuration = computed({
+        get: () => currentConfig.value,
+        set: (value: Partial<StreamManagerConfig>) => {
+            currentConfig.value = {
+                ...currentConfig.value,
+                ...value
+            }
+            useLocalStorage('sm-config', currentConfig.value);
+        }
+    })
 
-    const { updateConfig, configuration } = useStreamManagerStore();
+
+    watch(configuration, (config) => {
+        console.log('Configuration updated', config);
+    }, { deep: true, immediate: true });
+
+
+
 
 
     return {
         getStream,
         generateClip,
         handleSocketEvent,
-        updateConfig,
         configuration
     }
 }

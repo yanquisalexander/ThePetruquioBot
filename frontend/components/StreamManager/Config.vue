@@ -19,7 +19,7 @@
                     <UButton @click="emit('close')" color="gray" variant="soft">
                         Cerrar
                     </UButton>
-                    <UButton @click="updateConfig" color="blue" variant="soft" icon="i-lucide-save">
+                    <UButton color="blue" variant="soft" icon="i-lucide-save">
                         Guardar
                     </UButton>
                 </div>
@@ -31,9 +31,9 @@
 <script lang="ts" setup>
 const emit = defineEmits(['close'])
 
-const { updateConfig, configuration } = useStreamManager()
+const { configuration } = useStreamManager()
 
 const handleConfigChange = (key: string, value: any) => {
-    updateConfig({ [key]: value })
+    (configuration.value as Record<string, any>)[key] = value
 }
 </script>

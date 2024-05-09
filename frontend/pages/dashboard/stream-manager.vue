@@ -11,14 +11,16 @@
                     </div>
                 </template>
 
+                {{ configuration }}
+
 
                 <div class="grid">
                     <div class="grid md:grid-cols-12 gap-4">
                         <div class="col-span-12 o-2">
                             <ClientOnly>
                                 <Splitpanes>
-                                    <Pane size="50%" min-size="30">
-                                        <LazyStreamManagerPreview v-if="configuration.showStreamPreview" />
+                                    <Pane size="50%" min-size="30" v-if="configuration.showStreamPreview">
+                                        <LazyStreamManagerPreview />
                                     </Pane>
                                     <Pane min-size="30">
                                         <LazyStreamManagerChat />
@@ -54,7 +56,6 @@ const { rawUser } = useCurrentUser()
 const sidebar = useSidebar()
 const toast = useToast()
 const { getStream, handleSocketEvent, configuration } = useStreamManager()
-const { initializeConfigFromLocalStorage } = useStreamManagerStore()
 
 
 const streamData = ref(null)
@@ -114,7 +115,6 @@ onMounted(async () => {
             timeout: 15000
         })
     }
-    initializeConfigFromLocalStorage()
     connectSocket()
 
 })
