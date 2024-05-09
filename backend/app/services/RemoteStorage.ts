@@ -31,7 +31,7 @@ class RemoteStorageService {
             key: Key,
             mimetype: file.mimetype,
             filename: file.originalname,
-            path: `https://cdn.petruquio.live/${folder}/${file.originalname}`,
+            path: folder + '/' + file.originalname,
             size: file.size,
             uploaded_at: new Date(),
             uploaded_by: user.twitchId
