@@ -11,7 +11,7 @@ import { Configuration } from '../config'
 const { EmoteFetcher, EmoteParser } = TwitchEmoticons
 
 class Twitch {
-  constructor () {
+  constructor() {
     throw new Error('This class cannot be instantiated')
   }
 
@@ -21,7 +21,7 @@ class Twitch {
   public static EmoteFetcher: EmoteFetcher
   public static firstLiveStreamsCheck: boolean = true
 
-  public static async initialize (): Promise<void> {
+  public static async initialize(): Promise<void> {
     this.Helix = new ApiClient({
       authProvider: TwitchAuthenticator.RefreshingAuthProvider
     })
@@ -37,7 +37,7 @@ class Twitch {
     console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Twitch API initialized.'))
   }
 
-  public static async isChannelLive (channelName: string): Promise<boolean> {
+  public static async isChannelLive(channelName: string): Promise<boolean> {
     const user = await this.Helix.users.getUserByName(channelName)
     if (!user) {
       throw new Error(`User ${channelName} not found.`)
@@ -46,7 +46,7 @@ class Twitch {
     return stream !== null
   }
 
-  public static async shoutout (fromChannel: Channel, targetChannel: HelixUser): Promise<void> {
+  public static async shoutout(fromChannel: Channel, targetChannel: HelixUser): Promise<void> {
     const moderator = await this.Helix.users.getUserByName(Bot.username)
 
     if (!moderator) {
@@ -62,12 +62,12 @@ class Twitch {
     }
   }
 
-  public static async getUser (username: string): Promise<HelixUser | null> {
+  public static async getUser(username: string): Promise<HelixUser | null> {
     const user = await this.Helix.users.getUserByName(username)
     return user
   }
 
-  public static async getLiveChannels (channelList: string[]): Promise<HelixUser[]> {
+  public static async getLiveChannels(channelList: string[]): Promise<HelixUser[]> {
     if (channelList.length === 0) {
       return []
     }
@@ -96,7 +96,7 @@ class Twitch {
     return liveChannels
   }
 
-  public static async getUsersByList (userList: string[]): Promise<HelixUser[]> {
+  public static async getUsersByList(userList: string[]): Promise<HelixUser[]> {
     try {
       const users = await this.Helix.users.getUsersByNames(userList)
       return users
@@ -106,7 +106,7 @@ class Twitch {
     }
   }
 
-  public static async checkLiveChannels (): Promise<void> {
+  public static async checkLiveChannels(): Promise<void> {
     try {
       const bot = await Bot.getInstance()
       let channels: string[] = []
@@ -115,6 +115,7 @@ class Twitch {
         this.firstLiveStreamsCheck = false
       } else {
         channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''))
+        channels = [...channels, ...MemoryVariables.getLiveChannels().map(channel => channel.userName)]
       }
       const currentLive = await this.getLiveChannels(channels)
 
@@ -154,7 +155,7 @@ class Twitch {
     }
   }
 
-  public static async initializeLiveMonitor (): Promise<void> {
+  public static async initializeLiveMonitor(): Promise<void> {
     await this.checkLiveChannels() // Check live channels on startup
     cron.schedule('*/2 * * * *', async () => {
       console.log(chalk.blue('[TWITCH MODULE]'), chalk.white('Checking live channels...'))
@@ -166,7 +167,7 @@ class Twitch {
     })
   }
 
-  public static async parseEmotes (channel: Channel, message: string, userstate: ChatUserstate, isMapPin?: boolean): Promise<string> {
+  public static async parseEmotes(channel: Channel, message: string, userstate: ChatUserstate, isMapPin?: boolean): Promise<string> {
     let parsedMessage = message // Inicializa con el mensaje original
     const userStateEmotes = userstate.emotes
 
@@ -224,7 +225,7 @@ class Twitch {
     return parsedMessage
   }
 
-  public static async sendAnnouncement (channel: Channel, message: string, color?: string): Promise<void> {
+  public static async sendAnnouncement(channel: Channel, message: string, color?: string): Promise<void> {
     try {
       const moderator = await this.Helix.users.getUserByName(Bot.username)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
