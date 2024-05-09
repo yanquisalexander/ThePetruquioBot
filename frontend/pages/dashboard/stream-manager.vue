@@ -11,9 +11,6 @@
                     </div>
                 </template>
 
-                {{ configuration }}
-
-
                 <div class="grid">
                     <div class="grid md:grid-cols-12 gap-4">
                         <div class="col-span-12 o-2">
