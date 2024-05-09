@@ -1,9 +1,6 @@
 <template>
-  <div
-    id="HOMEPAGE"
-    class="w-full"
-  >
-    <HomeHero :stats="stats.data" />
+  <div id="HOMEPAGE" class="w-full">
+    <HomeHero v-if="stats" :stats="stats" />
     <LazyHomeFeatures />
     <HomeKawaiiTextMarquee />
     <!--     <HomeStreamersUsing />
@@ -13,7 +10,9 @@
 
 <script lang="ts" setup>
 
-const { data: stats } = useFetch<any>(`${API_ENDPOINT}/stats`)
+const { data } = await fetch(`${API_ENDPOINT}/stats`).then(res => res.json())
+const stats = ref(data)
+
 
 useHead({
   title: 'Home'

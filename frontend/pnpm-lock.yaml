@@ -107,6 +107,9 @@ importers:
       socket.io-client:
         specifier: 2.3.0
         version: 2.3.0
+      splitpanes:
+        specifier: ^3.1.5
+        version: 3.1.5
       tailwind-merge:
         specifier: ^2.2.0
         version: 2.3.0

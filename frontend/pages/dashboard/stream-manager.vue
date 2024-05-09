@@ -14,12 +14,19 @@
 
                 <div class="grid">
                     <div class="grid md:grid-cols-12 gap-4">
-                        <!-- Esto va a la izquierda -->
-                        <LazyStreamManagerPreview v-if="configuration.showStreamPreview" />
-                        <!-- Esto va a la derecha -->
-                        <div class="md:col-span-4">
-                            <LazyStreamManagerChat />
+                        <div class="col-span-12 o-2">
+                            <ClientOnly>
+                                <Splitpanes>
+                                    <Pane size="50%" min-size="30">
+                                        <LazyStreamManagerPreview v-if="configuration.showStreamPreview" />
+                                    </Pane>
+                                    <Pane min-size="30">
+                                        <LazyStreamManagerChat />
+                                    </Pane>
+                                </Splitpanes>
+                            </ClientOnly>
                         </div>
+
                         <LazyStreamManagerSonglist v-if="streamData?.data?.songlist" class="md:col-span-5"
                             :songlistUserId="streamData.data.songlist.id" />
 
@@ -39,6 +46,9 @@
 
 <script lang="ts" setup>
 import io from 'socket.io-client'
+// @ts-ignore
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 
 const { rawUser } = useCurrentUser()
 const sidebar = useSidebar()
@@ -125,3 +135,43 @@ onUnmounted(() => {
 
 
 </script>
+
+
+<style>
+.splitpanes__pane {
+    width: 100%;
+    height: 100%;
+    padding: 1px;
+}
+
+.splitpanes--vertical>.splitpanes__splitter {
+    min-width: 1px;
+    cursor: col-resize;
+    box-sizing: border-box;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.splitpanes__splitter:before,
+.splitpanes__splitter:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: #00000026;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 30px;
+
+}
+
+.splitpanes--vertical>.splitpanes__splitter:before {
+    margin-left: -2px;
+}
+
+.splitpanes--vertical>.splitpanes__splitter:after {
+    margin-left: 2px;
+}
+</style>

@@ -151,7 +151,7 @@
 
       </div>
       <div v-else class="flex justify-center items-center w-2/4 mx-auto mt-6">
-        <v-progress-circular indeterminate color="blue"></v-progress-circular>
+        <UProgress indeterminate color="blue" />
       </div>
     </div>
     <div class="fixed bottom-0 right-0 mb-4 mr-4 bg-black rounded-full p-2 px-3 cursor-pointer" @click="updateStats">
