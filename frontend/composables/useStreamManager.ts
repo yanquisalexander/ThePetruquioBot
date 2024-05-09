@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { defineStore } from 'pinia';
-import { useLocalStorage } from "@vueuse/core";
+import { useStorage } from "@vueuse/core";
 
 interface StreamManagerConfig {
     showStreamPreview: boolean;
@@ -14,9 +14,8 @@ const defaultConfig: StreamManagerConfig = {
 export const useStreamManager = () => {
     const toast = useToast();
     const client = useAuthenticatedRequest();
-    const currentConfig = ref<StreamManagerConfig>({
-        ...defaultConfig,
-        ...useLocalStorage('sm-config', defaultConfig).value
+    const currentConfig = useStorage('sm-config', defaultConfig, null, {
+        mergeDefaults: true
     })
 
 
@@ -62,15 +61,18 @@ export const useStreamManager = () => {
         }
     }
 
+    const updateConfiguration = (config: Partial<StreamManagerConfig>) => {
+        currentConfig.value = {
+            ...currentConfig.value,
+            ...config
+        }
+    }
+
 
     const configuration = computed({
         get: () => currentConfig.value,
         set: (value: Partial<StreamManagerConfig>) => {
-            currentConfig.value = {
-                ...currentConfig.value,
-                ...value
-            }
-            useLocalStorage('sm-config', currentConfig.value);
+            updateConfiguration(value);
         }
     })
 
