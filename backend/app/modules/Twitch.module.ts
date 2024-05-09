@@ -108,52 +108,53 @@ class Twitch {
 
   public static async checkLiveChannels(): Promise<void> {
     try {
-      const bot = await Bot.getInstance()
-      let channels: string[] = []
+      const bot = await Bot.getInstance();
+      let channels: Set<string> = new Set();
+
       if (this.firstLiveStreamsCheck) {
-        channels = (await Channel.getAutoJoinChannels()).map(channel => channel.user.username)
-        this.firstLiveStreamsCheck = false
+        (await Channel.getAutoJoinChannels()).forEach(channel => channels.add(channel.user.username));
+        this.firstLiveStreamsCheck = false;
       } else {
-        channels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''))
-        channels = [...channels, ...MemoryVariables.getLiveChannels().map(channel => channel.userName)]
+        const botChannels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
+        const memoryChannels = new Set(MemoryVariables.getLiveChannels().map(channel => channel.userName));
+        channels = new Set([...botChannels, ...memoryChannels]);
       }
-      const currentLive = await this.getLiveChannels(channels)
 
-      const currentLiveChannels: HelixStream[] = []
+      const currentLive = await this.getLiveChannels(Array.from(channels));
 
-      // Utiliza Promise.all para esperar a que todas las solicitudes asíncronas se completen
-      await Promise.all(
-        currentLive.map(async user => {
-          try {
-            const liveStream = await user.getStream()
-            if (liveStream) {
-              currentLiveChannels.push(liveStream)
-            }
-          } catch (error) {
-            console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${(error as Error).message}`))
+      const currentLiveChannels: Set<HelixStream> = new Set();
+
+      for (const user of currentLive) {
+        try {
+          const liveStream = await user.getStream();
+          if (liveStream) {
+            currentLiveChannels.add(liveStream);
           }
-        })
-      )
+        } catch (error) {
+          console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${(error as Error).message}`));
+        }
+      }
 
-      const previousLiveChannels = MemoryVariables.getLiveChannels()
+      const previousLiveChannels = new Set(MemoryVariables.getLiveChannels());
 
-      const newLiveChannels = currentLiveChannels.filter(channel => !previousLiveChannels.some(prevChannel => prevChannel.userName === channel.userName))
-      const offlineChannels = previousLiveChannels.filter(prevChannel => !currentLiveChannels.some(channel => channel.userName === prevChannel.userName))
+      const newLiveChannels = Array.from(currentLiveChannels).filter(channel => !previousLiveChannels.has(channel));
+      const offlineChannels = Array.from(previousLiveChannels).filter(prevChannel => !currentLiveChannels.has(prevChannel));
 
       if (newLiveChannels.length > 0) {
-        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`))
+        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
       }
 
       if (offlineChannels.length > 0) {
-        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New offline channels: ${offlineChannels.map(channel => channel.userName).join(', ')}`))
+        console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New offline channels: ${offlineChannels.map(channel => channel.userName).join(', ')}`));
       }
 
-      MemoryVariables.setLastLiveStreamsCheck(new Date())
-      MemoryVariables.setLiveChannels(currentLiveChannels)
+      MemoryVariables.setLastLiveStreamsCheck(new Date());
+      MemoryVariables.setLiveChannels(Array.from(currentLiveChannels));
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
+
 
   public static async initializeLiveMonitor(): Promise<void> {
     await this.checkLiveChannels() // Check live channels on startup
