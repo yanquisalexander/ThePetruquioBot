@@ -30,7 +30,7 @@
         color="gray"
         variant="ghost"
         icon
-        leading-icon="i-mdi-file-document-multiple"
+        leading-icon="i-lucide-file-code"
         @click="fetchLogs"
       >
         Ver logs

@@ -223,10 +223,12 @@ class Utils {
       /*       if (os.platform() === 'win32') {
         filePath = `file:///${filePath}`
       } */
+      // Convert path to URL
       const module = await import(filePath)
       return module
     } catch (error) {
       console.error('Error al importar el módulo:', error)
+      console.error('Ruta del archivo:', filePath)
       return null
     }
   }

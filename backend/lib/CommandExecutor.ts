@@ -8,9 +8,8 @@ import TranslatorModule from '../app/modules/Translator.module'
 import path from 'path'
 import Utils from './Utils'
 
-async function importCommandModules (): Promise<Command[]> {
-  const appRoot = path.resolve(__dirname, '..')
-  const commandsDirectory = path.join(appRoot, 'app', 'commands')
+async function importCommandModules(): Promise<Command[]> {
+  const commandsDirectory = path.join('app', 'commands')
   const commandFiles = await getCommandFiles(commandsDirectory)
 
   const commandModules: Command[] = []
@@ -25,7 +24,7 @@ async function importCommandModules (): Promise<Command[]> {
   return commandModules
 }
 
-async function getCommandFiles (directoryPath: string): Promise<string[]> {
+async function getCommandFiles(directoryPath: string): Promise<string[]> {
   try {
     const files = await fs.readdir(directoryPath)
     return files
@@ -40,7 +39,7 @@ const cooldowns = new Map()
 class CommandExecutor {
   private systemCommands: Command[] = []
   private static instance: CommandExecutor | null = null
-  constructor () {
+  constructor() {
     this.loadCommands().then((commands) => {
       this.systemCommands = commands
     }).catch((error) => {
@@ -48,19 +47,19 @@ class CommandExecutor {
     })
   }
 
-  public static getInstance (): CommandExecutor {
+  public static getInstance(): CommandExecutor {
     if (this.instance === null) {
       this.instance = new CommandExecutor()
     }
     return this.instance
   }
 
-  public static initialize (): void {
+  public static initialize(): void {
     this.getInstance()
     console.log(chalk.green('[COMMAND EXECUTOR]'), chalk.white('Initialized.'))
   }
 
-  async loadCommands (): Promise<Command[]> {
+  async loadCommands(): Promise<Command[]> {
     const systemCommandsArray = await importCommandModules()
     const commands = []
 
@@ -83,12 +82,12 @@ class CommandExecutor {
     return commands
   }
 
-  private getSystemCommand (commandName: string): Command | undefined {
+  private getSystemCommand(commandName: string): Command | undefined {
     return this.systemCommands.find((command) => command.getName() === commandName)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  public async executeCommand (user: ChatUser, commandName: string, args: string[], channelData: Channel, bot: Bot): Promise<string | void> {
+  public async executeCommand(user: ChatUser, commandName: string, args: string[], channelData: Channel, bot: Bot): Promise<string | void> {
     const systemCommand = this.getSystemCommand(commandName)
 
     if (systemCommand) {
@@ -142,7 +141,7 @@ class CommandExecutor {
     }
   }
 
-  private checkUserPermissions (user: ChatUser, command: Command): boolean {
+  private checkUserPermissions(user: ChatUser, command: Command): boolean {
     if (!user) {
       return false
     }
@@ -180,7 +179,7 @@ class CommandExecutor {
     return false
   }
 
-  private checkCooldowns (user: ChatUser, command: Command, channel: Channel): boolean {
+  private checkCooldowns(user: ChatUser, command: Command, channel: Channel): boolean {
     if (!cooldowns.has(channel.user.username)) {
       cooldowns.set(channel.user.username, new Map())
     }
