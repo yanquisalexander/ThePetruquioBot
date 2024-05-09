@@ -95,7 +95,7 @@
                       </div>
                       <div class="metadata p-2 space-x-2">
                         <span class="tag bg-green-600 text-white py-1 px-2 rounded-full text-xs">{{ channel.game_name
-                        }}</span>
+                          }}</span>
                         <span class="tag bg-purple text-white py-1 px-2 rounded-full text-xs">{{ channel.viewers }}
                           espectadores</span>
                       </div>
@@ -128,35 +128,35 @@
             </div>
           </div>
           <ul class="mt-2 flex flex-col md:flex-row md:flex-wrap">
-            <div v-for="(c, index) in joinedChannels" :key="c.username" class="flex flex-col md:flex-row md:items-center">
+            <div v-for="(c, index) in joinedChannels" :key="c.username"
+              class="flex flex-col md:flex-row md:items-center">
 
               <li
                 class="flex cursor-pointer font-gabarito items-center mx-2 my-1 hover:bg-gray-100 transition-all duration-150 hover:text-blue-500 rounded-full px-2 py-1">
-                      <a :href="`https://www.twitch.tv/${c.username}`" target="_blank" class="flex items-center">
-                        <div class="user flex items-center">
-                          <img :src="c.profile_image_url" class="w-8 h-8 rounded-full" />
-                          <div class="flex flex-col">
-                            <span class="ml-2">{{ c.display_name }}</span>
-                            <span v-if="liveChannels.find(lc => lc.username === c.username)"
-                              class="ml-2 text-xs text-green-500">
-                              <VideoIcon class="w-4 h-4 inline-block" />
-                              En directo
-                            </span>
-                            <span v-if="c.username === 'petruquiolive'"
-                              class="ml-2 text-xs text-blue-500 flex items-center">
-                              <BotIcon class="w-4 h-4 inline-block mr-1" />
-                              Canal del bot
-                            </span>
+                <a :href="`https://www.twitch.tv/${c.username}`" target="_blank" class="flex items-center">
+                  <div class="user flex items-center">
+                    <img :src="c.profile_image_url" class="w-8 h-8 rounded-full" />
+                    <div class="flex flex-col">
+                      <span class="ml-2">{{ c.display_name }}</span>
+                      <span v-if="liveChannels.find(lc => lc.username === c.username)"
+                        class="ml-2 text-xs text-green-500">
+                        <VideoIcon class="w-4 h-4 inline-block" />
+                        En directo
+                      </span>
+                      <span v-if="c.username === 'petruquiolive'" class="ml-2 text-xs text-blue-500 flex items-center">
+                        <BotIcon class="w-4 h-4 inline-block mr-1" />
+                        Canal del bot
+                      </span>
 
-                          </div>
-                        </div>
-                      </a>
-                    <template>
-                      <p>
-                        {{ c.description || `Looks like ${c.display_name} doesn't have a description, but we are sure that
-                        he/she is a great streamer!` }}
-                      </p>
-                    </template>
+                    </div>
+                  </div>
+                </a>
+                <template>
+                  <p>
+                    {{ c.description || `Looks like ${c.display_name} doesn't have a description, but we are sure that
+                    he/she is a great streamer!` }}
+                  </p>
+                </template>
               </li>
               <div class="rounded-full h-1 w-1 bg-gray-300 mx-2 hidden md:block"
                 v-if="!(index === joinedChannels.length - 1)" />
@@ -199,7 +199,7 @@
 
   </div>
 </template>
-  
+
 <script setup>
 import { Clock4Icon } from 'lucide-vue-next';
 import { BotIcon } from 'lucide-vue-next';
@@ -257,7 +257,7 @@ const getBotUptime = () => {
 
 const fetchStats = async () => {
   try {
-    stats.value = (await $fetch(`https://api.petruquio.live/v2/stats?tz=${Intl.DateTimeFormat().resolvedOptions().timeZone}`));
+    stats.value = (await $fetch(`${API_ENDPOINT}/stats?tz=${Intl.DateTimeFormat().resolvedOptions().timeZone}`));
     stats.value = stats.value.data;
     joinedChannels.value = stats.value.channels;
     liveChannels.value = stats.value.live_channels;
@@ -348,4 +348,3 @@ useHead({
 })
 
 </script>
-  

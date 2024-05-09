@@ -222,7 +222,35 @@ class Redemption {
       throw new Error((error as Error).message);
     }
   }
-  
+
+  static async getLast30Days(timezone?: string): Promise<any[]> {
+    if (!timezone || timezone === '') {
+      timezone = 'UTC';
+    }
+    try {
+      const query = `
+      SELECT
+      DATE_TRUNC('day', redemption_date AT TIME ZONE $1) AS day,
+      CAST(COUNT(*) AS INT) AS redemption_count
+  FROM
+      redemption_history
+  WHERE
+      redemption_date >= CURRENT_TIMESTAMP AT TIME ZONE $1 - INTERVAL '30 days'
+  GROUP BY
+      day
+  ORDER BY
+      day;
+      `;
+
+      const values = [timezone];
+
+      const result = await
+        Database.query(query, values);
+      return result.rows;
+    } catch (error) {
+      throw new Error((error as Error).message);
+    }
+  }
 }
 
 export default Redemption;

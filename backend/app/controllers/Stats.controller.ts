@@ -4,12 +4,10 @@ import { Bot } from "../../bot";
 import MessageLogger from "../models/MessageLogger.model";
 import User from "../models/User.model";
 import Twitch from "../modules/Twitch.module";
+import Redemption from "../models/Redemption.model";
 
 
 class StatsController {
-    constructor() {
-        throw new Error('This class cannot be instantiated');
-    }
 
     public static async getStats(req: Request, res: Response): Promise<Response> {
         // Englobe all the stats in a single endpoint        
@@ -20,7 +18,9 @@ class StatsController {
         const nextUpdateIn = lastUpdated.getTime() + 120000 - Date.now();
         const processedMessages = await MessageLogger.getCount();
         const last30DaysMessageCount = await MessageLogger.getLast30Days(timezone);
+        const last30DaysChannelPointsRedemptions = await Redemption.getLast30Days(timezone);
         const averageMessagesPerDay = last30DaysMessageCount.map(day => day.message_count).reduce((a, b) => a + b, 0) / last30DaysMessageCount.length;
+        const averageRedemptionsPerDay = last30DaysChannelPointsRedemptions.map(day => day.redemption_count).reduce((a, b) => a + b, 0) / last30DaysChannelPointsRedemptions.length;
         const userCount = await User.count();
         return res.status(200).json({
             data: {
@@ -53,11 +53,13 @@ class StatsController {
                 next_update_in: nextUpdateIn,
                 messages: processedMessages,
                 last_30_days_messages: last30DaysMessageCount,
+                last_30_days_channel_points_redemptions: last30DaysChannelPointsRedemptions,
                 average_messages_per_day: averageMessagesPerDay,
+                average_redemptions_per_day: averageRedemptionsPerDay,
                 users: userCount,
                 uptime: Date.now() - new Date(bot.bootedAt()).getTime(),
                 booted_at: bot.bootedAt(),
-                timezone: timezone
+                timezone
             }
         })
     }
