@@ -23,7 +23,7 @@ const initializeApp = async (): Promise<void> => {
   try {
     dotenv.config();
     await initializeServices();
-    console.log(chalk.bgCyan.bold('[APP]'), chalk.white('All services initialized@'));
+    console.log(chalk.bgCyan.bold('[APP]'), chalk.white('All services initialized.'));
   } catch (error) {
     handleAppError(error);
   }
