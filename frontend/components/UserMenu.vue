@@ -3,11 +3,11 @@
     <div v-if="currentUser.isLoggedIn()">
       <!-- Button for current user menu (Dropdown) -->
       <UPopover :popper="{ placement: 'bottom-start', arrow: false }">
-        <button class="bg-transparent cursor-pointer">
-          <div class="text-black rounded-full w-8 h-8 m-0.5">
-            <img :src="currentUser.getAvatar()" :alt="currentUser.getDisplayName()">
-          </div>
-        </button>
+        <UButton class="flex items-center" variant="soft" color="twitch">
+          <UAvatar :src="currentUser.getAvatar()" :alt="currentUser.getDisplayName()" />
+          <span class="hidden md:block ml-2">{{ currentUser.getDisplayName() }}</span>
+        </UButton>
+
         <template #panel>
           <ul class="px-1 py-2 w-48">
             <li class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200">

@@ -146,11 +146,9 @@ const fetchCustomWidget = async () => {
     widget.value = data.widget
     loading.value = false
   } catch (error) {
-
+    console.error(error)
   }
 }
 
-onMounted(async () => {
-  await fetchCustomWidget()
-})
+await fetchCustomWidget()
 </script>
