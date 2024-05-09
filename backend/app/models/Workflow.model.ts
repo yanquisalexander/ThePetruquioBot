@@ -91,6 +91,8 @@ class Workflow {
             } catch (error) {
                 logMessage = message;
             }
+
+            executionLog.push(logMessage);
         });
         jail.setSync('sendMessage', (message: string) => {
             if (typeof message !== 'string') {
