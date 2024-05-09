@@ -103,14 +103,23 @@ class Workflow {
             bot.sendMessage(channel, message);
         });
 
-        const script = await isolate.compileScript(this.script);
+        let script;
 
         try {
-            await script.run(context);
+            script = await isolate.compileScript(this.script);
         } catch (error) {
             console.error(error);
             executionSuccess = false;
             executionLog.push((error as Error).message);
+        }
+
+        try {
+            if (!script) throw new Error('Failed to compile script');
+            await script.run(context);
+        } catch (error) {
+            console.error(error);
+            executionSuccess = false;
+            executionLog.push(`Error: ${(error as Error).message}`);
         } finally {
             executionLog.push('')
             //isolate.wallTime
