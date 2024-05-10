@@ -1,5 +1,10 @@
 export default defineAppConfig({
-    ui: {
-      primary: 'blue'
-    }
-  })
+  ui: {
+    button: {
+      default: {
+        loadingIcon: 'i-lucide-loader'
+      }
+    },
+    primary: 'blue'
+  }
+})
