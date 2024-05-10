@@ -109,36 +109,36 @@ class Twitch {
   public static async checkLiveChannels(): Promise<void> {
     try {
       const bot = await Bot.getInstance();
-      let channels: Set<string> = new Set();
+      let channels: string[] = [];
 
       if (this.firstLiveStreamsCheck) {
-        (await Channel.getAutoJoinChannels()).forEach(channel => channels.add(channel.user.username));
+        (await Channel.getAutoJoinChannels()).forEach(channel => channels.push(channel.user.username));
         this.firstLiveStreamsCheck = false;
       } else {
         const botChannels = bot.getBotClient().getChannels().map(channel => channel.replace('#', ''));
-        const memoryChannels = new Set(MemoryVariables.getLiveChannels().map(channel => channel.userName));
-        channels = new Set([...botChannels, ...memoryChannels]);
+        const memoryChannels = MemoryVariables.getLiveChannels().map(channel => channel.userName);
+        channels = [...botChannels, ...memoryChannels];
       }
 
-      const currentLive = await this.getLiveChannels(Array.from(channels));
+      const currentLive = await this.getLiveChannels(channels);
 
-      const currentLiveChannels: Set<HelixStream> = new Set();
+      const currentLiveChannels: HelixStream[] = [];
 
       for (const user of currentLive) {
         try {
           const liveStream = await user.getStream();
           if (liveStream) {
-            currentLiveChannels.add(liveStream);
+            currentLiveChannels.push(liveStream);
           }
         } catch (error) {
           console.error(chalk.blue('[TWITCH MODULE]'), chalk.white(`Error checking if ${user.displayName} is live: ${(error as Error).message}`));
         }
       }
 
-      const previousLiveChannels = new Set(MemoryVariables.getLiveChannels());
+      const previousLiveChannels = MemoryVariables.getLiveChannels();
 
-      const newLiveChannels = Array.from(currentLiveChannels).filter(channel => !previousLiveChannels.has(channel));
-      const offlineChannels = Array.from(previousLiveChannels).filter(prevChannel => !currentLiveChannels.has(prevChannel));
+      const newLiveChannels = currentLiveChannels.filter(channel => !previousLiveChannels.includes(channel));
+      const offlineChannels = previousLiveChannels.filter(channel => !currentLiveChannels.includes(channel));
 
       if (newLiveChannels.length > 0) {
         console.log(chalk.blue('[TWITCH MODULE]'), chalk.white(`New live channels: ${newLiveChannels.map(channel => channel.userName).join(', ')}`));
@@ -149,11 +149,12 @@ class Twitch {
       }
 
       MemoryVariables.setLastLiveStreamsCheck(new Date());
-      MemoryVariables.setLiveChannels(Array.from(currentLiveChannels));
+      MemoryVariables.setLiveChannels(currentLiveChannels);
     } catch (error) {
       console.error(error);
     }
   }
+
 
 
   public static async initializeLiveMonitor(): Promise<void> {
