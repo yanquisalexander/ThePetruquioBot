@@ -44,7 +44,7 @@
 
     <div v-else>
       <!-- Button for login -->
-      <UButton @click="login" variant="soft" color="twitch" icon="i-fa6-brands-twitch">
+      <UButton @click="login" size="lg" variant="soft" color="twitch" icon="i-fa6-brands-twitch">
         <span>
           Login <span class="hidden md:inline">with Twitch</span>
         </span>
