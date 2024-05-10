@@ -44,7 +44,7 @@
 
     <div v-else>
       <!-- Button for login -->
-      <UButton @click="login" size="lg" variant="soft" color="twitch" icon="i-fa6-brands-twitch">
+      <UButton @click="login" size="lg" variant="soft" color="twitch" icon="i-fa6-brands-twitch" :loading="loadingAuth">
         <span>
           Login <span class="hidden md:inline">with Twitch</span>
         </span>
@@ -57,10 +57,11 @@
 <script lang="ts" setup>
 const { signIn, signOut } = useAuth()
 const currentUser = useCurrentUser()
-
+const loadingAuth = ref(false)
 
 
 const login = async () => {
+  loadingAuth.value = true
   await signIn('twitch')
 }
 </script>
