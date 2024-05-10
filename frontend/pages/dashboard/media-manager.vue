@@ -2,7 +2,7 @@
     <DashboardPageContainer>
         <DashboardPageHeader title="Media Manager" />
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <UCard v-for="upload in uploads" :key="upload.data.id">
                 <div class="flex flex-col items-center space-y-2 grow">
                     <component :is="typeToRender(upload.data.mimetype)" :src="getPath(upload.data.path)" :muted="true"
