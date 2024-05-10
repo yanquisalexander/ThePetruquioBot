@@ -5,8 +5,9 @@
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <UCard v-for="upload in uploads" :key="upload.data.id">
                 <div class="flex flex-col items-center space-y-2 grow">
-                    <component :is="typeToRender(upload.data.mimetype)" :src="upload.data.path" :muted="true" autoplay
-                        :loop="typeToRender(upload.data.mimetype) === 'video'" controls class="h-32 object-cover"
+                    <component :is="typeToRender(upload.data.mimetype)" :src="getPath(upload.data.path)" :muted="true"
+                        autoplay :loop="typeToRender(upload.data.mimetype) === 'video'" controls
+                        class="h-32 object-cover"
                         :class="(typeToRender(upload.data.mimetype) === 'video' || typeToRender(upload.data.mimetype) === 'audio') ? 'w-full' : 'w-32'"
                         :alt="upload.data.filename" />
                     <p class="mt-2 text-sm text-gray-600">{{ upload.data.filename }}</p>
@@ -25,7 +26,12 @@
             </UCard>
         </div>
 
-        <UInput type="file" size="sm" icon="i-heroicons-folder" @change="handleFileUpload" />
+        <div class="mt-4">
+            <UFormGroup label="Subir un archivo">
+                <UInput type="file" size="md" icon="i-heroicons-folder" @change="handleFileUpload" />
+            </UFormGroup>
+        </div>
+
 
     </DashboardPageContainer>
 </template>
@@ -39,16 +45,27 @@ definePageMeta({
     middleware: 'auth'
 })
 
+const getPath = (path: string) => {
+    return "https://cdn.petruquio.live/" + path
+}
+
 useHead({
     title: 'Media Manager'
 })
 
-const handleFileUpload = async (event: Event) => {
-    const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) {
+const handleFileUpload = async (files: File[]) => {
+    const file = files[0]
+    if (!file) return
+
+    try {
         await uploadFile(file)
-        await fetchUploads()
+        const { data } = await fetchUploads()
+        uploads.value = data.uploads
+    } catch (error) {
+        console.error(error)
+
     }
+
 }
 
 const typeToRender = (mimetype: string) => {
@@ -69,6 +86,7 @@ const typeToRender = (mimetype: string) => {
 
 onMounted(async () => {
     const { data } = await fetchUploads()
+    console.log(data)
     uploads.value = data.uploads
 })
 </script>
