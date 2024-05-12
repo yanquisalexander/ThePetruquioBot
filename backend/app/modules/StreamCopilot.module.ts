@@ -1,116 +1,132 @@
-import { OpenAI } from "openai";
-import chalk from "chalk";
-import Twitch from "./Twitch.module";
+import {
+    GoogleGenerativeAI, HarmCategory,
+    HarmBlockThreshold,
+    GenerativeModel,
+    FunctionDeclarationsTool,
+    FunctionDeclarationSchemaType,
+    POSSIBLE_ROLES
+} from '@google/generative-ai'
+import { Configuration } from "../config";
 import Channel from "../models/Channel.model";
 import User from "../models/User.model";
-import axios from "axios";
-import { ChatCompletionTool } from "openai/resources";
 
-const Tools : ChatCompletionTool[] = [
+const MODEL_NAME = "gemini-1.5-pro-latest";
+
+const BASE_SYSTEM_PROMPT = `
+Eres un chatbot de Twitch llamado Petruquio.LIVE, creado por @Alexitoo_UY.
+
+Tu deber es entretener e informar a los usuarios, y ayudar al streamer en cuestión con funciones inteligentes,
+como Cambiar el título, activar modos de chat, cambiar de juego, etc.
+
+Puedes usar emojis, mencionar a usuarios, y hacer preguntas a la audiencia.
+`
+
+/* function_declarations: [
     {
-      type: "function",
-      function: {
-        name: "get_current_weather",
-        description: "Get the current weather in a given location",
-        parameters: {
-          type: "object",
-          properties: {
-            location: {
-              type: "string",
-              description: "The city and state, e.g. San Francisco, CA",
-            },
-            unit: { type: "string", enum: ["celsius", "fahrenheit"] },
+      name: 'get_current_weather',
+      description: 'get weather in a given location',
+      parameters: {
+        type: FunctionDeclarationSchemaType.OBJECT,
+        properties: {
+          location: {type: FunctionDeclarationSchemaType.STRING},
+          unit: {
+            type: FunctionDeclarationSchemaType.STRING,
+            enum: ['celsius', 'fahrenheit'],
           },
-          required: ["location"],
         },
+        required: ['location'],
       },
     },
-  ];
+  ], */
 
+const safetySettings = [
+    {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+    {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+    },
+];
+
+const functionDeclarations: FunctionDeclarationsTool[] = [
+    {
+        functionDeclarations: [
+            {
+                name: "getChannelInfo",
+                description: "Get the information of a specified Twitch channel",
+                parameters: {
+                    type: FunctionDeclarationSchemaType.OBJECT,
+                    properties: {
+                        channel: { type: FunctionDeclarationSchemaType.STRING }
+                    }
+                }
+            },
+            {
+                name: 'changeStreamTitle',
+                description: 'Change the title of the stream',
+                parameters: {
+                    type: FunctionDeclarationSchemaType.OBJECT,
+                    properties: {
+                        title: { type: FunctionDeclarationSchemaType.STRING }
+                    },
+                    required: ['title']
+                }
+            }
+        ]
+    }
+]
 
 class StreamCopilot {
-    private static instance: StreamCopilot | null = null;
-    private static openAI: OpenAI | null = null;
-    private static apiKey: string | undefined;
+    private googleGenerativeAI: GoogleGenerativeAI;
+    private model: GenerativeModel
 
-    private constructor() {
-        // Private constructor to enforce singleton pattern
-    }
+    constructor() {
+        this.googleGenerativeAI = new GoogleGenerativeAI(Configuration.GOOGLE_GENERATIVE_AI_API_KEY);
+        this.model = this.googleGenerativeAI.getGenerativeModel({
+            safetySettings,
+            model: MODEL_NAME,
+            tools: functionDeclarations,
+            systemInstruction: BASE_SYSTEM_PROMPT
 
-    public static getInstance(): StreamCopilot {
-        if (StreamCopilot.instance === null) {
-            StreamCopilot.instance = new StreamCopilot();
-        }
-
-        return StreamCopilot.instance;
-    }
-
-    public static initialize(apiKey: string): void {
-        if (this.openAI !== null) {
-            throw new Error("StreamCopilot is already initialized. Call getInstance() to get the instance.");
-        }
-
-        if (!apiKey) {
-            throw new Error("API key is missing.");
-        }
-
-        this.apiKey = apiKey;
-
-        this.openAI = new OpenAI({
-            apiKey: this.apiKey,
-            baseURL: 'https://api.shuttleai.app/v1/'
         });
-
-        console.log(chalk.green("[StreamCopilot]"), chalk.white("Initialized"));
     }
 
-    public getOpenAIInstance(): OpenAI {
-        if (StreamCopilot.openAI === null) {
-            throw new Error("StreamCopilot not initialized. Call initialize() first.");
-        }
 
-        return StreamCopilot.openAI;
-    }
+    async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }) {
+        const { response } = await this.model.generateContent({
+            systemInstruction: `
+                ${BASE_SYSTEM_PROMPT}
 
-    public async generateResponse(input: string, user: User, channel: Channel): Promise<string> {
-        const initTime = Date.now();
-        const response = await this.getOpenAIInstance().chat.completions.create({
-            model: 'gpt-3.5-turbo-0613',
-            stream: false,
-            temperature: 0.9,
-            messages: [
+                Current channel: ${channel.user.displayName}
+                Replying to: ${user.displayName}
+            `,
+            contents: [
                 {
-                    role: 'system',
-                    content: channel.preferences.smartAssistantPrompt?.value || 'Hola, soy tu asistente personal PetruquioBot. ¿En qué puedo ayudarte?'
-                },
-                {
-                    role: 'user',
-                    content: input
-                },
+                    role: POSSIBLE_ROLES[0],
+                    parts: [
+                        {
+                            text: prompt,
+                        }
+                    ]
+                }
             ],
-            user: `petruquiouser-${user.twitchId}`,
-            tool_choice: 'auto',
-            tools: Tools,
         });
 
-        console.log(chalk.green("[StreamCopilot]"), chalk.white(`Generated response in ${Date.now() - initTime}ms`));
 
-        console.log(response.choices[0]);
 
-        return response.choices[0].message.content as string;
+        console.log(JSON.stringify(response, null, 2))
+        return response.text();
     }
-
-    private async changeStreamTitle(streamTitle: string, channel: Channel): Promise<string> {
-        try {
-            await Twitch.Helix.channels.updateChannelInfo(channel.twitchId, {
-                title: streamTitle,
-            });
-            return "Stream title changed to " + streamTitle;
-        } catch (error) {
-            return "Error changing stream title: " + error;
-        }
-    }
-
 }
 
-export default StreamCopilot;
+export const streamCopilot = new StreamCopilot();

@@ -1,6 +1,5 @@
 import { Command, CommandPermission } from "../models/Command.model";
 import User from "../models/User.model";
-import StreamCopilot from "../modules/StreamCopilot.module";
 import Twitch from "../modules/Twitch.module";
 
 
@@ -14,19 +13,19 @@ const AskCommand = new Command(
     async (_user, _args, _channel, _bot) => {
         const user = await User.findByTwitchId(_user.id);
 
-        if(!user) return;
+        if (!user) return;
 
 
         const question = _args.join(' ');
 
-        if(!question) {
+        if (!question) {
             return;
         }
 
         try {
-            const response = await StreamCopilot.getInstance().generateResponse(question, user, _channel);
+            const response = 'Estoy en mantenimiento, por favor intenta más tarde.'
             // Si la respuesta contiene el username, no incluirlo al inicio
-            if(response.includes(user.username)) {
+            if (response.includes(user.username)) {
                 return _bot.sendMessage(_channel, response);
             }
             return _bot.sendMessage(_channel, `@${_user.displayName}, ${response}`);
@@ -38,8 +37,8 @@ const AskCommand = new Command(
 
 
 
-        
-       
+
+
     }
 );
 

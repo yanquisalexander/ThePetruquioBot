@@ -23,7 +23,7 @@ class TwitchEvents {
   private static TwitchEventSub: EventSubMiddleware
   private static bot: Bot
 
-  public static async setup (): Promise<void> {
+  public static async setup(): Promise<void> {
     this.bot = await Bot.getInstance()
     this.TwitchEventSub = new EventSubMiddleware({
       apiClient: Twitch.HelixApp,
@@ -41,7 +41,7 @@ class TwitchEvents {
     })
   }
 
-  public static async subscribeToChannelPoints (channel: Channel): Promise<void> {
+  public static async subscribeToChannelPoints(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onChannelRedemptionAdd(channel.twitchId.toString(), async (event) => {
       console.log(`[TWITCH EVENT SUB] Channel Points Redemption on #${event.broadcasterDisplayName} (${event.broadcasterName})`)
       console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`)
@@ -109,14 +109,14 @@ class TwitchEvents {
     this.eventSubListeners[channel.twitchId.toString()]['channel-points'] = listener
   }
 
-  public static async unsubscribeToChannelPoints (channel: Channel): Promise<void> {
+  public static async unsubscribeToChannelPoints(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()]['channel-points']
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async subscribeToAppRevocation (channel: Channel): Promise<void> {
+  public static async subscribeToAppRevocation(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onUserAuthorizationRevoke(async (event) => {
       console.log(`[TWITCH EVENT SUB] App Revocation detected for ${event.userDisplayName} (${event.userName})`)
       console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`)
@@ -185,7 +185,7 @@ class TwitchEvents {
     this.eventSubListeners[channel.twitchId.toString()]['app-revocation'] = listener
   }
 
-  public static async subscribeToLiveStream (channel: Channel): Promise<void> {
+  public static async subscribeToLiveStream(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onStreamOnline(channel.twitchId.toString(), async (event) => {
       console.log(`[TWITCH EVENT SUB] Stream Online detected for ${event.broadcasterDisplayName} (${event.broadcasterName})`)
       console.log(`[TWITCH EVENT SUB] User: ${event.broadcasterDisplayName} (${event.broadcasterName})`)
@@ -227,21 +227,21 @@ class TwitchEvents {
     }
   }
 
-  public static async unsubscribeToAppRevocation (channel: Channel): Promise<void> {
+  public static async unsubscribeToAppRevocation(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()]['app-revocation']
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async unsubscribeToLiveStream (channel: Channel): Promise<void> {
+  public static async unsubscribeToLiveStream(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()]['live-stream']
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async subscribeToUserUpdate (channel: Channel): Promise<void> {
+  public static async subscribeToUserUpdate(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onUserUpdate(channel.twitchId.toString(), async (event) => {
       console.log(`[TWITCH EVENT SUB] User Update detected for ${event.userDisplayName} (${event.userName})`)
       console.log(`[TWITCH EVENT SUB] User: ${event.userDisplayName} (${event.userName})`)
@@ -263,14 +263,14 @@ class TwitchEvents {
     this.eventSubListeners[channel.twitchId.toString()]['user-update'] = listener
   }
 
-  public static async unsubscribeToUserUpdate (channel: Channel): Promise<void> {
+  public static async unsubscribeToUserUpdate(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()]['user-update']
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async suscribeToStreamEnd (channel: Channel): Promise<void> {
+  public static async suscribeToStreamEnd(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onStreamOffline(channel.twitchId.toString(), async (event) => {
       console.log(`[TWITCH EVENT SUB] Stream Offline detected for ${event.broadcasterDisplayName} (${event.broadcasterName})`)
       console.log(`[TWITCH EVENT SUB] User: ${event.broadcasterDisplayName} (${event.broadcasterName})`)
@@ -291,7 +291,7 @@ class TwitchEvents {
     this.eventSubListeners[channel.twitchId.toString()]['stream-end'] = listener
   }
 
-  public static async subscribeToFollows (channel: Channel): Promise<void> {
+  public static async subscribeToFollows(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onChannelFollow(channel.twitchId.toString(), process.env.TWITCH_USER_ID ?? '', async (event) => {
       console.log(`[TWITCH EVENT SUB] Follow detected for ${event.userName}`)
       console.log(`[TWITCH EVENT SUB] User: ${event.userName}`)
@@ -329,7 +329,7 @@ class TwitchEvents {
     }
   }
 
-  public static async suscribeToBans (channel: Channel): Promise<void> {
+  public static async suscribeToBans(channel: Channel): Promise<void> {
     const listener = this.TwitchEventSub.onChannelBan(channel.twitchId.toString(), async (event) => {
       console.log(`[TWITCH EVENT SUB] Ban detected for ${event.userName} on channel ${event.broadcasterName}`)
       console.log(`[TWITCH EVENT SUB] User: ${event.userName}`)
@@ -350,28 +350,28 @@ class TwitchEvents {
     this.eventSubListeners[channel.twitchId.toString()].bans = listener
   }
 
-  public static async unsubscribeToFollows (channel: Channel): Promise<void> {
+  public static async unsubscribeToFollows(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()].follows
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async unsubscribeToBans (channel: Channel): Promise<void> {
+  public static async unsubscribeToBans(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()].bans
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async unsubscribeToStreamEnd (channel: Channel): Promise<void> {
+  public static async unsubscribeToStreamEnd(channel: Channel): Promise<void> {
     const listener = this.eventSubListeners[channel.twitchId.toString()]['stream-end']
     if (listener) {
       listener.stop()
     }
   }
 
-  public static async subscribeChannel (channel: Channel): Promise<void> {
+  public static async subscribeChannel(channel: Channel): Promise<void> {
     await this.subscribeToChannelPoints(channel)
     await this.subscribeToAppRevocation(channel)
     await this.subscribeToLiveStream(channel)
@@ -381,7 +381,7 @@ class TwitchEvents {
     await this.suscribeToBans(channel)
   }
 
-  public static async unsubscribeChannel (channel: Channel): Promise<void> {
+  public static async unsubscribeChannel(channel: Channel): Promise<void> {
     await this.unsubscribeToChannelPoints(channel)
     await this.unsubscribeToAppRevocation(channel)
     await this.unsubscribeToLiveStream(channel)
@@ -391,7 +391,7 @@ class TwitchEvents {
     await this.unsubscribeToBans(channel)
   }
 
-  public static async subscribeAllChannels (): Promise<void> {
+  public static async subscribeAllChannels(): Promise<void> {
     const channels = await Channel.getAutoJoinChannels()
     for (const channel of channels) {
       if (!this.eventSubListeners[channel.twitchId.toString()]) {
@@ -401,7 +401,7 @@ class TwitchEvents {
     }
   }
 
-  public static async unsubscribeAllChannels (): Promise<void> {
+  public static async unsubscribeAllChannels(): Promise<void> {
     const channels = await Channel.getAutoJoinChannels()
     for (const channel of channels) {
       try {
@@ -414,15 +414,15 @@ class TwitchEvents {
     this.eventSubListeners = {}
   }
 
-  public static get middleware (): EventSubMiddleware {
+  public static get middleware(): EventSubMiddleware {
     return this.TwitchEventSub
   }
 
-  public static async markAsReady (): Promise<void> {
+  public static async markAsReady(): Promise<void> {
     await this.TwitchEventSub.markAsReady()
   }
 
-  public static getListenersForChannel (channel: Channel): EventSubSubscription[] {
+  public static getListenersForChannel(channel: Channel): EventSubSubscription[] {
     const listeners: EventSubSubscription[] = []
     for (const listener of Object.values(this.eventSubListeners[channel.twitchId.toString()])) {
       listeners.push(listener)

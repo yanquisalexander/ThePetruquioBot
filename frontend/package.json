@@ -74,6 +74,7 @@
     "vue-i18n": "^9.8.0",
     "vue3-lottie": "^3.2.0",
     "vue3-marquee": "^4.2.0",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "youtube-vue3": "^0.1.15"
   }
 }

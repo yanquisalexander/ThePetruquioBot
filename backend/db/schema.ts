@@ -196,3 +196,19 @@ export const UploadsTable = pgTable('uploads', {
   uploaded_at: timestamp('uploaded_at').default(sql.raw('now()')),
   key: text('key')
 })
+
+export const MediaRequestsTable = pgTable('media_requests', {
+  // Table like Song requests on Twitch
+  id: serial('id').primaryKey(),
+  channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id),
+  user_id: integer('user_id').references(() => UsersTable.twitch_id),
+  media_url: text('media_url').notNull(),
+  media_title: text('media_title').notNull(),
+  media_author: text('media_author'),
+  media_thumbnail: text('media_thumbnail'),
+  media_duration: integer('media_duration').notNull(),
+  media_type: text('media_type').notNull(),
+  media_id: text('media_id').notNull(),
+  status: text('status').default('pending'),
+  requested_at: timestamp('requested_at').default(sql.raw('now()')),
+})

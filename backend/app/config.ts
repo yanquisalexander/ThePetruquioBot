@@ -36,4 +36,5 @@ export const Configuration = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   AWS_REGION: process.env.AWS_REGION ?? '',
   AWS_ENDPOINT: process.env.AWS_ENDPOINT ?? '',
+  GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? '',
 }
