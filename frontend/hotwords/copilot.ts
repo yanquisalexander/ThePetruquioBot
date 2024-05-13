@@ -1,0 +1,3 @@
+export const copilot = new Uint8Array([
+    0x5d, 0x3b, 0x0d, 0x0a
+])
