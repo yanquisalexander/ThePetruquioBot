@@ -24,9 +24,9 @@
             </h2>
         </div>
         <div class="smart-assistant__content p-4">
-            <span :class="{ 'text-gray-500': !isFinal, 'text-black': isFinal }" v-if="finalTranscript">
+            <span :class="{ 'text-gray-500': !isFinal, 'text-black': isFinal }" v-if="currentTranscript">
                 <p class="mt-4">You:</p>
-                <p class="bg-gray-50 p-2 rounded-md w-max-content" v-html="md.render(finalTranscript)"></p>
+                <p class="bg-gray-50 p-2 rounded-md w-max-content" v-html="md.render(currentTranscript)"></p>
             </span>
 
             <span class="block text-gray-500" v-if="copilotResponse" :class="{ '!text-black': isCopilotResponseFinal }">
@@ -50,24 +50,24 @@
 import { useNavigatorLanguage } from '@vueuse/core'
 import { useSpeechRecognition } from '@vueuse/core'
 import MarkdownIt from "markdown-it";
+import Bumblebee from "bumblebee-hotword";
+import { alexa } from "@/hotwords/alexa";
+import { copilot } from "@/hotwords/copilot";
+
+
+const bumblebee = new Bumblebee()
+
+
+
 
 const md = new MarkdownIt();
 
 const { language } = useNavigatorLanguage()
 
-
-const ACTIVATION_WORDS = ref([
-    'hola asistente',
-    'ok asistente',
-    'hey asistente',
-    'asistente',
-])
-
 const currentIndex = ref(0)
 const currentTranscript = ref('')
 const finalTranscript = ref('')
 const isFinal = ref(false)
-const isListening = ref(false)
 const copilotResponse = ref('')
 const isCopilotResponseFinal = ref(false)
 const recognition = useSpeechRecognition({
@@ -97,6 +97,7 @@ const typewriter = (text: string) => {
 const sendToStreamCopilot = (transcript: string) => {
     const client = useAuthenticatedRequest()
     isCopilotResponseFinal.value = false
+    copilotResponse.value = ''
 
     client.post('/stream-manager/smart-assistant', {
         message: transcript,
@@ -110,15 +111,10 @@ const sendToStreamCopilot = (transcript: string) => {
             const url = URL.createObjectURL(blob)
             const audio = new Audio(url)
             audio.play()
-            recognition.stop()
-            audio.onended = () => {
-                recognition.start()
-            }
         })
 
 
 
-        recognition.start()
     }).catch((error) => {
         console.error('Error sending message to Stream Copilot:', error)
         typewriter('Copilot is not available at the moment. Please try again later.')
@@ -129,34 +125,31 @@ const sendToStreamCopilot = (transcript: string) => {
             const url = URL.createObjectURL(blob)
             const audio = new Audio(url)
             audio.play()
-            recognition.stop()
-            audio.onended = () => {
-                recognition.start()
-            }
         })
     })
 }
 
 const processResult = (event: any) => {
+    // Stop the bumblebee hotword detection while processing the speech recognition
+    bumblebee.stop()
     currentIndex.value = event.resultIndex
     isFinal.value = event.results[currentIndex.value].isFinal
     const recognitionResult = event.results[currentIndex.value]
-    currentTranscript.value = recognitionResult[0].transcript.toLowerCase()
-    const lowercaseActivationWords = ACTIVATION_WORDS.value.map(word => word.toLowerCase())
-    const words = currentTranscript.value.split(' ')
-    if (!words.some(word => lowercaseActivationWords.includes(word))) {
-        return
+
+    currentTranscript.value = recognitionResult[0].transcript
+
+
+
+    if (isFinal.value) {
+        finalTranscript.value = currentTranscript.value
+        sendToStreamCopilot(finalTranscript.value)
+        recognition.stop()
+        bumblebee.start()
     }
 
-    isListening.value = true
-    finalTranscript.value = currentTranscript.value
-    if (recognitionResult.isFinal) {
-        isFinal.value = true
-        console.log('Final result:', currentTranscript.value)
-        isListening.value = false
-        copilotResponse.value = ''
-        sendToStreamCopilot(currentTranscript.value)
-    }
+    console.log('Transcript:', currentTranscript.value)
+
+
 }
 
 
@@ -164,11 +157,25 @@ const processResult = (event: any) => {
 
 onMounted(() => {
     recognition.recognition.onresult = processResult
-    recognition.start()
+    //recognition.start()
+
+    bumblebee.setWorkersPath('/bumblebee-workers/')
+    bumblebee.addHotword('alexa')
+    bumblebee.addHotword('ok_google')
+
+    bumblebee.setSensitivity(1);
+
+    bumblebee.on('hotword', function (hotword) {
+        // YOUR CODE HERE
+        console.log('hotword detected:', hotword);
+        SoundManager.getInstance().playSound(Sounds.NEW_NOTIFICATION)
+        recognition.start()
+    });
+
+
+
+    bumblebee.start()
 })
 
-watch(isListening, (value) => {
-    console.log('Listening:', value)
-})
 
 </script>
