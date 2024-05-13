@@ -56,6 +56,29 @@ export const useStreamManager = () => {
                 })
                 SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
                 break;
+            case 'title-change':
+                console.log('title-change', data)
+                toast.add({
+                    id: 'title-change',
+                    color: 'blue',
+                    title: 'Título de la transmisión actualizado',
+                    description: `El título de la transmisión se ha actualizado a: <b>${data.title}</b>`,
+                    icon: 'i-lucide-pencil',
+                    timeout: 6000,
+                })
+                SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+                break;
+            case 'chat-cleared':
+                console.log('chat-cleared', data)
+                toast.add({
+                    title: 'Chat despejado',
+                    color: 'green',
+                    description: 'Un moderador limpió el chat de tu stream.',
+                    icon: 'i-lucide-sword',
+                    timeout: 5000
+                })
+                SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+                break;
             default:
                 break;
         }

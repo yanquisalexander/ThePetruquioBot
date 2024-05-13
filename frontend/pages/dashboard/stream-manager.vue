@@ -11,6 +11,10 @@
                     </div>
                 </template>
 
+                <div class="my-4">
+                    <StreamManagerStreamCopilot />
+                </div>
+
                 <div class="grid">
                     <div class="grid md:grid-cols-12 gap-4">
                         <div class="col-span-12 o-2">
@@ -79,17 +83,14 @@ const connectSocket = () => {
 
     socket.value.on('channel-point-redemption', async (data: any) => {
         await handleSocketEvent('channel-point-redemption', data)
-
     })
 
-    socket.value.on('chat-cleared', () => {
-        toast.add({
-            title: 'Chat despejado',
-            color: 'green',
-            description: 'Un moderador limpió el chat de tu stream.',
-            icon: 'i-lucide-sword',
-            timeout: 5000
-        })
+    socket.value.on('title-change', async (data: any) => {
+        await handleSocketEvent('title-change', data)
+    })
+
+    socket.value.on('chat-cleared', async (data: any) => {
+        await handleSocketEvent('chat-cleared', data)
     })
 }
 

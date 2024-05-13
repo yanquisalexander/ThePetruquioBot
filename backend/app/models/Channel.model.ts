@@ -1,5 +1,8 @@
 import Database from '../../lib/DatabaseManager'
 import defaultChannelPreferences, { type ChannelPreferences } from '../../utils/ChannelPreferences.class'
+import { Configuration } from "../config"
+import SocketIO from "../modules/SocketIO.module"
+import Twitch from "../modules/Twitch.module"
 import Audit, { type AuditDTO } from './Audit.model'
 import { Command } from './Command.model'
 import CommunityBook from './CommunityBook.model'
@@ -16,14 +19,14 @@ class Channel {
   preferences: ChannelPreferences
   user: User
 
-  constructor (twitchId: number, autoJoin: boolean, preferences: ChannelPreferences, user: User) {
+  constructor(twitchId: number, autoJoin: boolean, preferences: ChannelPreferences, user: User) {
     this.twitchId = twitchId
     this.autoJoin = autoJoin
     this.preferences = mergePreferences(defaultChannelPreferences, preferences)
     this.user = user
   }
 
-  public static async getAutoJoinChannels (): Promise<Channel[]> {
+  public static async getAutoJoinChannels(): Promise<Channel[]> {
     const channelsData = await Database.query('SELECT * FROM channels WHERE auto_join = true')
     const channels: Channel[] = []
 
@@ -46,7 +49,7 @@ class Channel {
     return channels
   }
 
-  public static async findByTwitchId (twitchId: number): Promise<Channel | null> {
+  public static async findByTwitchId(twitchId: number): Promise<Channel | null> {
     const query = 'SELECT * FROM channels WHERE twitch_id = $1'
     const values = [twitchId]
     const result = await Database.query(query, values)
@@ -69,7 +72,7 @@ class Channel {
     }
   }
 
-  public static async findByUsername (username: string): Promise<Channel | null> {
+  public static async findByUsername(username: string): Promise<Channel | null> {
     const user = await User.findByUsername(username)
     if (!user) {
       console.error(`User with username ${username} not found`)
@@ -93,7 +96,7 @@ class Channel {
     }
   }
 
-  public async save (): Promise<void> {
+  public async save(): Promise<void> {
     try {
       const query = 'INSERT INTO channels (twitch_id, auto_join, preferences) VALUES ($1, $2, $3) ON CONFLICT (twitch_id) DO UPDATE SET auto_join = $2, preferences = $3'
       const values = [this.twitchId, this.autoJoin, this.preferences]
@@ -104,35 +107,57 @@ class Channel {
     }
   }
 
-  public async getWorldMap (): Promise<any[]> {
+  public async getWorldMap(): Promise<any[]> {
     return await WorldMap.getChannelWorldMap(this.twitchId)
   }
 
-  public async getCommands (): Promise<Command[]> {
+  public async getCommands(): Promise<Command[]> {
     return await Command.getChannelCommands(this)
   }
 
-  public async getShoutouts (): Promise<any[]> {
+  public async getShoutouts(): Promise<any[]> {
     return await Shoutout.getChannelShoutouts(this)
   }
 
-  public async getCommunityBooks (): Promise<any[]> {
+  public async getCommunityBooks(): Promise<any[]> {
     return await CommunityBook.getByChannel(this)
   }
 
-  public async getWorkflows (): Promise<Workflow[]> {
+  public async getWorkflows(): Promise<Workflow[]> {
     return await Workflow.findAll(this)
   }
 
-  public async getAudits (): Promise<AuditDTO[] | null> {
+  public async getAudits(): Promise<AuditDTO[] | null> {
     return await Audit.getAuditsByChannel(this)
   }
 
-  public async getCoreWidgets (): Promise<CoreWidget[]> {
+  public async getCoreWidgets(): Promise<CoreWidget[]> {
     return await CoreWidget.findByChannel(this)
   }
 
-  public static async findOrCreate (id: number): Promise<Channel> {
+  public async changeStreamTitle(title: string): Promise<void> {
+    const res = await Twitch.Helix.channels.updateChannelInfo(this.twitchId, { title })
+    SocketIO.getInstance().emitEvent(`stream-manager:${this.twitchId}`, 'title-change', { title })
+    return res
+  }
+
+  public async toggleEmoteOnly(enabled: boolean): Promise<void> {
+    return await Twitch.Helix.asUser(Configuration.TWITCH_USER_ID, async ctx => {
+      const res = await ctx.chat.updateSettings(this.twitchId, {
+        emoteOnlyModeEnabled: enabled
+      })
+
+      if (res) return
+    })
+  }
+
+  public async clearChat(): Promise<void> {
+    return await Twitch.Helix.asUser(Configuration.TWITCH_USER_ID, async ctx => {
+      await ctx.moderation.deleteChatMessages(this.twitchId)
+    })
+  }
+
+  public static async findOrCreate(id: number): Promise<Channel> {
     const channel = await Channel.findByTwitchId(id)
     if (channel) {
       return channel
@@ -146,11 +171,12 @@ class Channel {
       return channel
     }
   }
+
 }
 
 export default Channel
 
-function mergePreferences (defaultPrefs: any, channelPrefs: any): any {
+function mergePreferences(defaultPrefs: any, channelPrefs: any): any {
   const mergedPrefs: any = { ...channelPrefs } // Inicia con las preferencias del canal
 
   // Itera sobre todas las claves de defaultPrefs
@@ -191,7 +217,7 @@ function mergePreferences (defaultPrefs: any, channelPrefs: any): any {
   return orderedPrefs
 }
 
-function mergeFieldType (defaultFieldType: any, channelFieldType: any): any {
+function mergeFieldType(defaultFieldType: any, channelFieldType: any): any {
   // Si channelFieldType es undefined o es del mismo tipo que defaultFieldType, devuelve defaultFieldType
   if (channelFieldType === undefined || typeof channelFieldType === typeof defaultFieldType) {
     return defaultFieldType

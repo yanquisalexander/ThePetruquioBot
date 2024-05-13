@@ -9,6 +9,7 @@ export const createStreamManagerRouter = (): Router => {
   router.get('/', streamManagerController.index)
   router.get('/stream', streamManagerController.getStream)
   router.post('/clip', streamManagerController.createClip)
+  router.post('/smart-assistant', streamManagerController.talkToSmartAssistant)
 
   console.log(chalk.bgGreenBright('[ROUTER]'), 'Stream Manager router created')
   return router

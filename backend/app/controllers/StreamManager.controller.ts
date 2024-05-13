@@ -6,6 +6,7 @@ import MessageLogger from '../models/MessageLogger.model'
 import Notification from '../models/Notification.model'
 import Twitch from "../modules/Twitch.module"
 import StreamerSonglist from "../modules/StreamerSonglist.module"
+import { streamCopilot } from "../modules/StreamCopilot.module"
 
 export class StreamManagerController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -32,7 +33,7 @@ export class StreamManagerController {
 
         let songlistInfo = null
 
-        if(channel.preferences.showSongRequestsOnMap?.value){
+        if (channel.preferences.showSongRequestsOnMap?.value) {
             songlistInfo = await StreamerSonglist.getChannel(user.username)
         }
 
@@ -80,6 +81,53 @@ export class StreamManagerController {
             console.error(error)
             return res.status(500).json({ error: 'Failed to create clip. ¿Maybe the user is not streaming?' })
         }
+
+    }
+
+    async talkToSmartAssistant(req: Request, res: Response): Promise<Response> {
+        const currentUser = new CurrentUser(req.user as ExpressUser)
+
+        const user = await currentUser.getCurrentUser()
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+
+        const channel = await user.getChannel()
+
+        if (!channel) {
+            return res.status(404).json({ error: 'Channel not found' })
+        }
+
+        if (channel.preferences.enableSmartAssistant?.value === false) {
+            return res.status(403).json({ error: 'Smart Assistant is disabled' })
+        }
+
+        const message = req.body.message
+
+        if (!message) {
+            return res.status(400).json({ error: 'Message is required' })
+        }
+
+        try {
+            const response = await streamCopilot.generateText({
+                prompt: message,
+                user,
+                channel
+            })
+
+            return res.json({
+                data: {
+                    response: response.text(),
+                    candidates: response.candidates
+                }
+            })
+
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({ error: 'Copilot failed to generate text. Please try again later' })
+        }
+
+
 
     }
 }

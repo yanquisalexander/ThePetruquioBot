@@ -29,14 +29,14 @@ export default defineNuxtConfig({
     '@sidebase/nuxt-auth',
     '@nuxt/ui',
     '@nuxtjs/device',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
   ],
   i18n: {
     vueI18n: './i18n.config.ts',
   },
   ui: {
     global: true,
-    icons: ['heroicons', 'lucide', 'fa6-brands', 'mdi'],
+    icons: ['heroicons', 'lucide', 'fa6-brands', 'mdi']
   },
   css: [
     '~/assets/styles/_petruquiolive.css',
