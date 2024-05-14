@@ -25,11 +25,11 @@ export default defineNuxtConfig({
   },
   modules: [
     '@pinia/nuxt',
-    '@pinia-plugin-persistedstate/nuxt',
     '@sidebase/nuxt-auth',
     '@nuxt/ui',
     '@nuxtjs/device',
     '@vueuse/nuxt',
+    '@nuxt/content',
   ],
   i18n: {
     vueI18n: './i18n.config.ts',
