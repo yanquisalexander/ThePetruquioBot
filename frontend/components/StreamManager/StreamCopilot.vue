@@ -54,6 +54,8 @@
             }" />
         </div>
 
+        <CopilotRichContext :context="copilotContext" />
+
         <div class="smart-assistant__footer p-4 flex items-center justify-between">
             <UInput placeholder="Type or say 'Hey Copilot'" class="w-full mr-4" v-model="finalTranscript"
                 :disabled="isThinking" />
@@ -91,6 +93,7 @@ const currentIndex = ref(0)
 const currentTranscript = ref('')
 const finalTranscript = ref('')
 const isFinal = ref(false)
+const copilotContext = ref({})
 const copilotResponse = ref('')
 const isCopilotResponseFinal = ref(false)
 const isThinking = ref(false)
@@ -137,6 +140,7 @@ const sendToCopilot = async () => {
     recognition.stop()
     porcupine.start()
     copilotResponse.value = ''
+    copilotContext.value = {}
     try {
         const res = await client.post('/stream-manager/smart-assistant', {
             message: finalTranscript.value
@@ -144,6 +148,7 @@ const sendToCopilot = async () => {
 
         console.log('Message received from Stream Copilot', res.data)
         await getAudio(res.data.data.response)
+        copilotContext.value = res.data.data.context
         await audioInstance.value?.play()
         typewriter(res.data.data.response)
     } catch (error) {
@@ -233,8 +238,10 @@ watch(() => porcupine.state.isListening, (value) => {
     console.log('Porcupine is listening', value)
 })
 
-watch(() => porcupine.state.isLoaded, (value) => {
-    console.log('Porcupine is loaded', value)
+watch(() => recognition.error.value, (value) => {
+    if (value.error === 'no-speech') {
+        SoundManager.getInstance().playSound(Sounds.COPILOT_ERROR)
+    }
 })
 
 watch(() => porcupine.state.error, (value) => {
