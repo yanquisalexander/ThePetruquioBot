@@ -28,7 +28,7 @@
             </UFormGroup>
 
             <UFormGroup label="Voz de Copilot">
-                <USelect v-model="configuration.copilotVoice"
+                <USelect v-model="configuration.copilotVoice" :options="voicesForCopilot"
                     @update:modelValue="handleConfigChange('copilotVoice', $event); previewCopilotVoice()" />
             </UFormGroup>
 

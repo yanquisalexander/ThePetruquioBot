@@ -94,6 +94,7 @@ import { useSpeechRecognition } from '@vueuse/core'
 import { usePorcupine } from '@picovoice/porcupine-vue';
 import { heyCopilot } from "@/hotwords/hey_copilot";
 import { porcupineParams } from "@/hotwords/porcupine_params";
+const { configuration } = useStreamManager()
 
 const PicoVoiceKey = 'u74TuYeZioAXjQRwzhrl1hA+RPQeaA3rZWejOriAeS2y/4Qun/Ezaw=='
 const porcupine = usePorcupine()
@@ -134,7 +135,7 @@ const typewriter = (text: string) => {
 }
 
 const getAudio = async (text: string): Promise<void> => {
-    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=${text}`)
+    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${configuration.value.copilotVoice}&text=${text}`)
     const blob = await voice.blob()
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
