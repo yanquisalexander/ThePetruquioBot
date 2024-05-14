@@ -7,15 +7,14 @@
             Copilot ha utilizado la siguiente información para responder
         </h3>
         <template v-if="props.context.spotify">
-            <UAlert class="p-4 animate-fade-in-down animate-delay-[100ms]" color="gray"
-                title="Tu música actual en Spotify">
+            <UAlert class="animate-fade-in-down animate-delay-[100ms]" color="gray" title="Tu música actual en Spotify"
+                icon="i-fa6-brands-spotify">
 
                 <template #description>
                     <div class="flex mt-2">
-                        <div class="flex-shrink-0 relative h-16 w-16 rounded-md bg-gray-100">
+                        <div class="flex-shrink-0">
                             <img :src="props.context.spotify.item.album.images[0].url" class="h-16 w-16 rounded-md" />
-                            <UIcon name="i-fa6-brands-spotify"
-                                class="text-white h-4 w-4 absolute bottom-1 right-1 z-10" />
+
                         </div>
                         <div class="flex items-center space-x-2 flex-col ml-4">
 
@@ -33,6 +32,51 @@
                     </div>
                 </template>
             </UAlert>
+        </template>
+
+        <template v-if="props.context.twitchChannel">
+            <UAlert class="animate-fade-in-down animate-delay-[200ms]" color="twitch" title="Canal de Twitch"
+                icon="i-fa6-brands-twitch">
+                <template #description>
+                    <div class="flex space-x-2 mt-2">
+                        <div class="flex-shrink-0">
+                            <UAvatar :src="props.context.twitchChannel.avatar" size="sm" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-medium">{{ props.context.twitchChannel.displayName }}</span>
+                            <span>{{ truncatedText(props.context.twitchChannel.description, 100) }}</span>
+
+                            <div v-if="props.context.twitchChannel.stream" class="flex items-center mt-4">
+                                <UIcon name="i-lucide-eye" class="mr-2" />
+                                <span>En vivo con {{ props.context.twitchChannel.stream.viewers }} espectadores</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </template>
+            </UAlert>
+        </template>
+
+        <template v-if="props.context.webResults">
+            <template v-if="props.context.webResults.knowledge_panel">
+                <UAlert class="animate-fade-in-down animate-delay-[300ms]" color="blue" title="Panel de conocimiento"
+                    icon="i-fa6-brands-wikipedia-w">
+                    <template #description>
+                        <div class="flex space-x-2 mt-2">
+                            <div class="flex-shrink-0">
+                                <img :src="props.context.webResults.knowledge_panel.images[0].url || '/favicon.ico'"
+                                    class="h-16 w-16 rounded-md" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-medium">{{ props.context.webResults.knowledge_panel.title }}</span>
+                                <span>{{ truncatedText(props.context.webResults.knowledge_panel.description, 100)
+                                    }}</span>
+                            </div>
+                        </div>
+                    </template>
+                </UAlert>
+            </template>
         </template>
     </div>
 
@@ -68,6 +112,10 @@ const spotifyCurrentProgressLabels = computed(() => {
 
     return `${current} / ${duration}`;
 });
+
+const truncatedText = (text: string, maxLength: number) => {
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+}
 
 
 // Mientras el contexto de Spotify esté presente, actualiza el progreso de la canción

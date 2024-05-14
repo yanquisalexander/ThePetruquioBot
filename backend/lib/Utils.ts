@@ -4,6 +4,8 @@ import type User from '../app/models/User.model'
 import { ExternalAccountProvider } from '../app/models/ExternalAccount.model'
 import chalk from 'chalk'
 import os from 'os'
+import google from 'googlethis';
+
 
 export const getSpotifyCurrentlyPlayingSong = async (channel: Channel, retryAttempts = 3): Promise<any> => {
   try {
@@ -230,6 +232,32 @@ class Utils {
       console.error('Error al importar el módulo:', error)
       console.error('Ruta del archivo:', filePath)
       return null
+    }
+  }
+
+  public static async googleSearch(query: string): Promise<any> {
+    try {
+      const response = await google.search(query, {
+        page: 1,
+        parse_ads: false,
+        safe: true,
+      })
+
+
+      console.log('Google search response:', response)
+      // If all values are null on response.knowledge_panel, it means that there is no knowledge panel
+      const kn = response.knowledge_panel ? Object.values(response.knowledge_panel).every(value => value === null) : true
+
+      return {
+        results: response.results,
+        knowledgePanel: kn ? null : response.knowledge_panel
+      }
+
+    } catch (error) {
+      console.error('Error al buscar en Google:', error)
+      return {
+        error: 'An error occurred while searching in Google'
+      }
     }
   }
 }

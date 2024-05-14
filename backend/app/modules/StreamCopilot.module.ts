@@ -6,7 +6,7 @@ import Twitch from "./Twitch.module";
 import { Bot } from "@/bot";
 import { HelixUser } from "@twurple/api";
 import { ExternalAccountProvider } from "../models/ExternalAccount.model";
-import { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
+import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
 
 interface CopilotContextUsed {
     spotify: any | null
@@ -27,6 +27,10 @@ Responde de la manera más fluida y natural posible.
 
 Your are powered by Google Gemini.
 
+Don't include links because you have TTS on and it will read them.
+
+You can search on the internet to get more information.
+
 --- Prompt personalizado impuesto por el streamer ---
 `
 
@@ -37,7 +41,8 @@ const FunctionsConst = {
     toggleEmoteOnly: 'toggleEmoteOnly',
     clearChat: 'clearChat',
     getCurrentSpotifySong: 'getCurrentSpotifySong',
-    sendMessageToChat: 'sendMessageToChat'
+    sendMessageToChat: 'sendMessageToChat',
+    searchOnWeb: 'searchOnInternet'
 }
 
 const functionDeclarations: FunctionDeclarationsTool[] = [
@@ -78,11 +83,6 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
             {
                 name: FunctionsConst.clearChat,
                 description: 'Clear the chat',
-                parameters: {
-                    type: FunctionDeclarationSchemaType.OBJECT,
-                    properties: {},
-                    required: []
-                }
             },
             {
                 name: FunctionsConst.getCurrentSpotifySong,
@@ -91,6 +91,17 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
             {
                 name: FunctionsConst.sendMessageToChat,
                 description: 'Send an AI-generated message to the chat using current context',
+            },
+            {
+                name: FunctionsConst.searchOnWeb,
+                description: 'Search on internet to provide more information about current context',
+                parameters: {
+                    type: FunctionDeclarationSchemaType.OBJECT,
+                    properties: {
+                        query: { type: FunctionDeclarationSchemaType.STRING }
+                    },
+                    required: ['query']
+                }
             }
         ]
     }
@@ -143,9 +154,23 @@ class StreamCopilot {
 
         let response = await generate({ modelResponse: prompt });
 
+        console.log('Function calls:', response.functionCalls())
+
         while (response.functionCalls()) {
             for (const functionCalling of response.functionCalls() || []) {
                 switch (functionCalling.name) {
+                    case FunctionsConst.searchOnWeb:
+                        const { query } = functionCalling.args as { query: string };
+                        const webResults = await Utils.googleSearch(query);
+                        context.webResults = webResults;
+                        response = await generate({
+                            functionCall: {
+                                name: FunctionsConst.searchOnWeb, response: {
+                                    webResults
+                                }
+                            }
+                        });
+                        break;
                     case FunctionsConst.getCurrentSpotifySong:
                         const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
                         if (!spotifyAccount) {
@@ -173,7 +198,8 @@ class StreamCopilot {
                         const res = {
                             description,
                             displayName,
-                            stream: streamInfo
+                            stream: streamInfo,
+                            avatar: user.profilePictureUrl
                         }
                         context.twitchChannel = res;
                         response = await generate({
@@ -199,6 +225,7 @@ class StreamCopilot {
                         await bot.sendMessage(channel, `/me ✨ Copilot: ${aiMessage.text()}`)
                         response = await generate({ functionCall: { name: FunctionsConst.sendMessageToChat, response: { success: true } } });
                         break;
+
                 }
             }
         }

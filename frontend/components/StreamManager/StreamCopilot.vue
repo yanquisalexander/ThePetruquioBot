@@ -151,6 +151,7 @@ const sendToCopilot = async () => {
         copilotContext.value = res.data.data.context
         await audioInstance.value?.play()
         typewriter(res.data.data.response)
+        isThinking.value = false
     } catch (error) {
         console.error('Error sending message to Stream Copilot:', error)
         typewriter('Copilot is not available at the moment. Please try again later.')
