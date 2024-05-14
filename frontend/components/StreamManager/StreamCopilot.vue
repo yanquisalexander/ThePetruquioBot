@@ -157,6 +157,9 @@ const sendToCopilot = async () => {
 
 
 const startListening = () => {
+    if (audioInstance.value && !audioInstance.value.ended) {
+        audioInstance.value.pause()
+    }
     porcupine.stop()
     SoundManager.getInstance().playSound(Sounds.NEW_NOTIFICATION)
     recognition.start()
