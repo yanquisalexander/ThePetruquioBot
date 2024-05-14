@@ -41,11 +41,15 @@
                 </div>
             </template>
         </UAlert>
-        <div class="smart-assistant__header p-4">
+        <div class="smart-assistant__header p-4 flex items-center justify-between">
             <h2
                 class="text-xl font-medium font-jost inline-block bg-gradient-to-r from-blue-600 via-red-500 to-purple-600 text-transparent bg-clip-text">
                 Stream Copilot
             </h2>
+
+            <div class="flex items-center space-x-4">
+                <UButton variant="soft" :ui="{ rounded: 'rounded-full' }" icon="i-lucide-settings" color="blue" />
+            </div>
         </div>
         <div class="smart-assistant__content p-4 md:w-3/4 space-y-4">
             <CopilotChatMessage v-if="currentTranscript" :message="currentTranscript" :isCopilot="false"

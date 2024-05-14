@@ -44,7 +44,7 @@ Don't include links because you have TTS on and it will read them.
 
 You can search on the internet to get more information.
 
-DON'T send JSON responses.
+DON'T send JSON responses, for example if you have tool_outputs in the response, don't send them.
 
 --- Prompt personalizado impuesto por el streamer ---
 `

@@ -23,7 +23,7 @@
 
             <UFormGroup label="Sonido de notificaciones">
                 <USelect v-model="configuration.notificationSound"
-                    @update:modelValue="handleConfigChange('notificationSound', $event)"
+                    @update:modelValue="handleConfigChange('notificationSound', $event); previewNotificationSound()"
                     :options="soundsForNotifications" />
 
             </UFormGroup>
@@ -49,6 +49,9 @@ const handleConfigChange = (key: string, value: any) => {
     (configuration.value as Record<string, any>)[key] = value
 }
 
+const previewNotificationSound = () => {
+    SoundManager.getInstance().playSound(Sounds[configuration.value.notificationSound])
+}
 
 
 const soundsForNotifications = [
