@@ -7,7 +7,9 @@
             <div class="flex items-center space-x-2">
                 <span class="font-medium" v-if="props.isCopilot">Copilot</span>
                 <span class="font-medium" v-else>{{ rawUser().displayName }}</span>
-                <span class="text-gray-500 text-sm">{{ new Date().toLocaleTimeString() }}</span>
+                <span class="text-gray-500 text-sm">{{ new Date().toLocaleTimeString([], {
+                    hour: '2-digit', minute:
+                    '2-digit' }) }}</span>
             </div>
             <div class="bg-gray-50 p-2 rounded-md w-max-content">
                 <div v-html="md.render(props.message)" :class="props.messageClasses" />
