@@ -6,7 +6,13 @@ import Twitch from "./Twitch.module";
 import { Bot } from "@/bot";
 import { HelixUser } from "@twurple/api";
 import { ExternalAccountProvider } from "../models/ExternalAccount.model";
-import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
+import { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
+
+interface CopilotContextUsed {
+    spotify: any | null
+    webResults: any[] | null
+    twitchChannel: any | null
+}
 
 const MODEL_NAME = "gemini-1.5-pro-latest";
 
@@ -108,8 +114,9 @@ class StreamCopilot {
         });
     }
 
-    async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<EnhancedGenerateContentResponse> {
+    async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed }> {
         const bot = await Bot.getInstance();
+        let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null };
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
             // @ts-ignore
             this.model.systemInstruction = `
@@ -146,6 +153,7 @@ class StreamCopilot {
                             break;
                         }
                         const currentSong = await getSpotifyCurrentlyPlayingSong(channel)
+                        context.spotify = currentSong;
                         response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { currentSong } } });
                         break;
                     case FunctionsConst.changeStreamTitle:
@@ -162,14 +170,15 @@ class StreamCopilot {
                         const { description, displayName } = user
                         const stream = await user.getStream();
                         const streamInfo = stream ? { title: stream.title, viewers: stream.viewers } : null;
-
+                        const res = {
+                            description,
+                            displayName,
+                            stream: streamInfo
+                        }
+                        context.twitchChannel = res;
                         response = await generate({
                             functionCall: {
-                                name: FunctionsConst.getChannelInfo, response: {
-                                    description,
-                                    displayName,
-                                    stream: streamInfo
-                                }
+                                name: FunctionsConst.getChannelInfo, response: res
                             }
                         });
                         break;
@@ -194,7 +203,7 @@ class StreamCopilot {
             }
         }
 
-        return response
+        return { response, context };
     }
 }
 

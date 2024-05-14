@@ -7,6 +7,7 @@ import Notification from '../models/Notification.model'
 import Twitch from "../modules/Twitch.module"
 import StreamerSonglist from "../modules/StreamerSonglist.module"
 import { streamCopilot } from "../modules/StreamCopilot.module"
+import { context } from "esbuild"
 
 export class StreamManagerController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -117,8 +118,9 @@ export class StreamManagerController {
 
             return res.json({
                 data: {
-                    response: response.text(),
-                    candidates: response.candidates
+                    context: response.context,
+                    response: response.response.text(),
+                    candidates: response.response.candidates
                 }
             })
 
