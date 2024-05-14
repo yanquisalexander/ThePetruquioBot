@@ -1,46 +1,72 @@
 <template>
     <UCard class="smart-assistant" :ui="{ body: { padding: '!px-0 !pt-0' } }">
-        <UAlert v-if="!recognition.isListening.value" color="blue" variant="soft" class="p-4">
+        <UAlert v-if="!porcupine.state.isListening && !recognition.isListening.value" color="orange" variant="soft"
+            class="p-4">
             <template #description>
                 <div class="flex items-center">
                     <UIcon name="i-lucide-mic-off" class="mr-2" />
                     <span>
-                        Copilot is not listening. Click the button below to start the voice recognition.
+                        Copilot is not listening. Say "Hey Copilot" to start listening.
                     </span>
-                    <div class="flex-1" />
-                    <div class="flex items-center">
-                        <UButton @click="recognition.start" color="blue" class="ml-2">
-                            <UIcon name="i-lucide-mic" class="mr-2" />
-                            Start
-                        </UButton>
-                    </div>
+                </div>
+            </template>
+        </UAlert>
+        <UAlert v-if="isThinking" color="gray" variant="soft" class="p-4">
+            <template #description>
+                <div class="flex items-center">
+                    <UIcon name="i-lucide-loader" class="mr-2 animate-spin animate-duration-[1000ms]" />
+                    <span>
+                        Copilot is thinking...
+                    </span>
+                </div>
+            </template>
+        </UAlert>
+        <UAlert v-if="recognition.isListening.value" color="blue" variant="soft" class="p-4">
+            <template #description>
+                <div class="flex items-center">
+                    <UIcon name="i-lucide-mic" class="mr-2" />
+                    <span>
+                        Listening...
+                    </span>
                 </div>
             </template>
         </UAlert>
         <div class="smart-assistant__header p-4">
-            <h2 class="text-white inline-block bg-blue-500 rounded-full py-1 px-2">
-                <CopilotLogo class="h-5 w-5 inline-block" />
+            <h2 class="inline-block bg-blue-100 text-blue-700 rounded-full py-1 px-2">
+                <CopilotLogo class="h-5 w-5 inline-block mr-1" />
                 Copilot
             </h2>
         </div>
-        <div class="smart-assistant__content p-4">
-            <span :class="{ 'text-gray-500': !isFinal, 'text-black': isFinal }" v-if="currentTranscript">
-                <p class="mt-4">You:</p>
-                <p class="bg-gray-50 p-2 rounded-md w-max-content" v-html="md.render(currentTranscript)"></p>
-            </span>
+        <div class="smart-assistant__content p-4 md:w-3/4 space-y-4">
+            <CopilotChatMessage v-if="currentTranscript" :message="currentTranscript" :isCopilot="false"
+                :messageClasses="{
+                    'text-gray-500': !isFinal,
+                    'text-black': isFinal
+                }" />
 
-            <span class="block text-gray-500" v-if="copilotResponse" :class="{ '!text-black': isCopilotResponseFinal }">
-                <p class="mt-4">Copilot:</p>
-                <p class="bg-gray-50 p-2 rounded-md w-max-content" v-html="md.render(copilotResponse)"></p>
-            </span>
+            <CopilotChatMessage v-if="copilotResponse" :message="copilotResponse" isCopilot :messageClasses="{
+                'text-gray-500': !isCopilotResponseFinal,
+                'text-black': isCopilotResponseFinal
+            }" />
+        </div>
+
+        <div class="smart-assistant__footer p-4 flex items-center justify-between">
+            <UInput placeholder="Type or say 'Hey Copilot'" class="w-full mr-4" v-model="finalTranscript"
+                :disabled="isThinking" />
+            <UButton @click="sendToCopilot" color="blue" :disabled="isThinking" icon="i-lucide-send">
+                Send
+            </UButton>
+
         </div>
 
 
         <footer class="flex justify-end px-4">
             <span class="block text-gray-500">
                 Powered by <span class="font-medium">Google</span> Gemini
-                <GeminiLogo class="h-5 w-5 inline-block animate-float animate-pulsing animate-duration-[5000ms]"
-                    style="animation-iteration-count: infinite;" />
+                <span class="animate-float" style="animation-iteration-count: infinite;">
+                    <GeminiLogo class="h-5 w-5 inline-block animate-pulsing animate-duration-[5000ms]"
+                        style="animation-iteration-count: infinite;" />
+                </span>
             </span>
         </footer>
     </UCard>
@@ -49,19 +75,12 @@
 <script lang="ts" setup>
 import { useNavigatorLanguage } from '@vueuse/core'
 import { useSpeechRecognition } from '@vueuse/core'
-import MarkdownIt from "markdown-it";
-import Bumblebee from "bumblebee-hotword";
-import { alexa } from "@/hotwords/alexa";
-import { copilot } from "@/hotwords/copilot";
+import { usePorcupine } from '@picovoice/porcupine-vue';
+import { heyCopilot } from "@/hotwords/hey_copilot";
+import { porcupineParams } from "@/hotwords/porcupine_params";
 
-
-const bumblebee = new Bumblebee()
-
-
-
-
-const md = new MarkdownIt();
-
+const PicoVoiceKey = 'u74TuYeZioAXjQRwzhrl1hA+RPQeaA3rZWejOriAeS2y/4Qun/Ezaw=='
+const porcupine = usePorcupine()
 const { language } = useNavigatorLanguage()
 
 const currentIndex = ref(0)
@@ -70,6 +89,8 @@ const finalTranscript = ref('')
 const isFinal = ref(false)
 const copilotResponse = ref('')
 const isCopilotResponseFinal = ref(false)
+const isThinking = ref(false)
+const audioInstance = ref<HTMLAudioElement | null>(null)
 const recognition = useSpeechRecognition({
     lang: language.value,
     continuous: true,
@@ -77,6 +98,7 @@ const recognition = useSpeechRecognition({
 })
 
 const typewriter = (text: string) => {
+    isCopilotResponseFinal.value = false
     let index = 0
 
     // use requestAnimationFrame to animate the typing
@@ -94,44 +116,55 @@ const typewriter = (text: string) => {
     }, text.length * 50)
 }
 
-const sendToStreamCopilot = (transcript: string) => {
-    const client = useAuthenticatedRequest()
-    isCopilotResponseFinal.value = false
-    copilotResponse.value = ''
-
-    client.post('/stream-manager/smart-assistant', {
-        message: transcript,
-    }).then((res) => {
-        console.log('Message sent to Stream Copilot', res.data)
-        typewriter(res.data.data.response)
-        const voice = fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=${res.data.data.response}`)
-        voice.then((response) => {
-            return response.blob()
-        }).then((blob) => {
-            const url = URL.createObjectURL(blob)
-            const audio = new Audio(url)
-            audio.play()
-        })
-
-
-
-    }).catch((error) => {
-        console.error('Error sending message to Stream Copilot:', error)
-        typewriter('Copilot is not available at the moment. Please try again later.')
-        const voice = fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=Copilot is not available at the moment. Please try again later.`)
-        voice.then((response) => {
-            return response.blob()
-        }).then((blob) => {
-            const url = URL.createObjectURL(blob)
-            const audio = new Audio(url)
-            audio.play()
-        })
-    })
+const getAudio = async (text: string): Promise<void> => {
+    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=${text}`)
+    const blob = await voice.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    audio.onended = () => {
+        audioInstance.value = null
+    }
+    audioInstance.value = audio
 }
 
-const processResult = (event: any) => {
-    // Stop the bumblebee hotword detection while processing the speech recognition
-    bumblebee.stop()
+const sendToCopilot = async () => {
+    const client = useAuthenticatedRequest()
+    isThinking.value = true
+    recognition.stop()
+    porcupine.start()
+    copilotResponse.value = ''
+    try {
+        const res = await client.post('/stream-manager/smart-assistant', {
+            message: finalTranscript.value
+        })
+
+        console.log('Message received from Stream Copilot', res.data)
+        await getAudio(res.data.data.response)
+        await audioInstance.value?.play()
+        typewriter(res.data.data.response)
+    } catch (error) {
+        console.error('Error sending message to Stream Copilot:', error)
+        typewriter('Copilot is not available at the moment. Please try again later.')
+        await getAudio('Copilot is not available at the moment. Please try again later.')
+        await audioInstance.value?.play()
+    } finally {
+        isThinking.value = false
+    }
+}
+
+
+
+
+
+const startListening = () => {
+    porcupine.stop()
+    SoundManager.getInstance().playSound(Sounds.NEW_NOTIFICATION)
+    recognition.start()
+}
+
+const processResult = async (event: any) => {
+    // Stop the hotword detection while processing the speech recognition
+    porcupine.stop()
     currentIndex.value = event.resultIndex
     isFinal.value = event.results[currentIndex.value].isFinal
     const recognitionResult = event.results[currentIndex.value]
@@ -142,9 +175,7 @@ const processResult = (event: any) => {
 
     if (isFinal.value) {
         finalTranscript.value = currentTranscript.value
-        sendToStreamCopilot(finalTranscript.value)
-        recognition.stop()
-        bumblebee.start()
+        await sendToCopilot()
     }
 
     console.log('Transcript:', currentTranscript.value)
@@ -155,27 +186,54 @@ const processResult = (event: any) => {
 
 
 
-onMounted(() => {
+onMounted(async () => {
     recognition.recognition.onresult = processResult
     //recognition.start()
 
-    bumblebee.setWorkersPath('/bumblebee-workers/')
-    bumblebee.addHotword('alexa')
-    bumblebee.addHotword('ok_google')
+    await porcupine.init(PicoVoiceKey, [
+        {
+            base64: heyCopilot.file.data,
+            label: "Hey Copilot",
+            forceWrite: true,
+        }
+    ],
+        {
+            base64: porcupineParams.file.data,
+            forceWrite: true,
+        },
+    )
 
-    bumblebee.setSensitivity(1);
-
-    bumblebee.on('hotword', function (hotword) {
-        // YOUR CODE HERE
-        console.log('hotword detected:', hotword);
-        SoundManager.getInstance().playSound(Sounds.NEW_NOTIFICATION)
-        recognition.start()
-    });
 
 
+    try {
+        await porcupine.start()
+        console.log('Porcupine started')
+    } catch (error) {
+        console.error('Error starting Porcupine', error)
+    }
 
-    bumblebee.start()
 })
+
+
+
+watch(() => porcupine.state.keywordDetection, (value) => {
+    if (value) {
+        startListening()
+    }
+})
+
+watch(() => porcupine.state.isListening, (value) => {
+    console.log('Porcupine is listening', value)
+})
+
+watch(() => porcupine.state.isLoaded, (value) => {
+    console.log('Porcupine is loaded', value)
+})
+
+watch(() => porcupine.state.error, (value) => {
+    console.error('Porcupine error', value)
+})
+
 
 
 </script>

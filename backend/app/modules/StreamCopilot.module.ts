@@ -139,6 +139,15 @@ class StreamCopilot {
         while (response.functionCalls()) {
             for (const functionCalling of response.functionCalls() || []) {
                 switch (functionCalling.name) {
+                    case FunctionsConst.getCurrentSpotifySong:
+                        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
+                        if (!spotifyAccount) {
+                            response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { error: `No Spotify account linked` } } });
+                            break;
+                        }
+                        const currentSong = await getSpotifyCurrentlyPlayingSong(channel)
+                        response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { currentSong } } });
+                        break;
                     case FunctionsConst.changeStreamTitle:
                         const { title } = functionCalling.args as { title: string };
                         await channel.changeStreamTitle(title);
@@ -174,15 +183,6 @@ class StreamCopilot {
                         await channel.clearChat();
                         await bot.sendMessage(channel, `/me ✨ Copilot: Chat cleared`)
                         response = await generate({ functionCall: { name: FunctionsConst.clearChat, response: { success: true } } });
-                        break;
-                    case FunctionsConst.getCurrentSpotifySong:
-                        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
-                        if (!spotifyAccount) {
-                            response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { error: `No Spotify account linked` } } });
-                            break;
-                        }
-                        const currentSong = await getSpotifyCurrentlyPlayingSong(channel)
-                        response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { currentSong } } });
                         break;
                     case FunctionsConst.sendMessageToChat:
                         // this function don't have args
