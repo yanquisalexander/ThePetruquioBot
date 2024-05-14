@@ -6,8 +6,12 @@
                 <div class="flex items-center">
                     <UIcon name="i-lucide-mic-off" class="mr-2" />
                     <span>
-                        Copilot is not listening. Say "Hey Copilot" to start listening.
+                        Copilot has stopped listening. Press the mic button to start listening again.
                     </span>
+
+                    <UButton @click="startListening" color="blue" class="ml-4">
+                        Start Listening
+                    </UButton>
                 </div>
             </template>
         </UAlert>
