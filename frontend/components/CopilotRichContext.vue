@@ -78,6 +78,24 @@
                 </UAlert>
             </template>
         </template>
+
+        <template v-if="props.context.actions.length > 0">
+            <template v-for="action in props.context.actions">
+                <UAlert class="animate-fade-in-down animate-delay-[400ms] my-2" :color="getActionInfo(action).color"
+                    :title="getActionInfo(action).title" variant="subtle" :icon="getActionInfo(action).icon">
+                    <template #description>
+                        <div class="flex mt-2">
+                            <div class="flex-shrink-0">
+                                <UIcon name="i-fa6-info-circle" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span>{{ getActionInfo(action).description }}</span>
+                            </div>
+                        </div>
+                    </template>
+                </UAlert>
+            </template>
+        </template>
     </div>
 
 </template>
@@ -88,8 +106,46 @@ const props = defineProps<{
 }>()
 
 const hasAtLeastOne = computed(() => {
-    return Object.keys(props.context).some(key => props.context[key] !== null)
+    // Check if value is different to null or empty array
+    return Object.keys(props.context).some(key => {
+        const value = props.context[key]
+        return value !== null && value !== undefined && (Array.isArray(value) ? value.length > 0 : true)
+    })
 })
+
+const getActionInfo = (action: any) => {
+    switch (action.id) {
+        case 'changeStreamTitle':
+            return {
+                title: 'Cambio de título de stream',
+                icon: 'i-lucide-edit',
+                color: 'twitch',
+                description: `El título de tu stream ha sido cambiado a "${action.args?.title}"`
+            }
+        case 'toggleEmoteOnly':
+            return {
+                title: 'Modo solo emotes',
+                icon: 'i-lucide-smile',
+                color: 'twitch',
+                description: `El modo solo emotes ha sido ${action.args?.enabled ? 'activado' : 'desactivado'}`
+            }
+        case 'clearChat':
+            return {
+                title: 'Chat limpiado',
+                icon: 'i-lucide-trash',
+                color: 'blue',
+                description: 'El chat de tu stream ha sido limpiado'
+            }
+        default:
+            return {
+                title: action.id,
+                color: 'gray',
+                icon: 'i-fa6-question-circle',
+                description: 'No se ha podido obtener información sobre esta acción'
+            }
+    }
+}
+
 
 const spotifyInterval = ref<NodeJS.Timeout | null>(null)
 

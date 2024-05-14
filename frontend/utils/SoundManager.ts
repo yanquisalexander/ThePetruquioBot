@@ -12,6 +12,7 @@ export enum Sounds {
   CONFETTI = '/assets/sounds/confetti.mp3',
   SLACK_NOTIFICATION = '/assets/sounds/slack-notification.mp3',
   COPILOT_ERROR = '/assets/sounds/copilot-error.mp3',
+  COPILOT_LISTENED = '/assets/sounds/copilot-listened.mp3',
 }
 
 class SoundManager {

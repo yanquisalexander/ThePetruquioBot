@@ -8,11 +8,17 @@ import { HelixUser } from "@twurple/api";
 import { ExternalAccountProvider } from "../models/ExternalAccount.model";
 import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
 
+interface CopilotAction {
+    id: string
+    args?: any
+}
 interface CopilotContextUsed {
     spotify: any | null
     webResults: any[] | null
     twitchChannel: any | null
+    actions?: CopilotAction[]
 }
+
 
 const MODEL_NAME = "gemini-1.5-pro-latest";
 
@@ -127,7 +133,7 @@ class StreamCopilot {
 
     async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed }> {
         const bot = await Bot.getInstance();
-        let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null };
+        let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [] };
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
             // @ts-ignore
             this.model.systemInstruction = `
@@ -136,7 +142,9 @@ class StreamCopilot {
             ${channel.preferences.smartAssistantPrompt.value}
 
             ---
-            
+
+            Current time (UTC): ${new Date().toUTCString()}
+        
             Current channel: ${channel.user.displayName}
             Replying to: ${user.displayName}
 
@@ -185,6 +193,7 @@ class StreamCopilot {
                         const { title } = functionCalling.args as { title: string };
                         await channel.changeStreamTitle(title);
                         await bot.sendMessage(channel, `/me ✨ Copilot: Stream title changed to: ${title}`)
+                        context.actions?.push({ id: FunctionsConst.changeStreamTitle, args: { title } })
                         response = await generate({ functionCall: { name: FunctionsConst.changeStreamTitle, response: { success: true, title } } });
                         break;
                     case FunctionsConst.getChannelInfo:
@@ -212,11 +221,13 @@ class StreamCopilot {
                         const { enabled } = functionCalling.args as { enabled: boolean };
                         await channel.toggleEmoteOnly(enabled);
                         await bot.sendMessage(channel, `/me ✨ Copilot: Emote-only mode ${enabled ? 'enabled' : 'disabled'}`)
+                        context.actions?.push({ id: FunctionsConst.toggleEmoteOnly, args: { enabled } })
                         response = await generate({ functionCall: { name: FunctionsConst.toggleEmoteOnly, response: { success: true } } });
                         break;
                     case FunctionsConst.clearChat:
                         await channel.clearChat();
                         await bot.sendMessage(channel, `/me ✨ Copilot: Chat cleared`)
+                        context.actions?.push({ id: FunctionsConst.clearChat })
                         response = await generate({ functionCall: { name: FunctionsConst.clearChat, response: { success: true } } });
                         break;
                     case FunctionsConst.sendMessageToChat:

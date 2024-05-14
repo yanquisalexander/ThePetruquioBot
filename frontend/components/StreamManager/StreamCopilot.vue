@@ -135,6 +135,7 @@ const getAudio = async (text: string): Promise<void> => {
 }
 
 const sendToCopilot = async () => {
+    SoundManager.getInstance().playSound(Sounds.COPILOT_LISTENED, 0.2)
     const client = useAuthenticatedRequest()
     isThinking.value = true
     recognition.stop()
