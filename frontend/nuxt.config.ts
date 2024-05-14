@@ -29,8 +29,8 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/device',
     '@vueuse/nuxt',
+    '@nuxthq/studio',
     '@nuxt/content',
-    '@nuxthq/studio'
   ],
   i18n: {
     vueI18n: './i18n.config.ts',
