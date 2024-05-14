@@ -7,35 +7,44 @@ import { Bot } from "@/bot";
 import { HelixUser } from "@twurple/api";
 import { ExternalAccountProvider } from "../models/ExternalAccount.model";
 import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
+import MemoryVariables from "@/lib/MemoryVariables";
 
 interface CopilotAction {
     id: string
     args?: any
 }
+
+interface CopilotSuggestedAction {
+    id: string
+    args?: any
+    actions?: any[]
+}
+
 interface CopilotContextUsed {
     spotify: any | null
     webResults: any[] | null
     twitchChannel: any | null
     actions?: CopilotAction[]
+    suggested_actions?: CopilotSuggestedAction[]
 }
 
 
 const MODEL_NAME = "gemini-1.5-pro-latest";
 
 const BASE_SYSTEM_PROMPT = `
-Eres un chatbot de Twitch llamado Petruquio.LIVE, creado por @Alexitoo_UY.
+You are a Twitch chatbot named Petruquio.LIVE, created by @Alexitoo_UY.
+Your duty is to entertain and inform users, and to help the streamer in question with smart features.
 
-Tu deber es entretener e informar a los usuarios, y ayudar al streamer en cuestión con funciones inteligentes.
-
-Puedes usar emojis, mencionar a usuarios, y hacer preguntas a la audiencia.
-
-Responde de la manera más fluida y natural posible.
+You can use emojis, mention users, and ask questions to the audience.
+Respond as smoothly and naturally as possible.
 
 Your are powered by Google Gemini.
 
 Don't include links because you have TTS on and it will read them.
 
 You can search on the internet to get more information.
+
+DON'T send JSON responses.
 
 --- Prompt personalizado impuesto por el streamer ---
 `
@@ -48,7 +57,9 @@ const FunctionsConst = {
     clearChat: 'clearChat',
     getCurrentSpotifySong: 'getCurrentSpotifySong',
     sendMessageToChat: 'sendMessageToChat',
-    searchOnWeb: 'searchOnInternet'
+    searchOnWeb: 'searchOnInternet',
+    getCurrentLiveChannels: 'getCurrentLiveChannels',
+    suggestChannelToRaid: 'suggestChannelToRaid',
 }
 
 const functionDeclarations: FunctionDeclarationsTool[] = [
@@ -56,7 +67,7 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
         functionDeclarations: [
             {
                 name: FunctionsConst.getChannelInfo,
-                description: "Get the information of a specified Twitch channel",
+                description: "Search for a channel on Twitch and get information about it, for example, the stream title, viewers, and description",
                 parameters: {
                     type: FunctionDeclarationSchemaType.OBJECT,
                     properties: {
@@ -92,7 +103,7 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
             },
             {
                 name: FunctionsConst.getCurrentSpotifySong,
-                description: 'Get the current song playing on Spotify'
+                description: 'Get the current song that is playing on Spotify',
             },
             {
                 name: FunctionsConst.sendMessageToChat,
@@ -108,6 +119,14 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
                     },
                     required: ['query']
                 }
+            },
+            {
+                name: FunctionsConst.getCurrentLiveChannels,
+                description: 'Get the current live channels on Twitch that have joined Petruquio.LIVE'
+            },
+            {
+                name: FunctionsConst.suggestChannelToRaid,
+                description: 'Suggest a channel to raid based on the current live channels',
             }
         ]
     }
@@ -133,7 +152,7 @@ class StreamCopilot {
 
     async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed }> {
         const bot = await Bot.getInstance();
-        let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [] };
+        let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [], suggested_actions: [] };
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
             // @ts-ignore
             this.model.systemInstruction = `
@@ -236,7 +255,68 @@ class StreamCopilot {
                         await bot.sendMessage(channel, `/me ✨ Copilot: ${aiMessage.text()}`)
                         response = await generate({ functionCall: { name: FunctionsConst.sendMessageToChat, response: { success: true } } });
                         break;
-
+                    case FunctionsConst.getCurrentLiveChannels:
+                        const liveChannels = MemoryVariables.getLiveChannels();
+                        response = await generate({
+                            functionCall: {
+                                name: FunctionsConst.getCurrentLiveChannels, response: {
+                                    live_channels: liveChannels.map(stream => {
+                                        return {
+                                            username: stream.userName,
+                                            display_name: stream.userDisplayName,
+                                            title: stream.title,
+                                            viewers: stream.viewers,
+                                            thumbnail_url: stream.thumbnailUrl,
+                                            started_at: stream.startDate,
+                                            language: stream.language,
+                                            tags: stream.tags,
+                                            game_id: stream.gameId,
+                                            game_name: stream.gameName,
+                                            type: stream.type,
+                                            is_mature: stream.isMature,
+                                        }
+                                    }),
+                                }
+                            }
+                        });
+                        break;
+                    case FunctionsConst.suggestChannelToRaid:
+                        const liveChannelsToRaid = MemoryVariables.getLiveChannels();
+                        const randomChannel = liveChannelsToRaid[Math.floor(Math.random() * liveChannelsToRaid.length)];
+                        context.suggested_actions?.push({
+                            id: FunctionsConst.suggestChannelToRaid, args: {
+                                channel: {
+                                    display_name: randomChannel.userDisplayName || randomChannel.userName,
+                                    title: randomChannel.title,
+                                    viewers: randomChannel.viewers,
+                                    started_at: randomChannel.startDate,
+                                    language: randomChannel.language,
+                                    game_name: randomChannel.gameName,
+                                    thumbnail_url: randomChannel.getThumbnailUrl(440, 248),
+                                }
+                            }
+                        })
+                        response = await generate({
+                            functionCall: {
+                                name: FunctionsConst.suggestChannelToRaid, response: {
+                                    suggested_channel: {
+                                        username: randomChannel.userName,
+                                        display_name: randomChannel.userDisplayName,
+                                        title: randomChannel.title,
+                                        viewers: randomChannel.viewers,
+                                        thumbnail_url: randomChannel.thumbnailUrl,
+                                        started_at: randomChannel.startDate,
+                                        language: randomChannel.language,
+                                        tags: randomChannel.tags,
+                                        game_id: randomChannel.gameId,
+                                        game_name: randomChannel.gameName,
+                                        type: randomChannel.type,
+                                        is_mature: randomChannel.isMature,
+                                    }
+                                }
+                            }
+                        });
+                        break;
                 }
             }
         }

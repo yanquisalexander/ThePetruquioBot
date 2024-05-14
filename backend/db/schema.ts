@@ -212,3 +212,11 @@ export const MediaRequestsTable = pgTable('media_requests', {
   status: text('status').default('pending'),
   requested_at: timestamp('requested_at').default(sql.raw('now()')),
 })
+
+export const StreamCopilotMessagesTable = pgTable('stream_copilot_messages', {
+  id: serial('id').primaryKey(),
+  channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id),
+  message: text('message').notNull(),
+  role: text('role').notNull(), // 'copilot' | 'streamer'
+  created_at: timestamp('created_at').default(sql.raw('now()'))
+})

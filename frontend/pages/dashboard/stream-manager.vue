@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </UCard>
-            <StreamManagerConfig v-model="showConfig" />
+            <StreamManagerConfig v-model="showConfig" @close="showConfig = false" />
         </UContainer>
     </DashboardPageContainer>
 </template>

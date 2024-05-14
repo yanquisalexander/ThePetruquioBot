@@ -1,5 +1,11 @@
 <template>
     <UCard class="smart-assistant" :ui="{ body: { padding: '!px-0 !pt-0' } }">
+        <div class="bg-blue-500 text-white p-2 rounded-t-md text-center shadow-md">
+            <h2 class="flex items-center justify-center">
+                <UIcon name="i-lucide-verified" class="mr-2" />
+                You have been granted access to Copilot Beta
+            </h2>
+        </div>
         <UAlert v-if="!porcupine.state.isListening && !recognition.isListening.value" color="orange" variant="soft"
             class="p-4">
             <template #description>
@@ -36,9 +42,9 @@
             </template>
         </UAlert>
         <div class="smart-assistant__header p-4">
-            <h2 class="inline-block bg-blue-100 text-blue-700 rounded-full py-1 px-2">
-                <CopilotLogo class="h-5 w-5 inline-block mr-1" />
-                Copilot
+            <h2
+                class="text-xl font-medium font-jost inline-block bg-gradient-to-r from-blue-600 via-red-500 to-purple-600 text-transparent bg-clip-text">
+                Stream Copilot
             </h2>
         </div>
         <div class="smart-assistant__content p-4 md:w-3/4 space-y-4">

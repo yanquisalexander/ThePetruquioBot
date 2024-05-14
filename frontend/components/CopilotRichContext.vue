@@ -4,7 +4,7 @@
             class="text-lg font-medium mb-2 bg-gradient-to-r from-blue-600 via-red-500 to-purple-400 text-transparent bg-clip-text">
             <GeminiLogo class="h-5 w-5 inline-block mr-1 animate-swing animate-duration-[3000ms]"
                 style="animation-iteration-count: infinite;" />
-            Copilot ha utilizado la siguiente información para responder
+            {{ sectionTitle }}
         </h3>
         <template v-if="props.context.spotify">
             <UAlert class="animate-fade-in-down animate-delay-[100ms]" color="gray" title="Tu música actual en Spotify"
@@ -77,6 +77,24 @@
                     </template>
                 </UAlert>
             </template>
+            <div v-if="props.context.webResults.results"
+                class="animate-fade-in-down animate-delay-[300ms] grid grid-cols-3 gap-4">
+                <UCard v-for="result in props.context.webResults.results.splice(0, 3)">
+                    <template #header>
+                        <div class="flex space-x-2">
+                            <img :src="result.favicons.high_res" class="h-6 w-6" />
+                            <span class="font-medium flex-1">{{ result.title }}</span>
+                        </div>
+                    </template>
+                    <span>{{ truncatedText(result.description, 100) }}</span>
+                    <template #footer>
+                        <UButton color="blue" size="sm" :href="result.url" target="_blank">
+                            Leer más
+                        </UButton>
+                    </template>
+                </UCard>
+            </div>
+
         </template>
 
         <template v-if="props.context.actions.length > 0">
@@ -96,6 +114,10 @@
                 </UAlert>
             </template>
         </template>
+
+        <template v-if="props.context.suggested_actions.length > 0">
+            <CopilotSuggestedActionsWrapper :suggested_actions="props.context.suggested_actions" />
+        </template>
     </div>
 
 </template>
@@ -112,6 +134,26 @@ const hasAtLeastOne = computed(() => {
         return value !== null && value !== undefined && (Array.isArray(value) ? value.length > 0 : true)
     })
 })
+
+const sectionTitle = computed(() => {
+    const suggestedActionsKeys = ['suggested_actions'];
+    const actionsTakenKeys = ['actions'];
+    const otherKeys = Object.keys(props.context).filter(key => !suggestedActionsKeys.includes(key) && !actionsTakenKeys.includes(key));
+
+    const suggestedActionCount = suggestedActionsKeys.reduce((count, key) => count + (props.context[key]?.length || 0), 0);
+    const actionsTakenCount = actionsTakenKeys.reduce((count, key) => count + (props.context[key]?.length || 0), 0);
+    const otherCount = otherKeys.reduce((count, key) => count + (props.context[key] ? 1 : 0), 0);
+
+    if (actionsTakenCount > otherCount && actionsTakenCount > suggestedActionCount) {
+        return 'Acciones realizadas';
+    } else if (suggestedActionCount > otherCount && suggestedActionCount > actionsTakenCount) {
+        return 'Acciones recomendadas';
+    } else {
+        return 'Copilot ha utilizado la siguiente información para responder';
+    }
+});
+
+
 
 const getActionInfo = (action: any) => {
     switch (action.id) {

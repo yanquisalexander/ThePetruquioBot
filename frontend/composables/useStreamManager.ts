@@ -4,10 +4,14 @@ import { useStorage } from "@vueuse/core";
 
 interface StreamManagerConfig {
     showStreamPreview: boolean;
+    showChat: boolean;
+    notificationSound: keyof typeof Sounds;
 }
 
 const defaultConfig: StreamManagerConfig = {
     showStreamPreview: true,
+    showChat: true,
+    notificationSound: 'SLACK_NOTIFICATION'
 };
 
 
@@ -54,7 +58,7 @@ export const useStreamManager = () => {
                         src: data.user.avatar ?? data.rewardIcon,
                     }
                 })
-                SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+                SoundManager.getInstance().playSound(Sounds[configuration.value.notificationSound])
                 break;
             case 'title-change':
                 console.log('title-change', data)
@@ -66,7 +70,7 @@ export const useStreamManager = () => {
                     icon: 'i-lucide-pencil',
                     timeout: 6000,
                 })
-                SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+                SoundManager.getInstance().playSound(Sounds[configuration.value.notificationSound])
                 break;
             case 'chat-cleared':
                 console.log('chat-cleared', data)
@@ -77,7 +81,7 @@ export const useStreamManager = () => {
                     icon: 'i-lucide-sword',
                     timeout: 5000
                 })
-                SoundManager.getInstance().playSound(Sounds.SLACK_NOTIFICATION)
+                SoundManager.getInstance().playSound(Sounds[configuration.value.notificationSound])
                 break;
             default:
                 break;
