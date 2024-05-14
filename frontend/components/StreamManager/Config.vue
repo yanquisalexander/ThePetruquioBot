@@ -25,7 +25,11 @@
                 <USelect v-model="configuration.notificationSound"
                     @update:modelValue="handleConfigChange('notificationSound', $event); previewNotificationSound()"
                     :options="soundsForNotifications" />
+            </UFormGroup>
 
+            <UFormGroup label="Voz de Copilot">
+                <USelect v-model="configuration.copilotVoice"
+                    @update:modelValue="handleConfigChange('copilotVoice', $event); previewCopilotVoice()" />
             </UFormGroup>
 
 
@@ -42,6 +46,18 @@
 
 <script lang="ts" setup>
 const emit = defineEmits(['close'])
+const audioInstance = ref<HTMLAudioElement | null>(null)
+
+const getAudio = async (text: string): Promise<void> => {
+    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=${text}`)
+    const blob = await voice.blob()
+    const url = URL.createObjectURL(blob)
+    const audio = new Audio(url)
+    audio.onended = () => {
+        audioInstance.value = null
+    }
+    audioInstance.value = audio
+}
 
 const { configuration } = useStreamManager()
 
@@ -51,6 +67,10 @@ const handleConfigChange = (key: string, value: any) => {
 
 const previewNotificationSound = () => {
     SoundManager.getInstance().playSound(Sounds[configuration.value.notificationSound])
+}
+
+const previewCopilotVoice = async () => {
+    await getAudio('Hola, soy Copilot')
 }
 
 
@@ -66,6 +86,17 @@ const soundsForNotifications = [
     {
         label: 'New',
         value: 'NEW_NOTIFICATION'
+    }
+]
+
+const voicesForCopilot = [
+    {
+        label: 'Mia',
+        value: 'Mia',
+    },
+    {
+        label: 'Enrique',
+        value: 'Enrique',
     }
 ]
 

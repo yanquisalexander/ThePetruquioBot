@@ -6,12 +6,14 @@ interface StreamManagerConfig {
     showStreamPreview: boolean;
     showChat: boolean;
     notificationSound: keyof typeof Sounds;
+    copilotVoice: string;
 }
 
 const defaultConfig: StreamManagerConfig = {
     showStreamPreview: true,
     showChat: true,
-    notificationSound: 'SLACK_NOTIFICATION'
+    notificationSound: 'SLACK_NOTIFICATION',
+    copilotVoice: 'Enrique'
 };
 
 
