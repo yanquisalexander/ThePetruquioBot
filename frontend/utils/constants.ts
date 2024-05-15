@@ -12,7 +12,7 @@ export enum ENDPOINTS {
 
 export enum SOCKET_ENDPOINTS {
   development = 'localhost:3000',
-  production = 'api.petruquio.live',
+  production = 'api-prod-home.petruquio.live',
 }
 
 export const FRONTEND_URL = isDevelopment ? FRONTEND_URLS.development : FRONTEND_URLS.production
