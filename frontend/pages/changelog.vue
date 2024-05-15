@@ -21,6 +21,5 @@
 </template>
 
 <script lang="ts" setup>
-const { pending, data: changelogs } = await useAsyncData("changelogs", async () =>
-    queryContent("/changelog").find()
-);</script>
+const changelogs = await queryContent("/changelog").find()
+</script>
