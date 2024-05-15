@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/device',
     '@vueuse/nuxt',
-    '@nuxthq/studio',
+    // '@nuxthq/studio',
     '@nuxt/content',
   ],
   i18n: {
