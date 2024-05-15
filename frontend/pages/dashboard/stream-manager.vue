@@ -53,6 +53,15 @@ import io from 'socket.io-client'
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
+definePageMeta({
+    middleware: 'auth',
+    layout: 'dashboard',
+})
+
+useHead({
+    title: 'Stream Manager'
+})
+
 const { rawUser } = useCurrentUser()
 const sidebar = useSidebar()
 const toast = useToast()
@@ -94,14 +103,7 @@ const connectSocket = () => {
     })
 }
 
-definePageMeta({
-    layout: 'dashboard',
-    middleware: 'auth'
-})
 
-useHead({
-    title: 'Stream Manager'
-})
 
 onMounted(async () => {
     if (sidebar.sidebarVisible) {
