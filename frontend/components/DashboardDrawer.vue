@@ -96,7 +96,7 @@ const menuCategories = ref([
         icon: 'i-lucide-clapperboard',
         label: 'Stream Manager',
         to: '/dashboard/stream-manager',
-        enabled: process.env.NODE_ENV === 'development',
+        enabled: true,
         newFeature: true
       },
       {
