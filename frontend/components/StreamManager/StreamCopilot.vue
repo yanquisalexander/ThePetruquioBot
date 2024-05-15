@@ -261,6 +261,10 @@ watch(() => porcupine.state.error, (value) => {
     console.error('Porcupine error', value)
 })
 
+onBeforeUnmount(() => {
+    recognition.stop()
+    porcupine.stop()
+})
 
 
 </script>
