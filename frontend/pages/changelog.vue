@@ -1,5 +1,5 @@
 <template>
-    <div class="space-y-4 max-w-3xl mx-auto">
+    <div class="space-y-4 max-w-3xl mx-auto" v-if="!true">
         <template v-for="changelog in changelogs">
             <ContentRenderer :value="changelog">
                 <h2 class="text-2xl font-semibold">
