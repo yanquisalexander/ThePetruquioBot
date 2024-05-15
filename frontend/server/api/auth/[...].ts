@@ -15,7 +15,7 @@ export default NuxtAuthHandler({
                 console.log(`Fetching user session: ${token.username}`);
             }
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + token.token;
-            let url = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/v2/accounts/session' : 'https://api.petruquio.live/v2/accounts/session';
+            let url = `${API_ENDPOINT}/accounts/session`
             try {
                 const response = await axios.get(url);
                 session.user = response.data.user;
