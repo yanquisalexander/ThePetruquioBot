@@ -49,7 +49,11 @@ const emit = defineEmits(['close'])
 const audioInstance = ref<HTMLAudioElement | null>(null)
 
 const getAudio = async (text: string): Promise<void> => {
-    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=Mia&text=${text}`)
+    if (audioInstance.value && !audioInstance.value.ended) {
+        audioInstance.value.pause()
+        audioInstance.value = null
+    }
+    const voice = await fetch(`https://api.streamelements.com/kappa/v2/speech?voice=${configuration.value.copilotVoice}&text=${text}`)
     const blob = await voice.blob()
     const url = URL.createObjectURL(blob)
     const audio = new Audio(url)
@@ -71,6 +75,7 @@ const previewNotificationSound = () => {
 
 const previewCopilotVoice = async () => {
     await getAudio('Hola, soy Copilot')
+    audioInstance.value?.play()
 }
 
 
@@ -97,6 +102,26 @@ const voicesForCopilot = [
     {
         label: 'Enrique',
         value: 'Enrique',
+    },
+    {
+        label: 'Conchita',
+        value: 'Conchita',
+    },
+    {
+        label: 'Miguel',
+        value: 'Miguel',
+    },
+    {
+        label: 'Ricardo',
+        value: 'Ricardo',
+    },
+    {
+        label: 'pt-PT-Wavenet-A',
+        value: 'pt-PT-Wavenet-A',
+    },
+    {
+        label: 'pt-PT-Wavenet-B',
+        value: 'pt-PT-Wavenet-B',
     }
 ]
 

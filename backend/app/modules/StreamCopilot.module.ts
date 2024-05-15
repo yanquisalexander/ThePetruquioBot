@@ -51,15 +51,15 @@ DON'T send JSON responses, for example if you have tool_outputs in the response,
 
 
 const FunctionsConst = {
-    getChannelInfo: 'getChannelInfo',
-    changeStreamTitle: 'changeStreamTitle',
-    toggleEmoteOnly: 'toggleEmoteOnly',
-    clearChat: 'clearChat',
-    getCurrentSpotifySong: 'getCurrentSpotifySong',
-    sendMessageToChat: 'sendMessageToChat',
-    searchOnWeb: 'searchOnInternet',
-    getCurrentLiveChannels: 'getCurrentLiveChannels',
-    suggestChannelToRaid: 'suggestChannelToRaid',
+    getChannelInfo: 'get_channel_info',
+    changeStreamTitle: 'change_stream_title',
+    toggleEmoteOnly: 'toggle_emote_only',
+    clearChat: 'clear_chat',
+    getCurrentSpotifySong: 'get_current_spotify_song',
+    sendMessageToChat: 'send_message_to_chat',
+    searchOnWeb: 'search_on_web',
+    getCurrentLiveChannels: 'get_current_live_channels',
+    suggestChannelToRaid: 'suggest_channel_to_raid',
 }
 
 const functionDeclarations: FunctionDeclarationsTool[] = [
@@ -140,6 +140,11 @@ class StreamCopilot {
         this.googleGenerativeAI = new GoogleGenerativeAI(Configuration.GOOGLE_GENERATIVE_AI_API_KEY);
         this.model = this.googleGenerativeAI.getGenerativeModel({
             model: MODEL_NAME,
+            generationConfig: {
+                topP: 0.95,
+                topK: 64,
+                maxOutputTokens: 8192,
+            },
             tools: functionDeclarations,
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -152,6 +157,7 @@ class StreamCopilot {
 
     async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed }> {
         const bot = await Bot.getInstance();
+        const currentStream = await channel.getStream();
         let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [], suggested_actions: [] };
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
             // @ts-ignore
@@ -165,6 +171,9 @@ class StreamCopilot {
             Current time (UTC): ${new Date().toUTCString()}
         
             Current channel: ${channel.user.displayName}
+
+            ${currentStream ? `Current stream of ${channel.user.displayName}: ${currentStream.title} - ${currentStream.viewers} viewers` : `${channel.user.displayName} is not streaming right now`}
+            
             Replying to: ${user.displayName}
 
             `
@@ -283,6 +292,11 @@ class StreamCopilot {
                     case FunctionsConst.suggestChannelToRaid:
                         const liveChannelsToRaid = MemoryVariables.getLiveChannels();
                         const randomChannel = liveChannelsToRaid[Math.floor(Math.random() * liveChannelsToRaid.length)];
+
+                        if (!randomChannel) {
+                            response = await generate({ functionCall: { name: FunctionsConst.suggestChannelToRaid, response: { error: 'No live channels to raid' } } });
+                            break;
+                        }
                         context.suggested_actions?.push({
                             id: FunctionsConst.suggestChannelToRaid, args: {
                                 channel: {

@@ -7,7 +7,7 @@ export enum FRONTEND_URLS {
 
 export enum ENDPOINTS {
   development = 'http://localhost:3000/v2',
-  production = 'https://api.petruquio.live/v2',
+  production = 'https://api-prod-home.petruquio.live/v2',
 }
 
 export enum SOCKET_ENDPOINTS {

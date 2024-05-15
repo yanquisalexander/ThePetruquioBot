@@ -1,3 +1,4 @@
+import { HelixStream } from "@twurple/api"
 import Database from '../../lib/DatabaseManager'
 import defaultChannelPreferences, { type ChannelPreferences } from '../../utils/ChannelPreferences.class'
 import { Configuration } from "../config"
@@ -155,6 +156,9 @@ class Channel {
     return await Twitch.Helix.asUser(Configuration.TWITCH_USER_ID, async ctx => {
       await ctx.moderation.deleteChatMessages(this.twitchId)
     })
+  }
+  public async getStream(): Promise<HelixStream | null> {
+    return await Twitch.Helix.streams.getStreamByUserId(this.twitchId)
   }
 
   public static async findOrCreate(id: number): Promise<Channel> {
