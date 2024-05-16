@@ -10,23 +10,23 @@
 
         <template #panel>
           <ul class="px-1 py-2 w-48">
-            <li class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200">
-              <nuxt-link to="/dashboard" class="font-gabarito w-full">
-                Dashboard
-              </nuxt-link>
-            </li>
-            <li class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200">
-              <nuxt-link to="/dashboard/settings" class="font-gabarito w-full">
-                Settings
-              </nuxt-link>
-            </li>
-            <li class="flex px-4 py-2 hover:bg-gray-100  text-black rounded-md transition-colors duration-200">
-              <button class="font-gabarito" @click="signOut({ callbackUrl: '/' })">
-                Logout
-              </button>
-            </li>
+            <template v-for="(link, index) in LINKS" :key="index">
+              <li v-if="link.type === 'link'"
+                class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200 dark:hover:bg-gray-800 dark:text-white">
+                <nuxt-link :to="link.href" class="font-gabarito w-full">
+                  {{ link.name }}
+                </nuxt-link>
+              </li>
+              <li v-else
+                class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200 dark:hover:bg-gray-800 dark:text-white cursor-pointer"
+                @click="link.callback">
+                <span class="font-gabarito w-full">
+                  {{ link.name }}
+                </span>
+              </li>
+            </template>
             <UDivider v-if="currentUser.isAdmin()" label="Admin actions" />
-            <div class="py-2">
+            <div class="py-2" v-if="currentUser.isAdmin()">
               <li class="flex px-4 py-2 hover:bg-gray-100 text-black rounded-md transition-colors duration-200">
                 <nuxt-link to="/admin" class="font-gabarito w-full">
                   Admin panel
@@ -53,15 +53,20 @@
   </div>
 </template>
 
-
 <script lang="ts" setup>
 const { signIn, signOut } = useAuth()
 const currentUser = useCurrentUser()
 const loadingAuth = ref(false)
 
-
 const login = async () => {
   loadingAuth.value = true
   await signIn('twitch')
+  loadingAuth.value = false
 }
+
+const LINKS = ref([
+  { name: 'Dashboard', href: '/dashboard', type: 'link' },
+  { name: 'Settings', href: '/dashboard/settings', type: 'link' },
+  { name: 'Logout', callback: () => signOut({ callbackUrl: '/' }), type: 'button' }
+])
 </script>

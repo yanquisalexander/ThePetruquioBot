@@ -1,7 +1,7 @@
 <template>
-    <UCard>
+    <div class="px-4 py-5 sm:p-6">
         <div class="flex flex-col items-center justify-center">
-            <div class="inline-block text-xl text-gray-800 font-medium text-center max-w-[400px]">
+            <div class="inline-block text-xl text-gray-800 font-medium text-center max-w-[400px] dark:text-gray-200">
                 Meet
                 <StreamCopilotLogo />, your personal assistant for your stream
                 <div class="inline-block !rotate-12 align-middle">
@@ -9,13 +9,20 @@
                         style="animation-iteration-count: infinite;" />
                 </div>
             </div>
+
+            <p class="text-gray-500 text-center max-w-3xl mt-4">
+                Copilot was designed to help you manage your stream, interact with your audience, and make your life
+                easier.<br />
+                Just say "Hey Copilot" and ask for help!
+            </p>
         </div>
 
-        <div class="demo-container flex flex-col items-center justify-center space-y-4">
-            <div class="flex flex-col items-center justify-center space-y-4">
 
+
+        <div class="demo-container flex flex-col items-center justify-center space-y-4 mt-4">
+            <div class="flex flex-col items-center justify-center space-y-4">
                 <div
-                    class="flex flex-col justify-center space-y-4 bg-gray-50 p-4 rounded-md min-w-[300px] w-max-content">
+                    class="flex flex-col justify-center space-y-4 bg-gray-100 p-4 rounded-md min-w-[300px] w-max-content dark:bg-gray-800">
                     <DemoChatBubble :message="currentUserMessage" role="user">
                         <template #avatar>
                             <UIcon name="i-lucide-user" class="w-5 h-5" />
@@ -34,6 +41,10 @@
                     <UButton @click="prevDemo" color="blue" variant="soft" icon="i-lucide-chevron-left" />
                     <UButton @click="nextDemo" color="blue" variant="soft" icon="i-lucide-chevron-right" />
                 </div>
+
+                <em class="text-gray-500 text-center dark:text-gray-400 py-6 text-sm">
+                    Copilot requires a microphone and PetruquioLIVE+ subscription to work.
+                </em>
             </div>
         </div>
 
@@ -45,7 +56,7 @@
                 </span>
             </span>
         </footer>
-    </UCard>
+    </div>
 </template>
 
 <script lang="ts" setup>

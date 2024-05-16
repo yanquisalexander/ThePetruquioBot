@@ -1,5 +1,5 @@
 <template>
-  <div id="HOMEPAGE" class="w-full flex flex-col space-y-4">
+  <div id="HOMEPAGE" class="w-full flex flex-col space-y-8">
     <HomeHero v-if="stats" :stats="stats" />
     <HomeMeetCopilot />
     <LazyHomeFeatures />
