@@ -1,6 +1,6 @@
 <template>
-  <header :class="scrolled ? 'bg-white shadow-md' : ''"
-    class="z-[10] sticky top-0 flex items-center justify-between px-5 py-4 transition-all duration-300 mx-0 mt-0 md:px-10 bg-white border-b">
+  <header
+    class="z-[10] sticky top-0 flex items-center justify-between px-5 py-4 transition-all duration-300 mx-0 mt-0 md:px-10 bg-white dark:bg-black border-b dark:border-gray-800">
     <div class="flex-shrink-0 flex items-center">
       <nuxt-link class="items-center" to="/">
         <SiteLogo />
@@ -40,13 +40,5 @@ const menuLinks = ref([
   }
 ])
 
-const handleScrolled = () => {
-  if (!process.client) return
-  scrolled.value = window.scrollY > 0
-}
-
-onMounted(() => {
-  window.addEventListener('scroll', handleScrolled)
-})
 
 </script>

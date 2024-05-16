@@ -1,6 +1,7 @@
 <template>
-  <div id="HOMEPAGE" class="w-full">
+  <div id="HOMEPAGE" class="w-full flex flex-col space-y-4">
     <HomeHero v-if="stats" :stats="stats" />
+    <HomeMeetCopilot />
     <LazyHomeFeatures />
     <HomeKawaiiTextMarquee />
     <!--     <HomeStreamersUsing />
