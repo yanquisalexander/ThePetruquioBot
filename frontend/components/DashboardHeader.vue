@@ -1,8 +1,9 @@
 <template>
-  <header class="top-0 z-[8] mb-5 flex h-16 items-center gap-2 sticky px-4 bg-white border-b-[1px] border-gray-200">
+  <header
+    class="top-0 z-[8] mb-5 flex h-16 items-center gap-2 sticky px-4 bg-white dark:bg-black border-b dark:border-gray-800 border-b-1">
     <div class="flex items-center">
       <UButton variant="ghost" @click="sidebar.toggleSidebar()">
-        <UIcon name="i-lucide-align-left" class="w-5 h-5 text-black" />
+        <UIcon name="i-lucide-align-left" class="w-5 h-5 text-black dark:text-white" />
       </UButton>
     </div>
 
