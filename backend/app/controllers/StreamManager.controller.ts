@@ -117,8 +117,13 @@ export class StreamManagerController {
                 channel
             })
 
-            SocketIO.getInstance().emitEvent(`copilot:${channel.twitchId}`, 'copilot-response', {
-                response
+            SocketIO.getInstance().emitEvent(`events:channel.${channel.twitchId}`, 'copilot-response', {
+                rawResponse: response,
+                prompt: message,
+                user,
+                channel,
+                timestamp: new Date(),
+                response: response.response.text()
             })
 
             return res.json({
