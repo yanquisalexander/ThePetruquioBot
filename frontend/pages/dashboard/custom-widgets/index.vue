@@ -22,8 +22,7 @@
           <UButton color="gray" variant="soft" @click="showTemplateSearch = true" icon="i-lucide-book-dashed">
             Plantillas
           </UButton>
-          <UButton color="blue" variant="soft" @click="router.push('/dashboard/custom-widgets/new')"
-            icon="i-lucide-plus">
+          <UButton color="blue" variant="soft" @click="showCreateModal = true" icon="i-lucide-plus">
             Nuevo Widget
           </UButton>
         </div>
@@ -35,6 +34,7 @@
       </template>
     </UContainer>
     <CustomWidgetTemplateSearch v-model="showTemplateSearch" @select="handleSelectTemplate" />
+    <CustomWidgetCreateModal v-model="showCreateModal" @widgetCreated="onWidgetCreated" />
   </DashboardPageContainer>
 </template>
 
@@ -46,6 +46,7 @@ const loading = ref(false)
 const widgets = ref<any[]>([])
 const userApiKey = ref(null)
 const showTemplateSearch = ref(false)
+const showCreateModal = ref(false)
 
 definePageMeta({
   layout: 'dashboard',
@@ -55,6 +56,11 @@ definePageMeta({
 useHead({
   title: 'Custom Widgets'
 })
+
+const onWidgetCreated = () => {
+  fetchCustomWidgets()
+  showCreateModal.value = false
+}
 
 const fetchCustomWidgets = async () => {
   try {

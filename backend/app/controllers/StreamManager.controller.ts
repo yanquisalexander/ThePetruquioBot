@@ -8,6 +8,7 @@ import Twitch from "../modules/Twitch.module"
 import StreamerSonglist from "../modules/StreamerSonglist.module"
 import { streamCopilot } from "../modules/StreamCopilot.module"
 import { context } from "esbuild"
+import SocketIO from "../modules/SocketIO.module"
 
 export class StreamManagerController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -114,6 +115,10 @@ export class StreamManagerController {
                 prompt: message,
                 user,
                 channel
+            })
+
+            SocketIO.getInstance().emitEvent(`copilot:${channel.twitchId}`, 'copilot-response', {
+                response
             })
 
             return res.json({
