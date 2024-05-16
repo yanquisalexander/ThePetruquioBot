@@ -8,6 +8,7 @@ import { HelixUser } from "@twurple/api";
 import { ExternalAccountProvider } from "../models/ExternalAccount.model";
 import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
 import MemoryVariables from "@/lib/MemoryVariables";
+import StreamerSonglist from "./StreamerSonglist.module";
 
 interface CopilotAction {
     id: string
@@ -60,6 +61,7 @@ const FunctionsConst = {
     searchOnWeb: 'search_on_web',
     getCurrentLiveChannels: 'get_current_live_channels',
     suggestChannelToRaid: 'suggest_channel_to_raid',
+    getSongRequestsQueue: 'get_song_requests_queue',
 }
 
 const functionDeclarations: FunctionDeclarationsTool[] = [
@@ -127,6 +129,10 @@ const functionDeclarations: FunctionDeclarationsTool[] = [
             {
                 name: FunctionsConst.suggestChannelToRaid,
                 description: 'Suggest a channel to raid based on the current live channels',
+            },
+            {
+                name: FunctionsConst.getSongRequestsQueue,
+                description: 'Get the current song requests queue, from Streamer SongList',
             }
         ]
     }
@@ -327,6 +333,24 @@ class StreamCopilot {
                                         type: randomChannel.type,
                                         is_mature: randomChannel.isMature,
                                     }
+                                }
+                            }
+                        });
+                        break;
+                    case FunctionsConst.getSongRequestsQueue:
+                        const sslChannel = await StreamerSonglist.getChannel(channel.user.username)
+
+                        if (!sslChannel) {
+                            response = await generate({ functionCall: { name: FunctionsConst.getSongRequestsQueue, response: { error: 'This channel does not have a Streamer SongList account' } } });
+                            break;
+                        }
+
+                        const queue = await sslChannel.getQueue();
+                        context.actions?.push({ id: FunctionsConst.getSongRequestsQueue, args: { queue } })
+                        response = await generate({
+                            functionCall: {
+                                name: FunctionsConst.getSongRequestsQueue, response: {
+                                    queue
                                 }
                             }
                         });

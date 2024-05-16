@@ -11,7 +11,6 @@ class StreamerSonglist {
     static async getChannel(channelName: string): Promise<StreamerSonglist | null> {
         try {
             const response = await axios.get(`https://api.streamersonglist.com/v1/streamers/${channelName}`)
-
             return new StreamerSonglist(response.data.id, response.data.requests_active);
         } catch (error) {
             console.error(error);
