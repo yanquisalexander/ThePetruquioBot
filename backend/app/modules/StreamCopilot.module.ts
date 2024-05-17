@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, EnhancedGenerateContentResponse } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, EnhancedGenerateContentResponse, Content } from '@google/generative-ai';
 import { Configuration } from "../config";
 import Channel from "../models/Channel.model";
 import User from "../models/User.model";
@@ -7,6 +7,7 @@ import { CopilotPlugins } from "./copilot/plugins";
 import { CopilotPlugin } from "./copilot/plugins/CopilotPlugin";
 import { CopilotContextUsed } from "./copilot/types";
 import { CopilotFunctionDeclarations } from "./copilot/CopilotFunctions";
+import CopilotMessage from "../models/CopilotMessage.model";
 
 
 const MODEL_NAME = "gemini-1.5-pro-latest"
@@ -25,12 +26,15 @@ You are powered by Google Gemini.
 
 When you need to take an action, like execute or call a function or tool, just DO it.
 
+IMPORTANT: The output should be a JSON.
 ALWAYS respond in the following format:
 
 {
     "thought": "A summary of what has been done or said, explaining how the bot decides to respond or take action",
-    "response": "The response to the user"
+    "response": "The response to the user",
+    "inmediate_user_reply": valid boolean, use this to indicate if the user should reply for example if you ask a question, like "What title do you want for the stream?"
 }
+
 
 Even with the custom prompt, you should follow the same format, and rules.
 
@@ -50,22 +54,39 @@ class StreamCopilot {
             }],
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
                 { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
             ]
         });
     }
 
-    async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed }> {
+    async generateText({ channel, user, prompt }: { channel: Channel, user: User, prompt: string }): Promise<{ response: EnhancedGenerateContentResponse, context: CopilotContextUsed, history?: CopilotMessage[] }> {
         const bot = await Bot.getInstance();
         const currentStream = await channel.getStream();
+        const history = (await CopilotMessage.getHistory(channel)).reverse();
         let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [], suggested_actions: [] };
 
+        // Save the message to the database
+        await CopilotMessage.create({
+            channel_id: channel.twitchId,
+            message: prompt,
+            role: 'streamer',
+            thought: null,
+            timestamp: new Date()
+        });
+
         // Initialize the conversation contents
-        let contents = [
+        let contents: Content[] = [
             { role: 'user', parts: [{ text: prompt }] }
         ];
+
+        const historyToAppend: CopilotMessage['data'][] = [];
+
+        for (const message of history) {
+            historyToAppend.push(message.data);
+        }
+
 
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
             // Update system instruction with the current context
@@ -78,14 +99,29 @@ class StreamCopilot {
                 Current channel: ${channel.user.displayName}
                 ${currentStream ? `Current stream of ${channel.user.displayName}: ${currentStream.title} - ${currentStream.viewers} viewers` : `${channel.user.displayName} is not streaming right now`}
                 Replying to: ${user.displayName}
+                
+                --- chat history ---
+    
+                    ${historyToAppend.map(h =>
+                `${new Date(h.timestamp).toUTCString()} - ${h.role === 'streamer' ? 'Streamer' : 'You (Copilot)'}: ${h.message}
+                    
+                    ${h.thought ? `Copilot thought: ${h.thought}` : ''}
+                    `
+            ).join('\n')}
+
+                ---
+
+                Now, continue the conversation with the user.
+
+                If a response of a function does not make sense, you should tell the user that you don't understand and ask for clarification.
             `;
+
 
             if (modelResponse) {
                 contents.push({ role: 'model', parts: [{ text: modelResponse }] });
             }
 
             if (functionCall) {
-                // @ts-ignore
                 contents.push({ role: 'system', parts: [{ functionResponse: { name: functionCall.name, response: functionCall.response } }] });
             }
 
@@ -148,6 +184,7 @@ class StreamCopilot {
 
         console.log('Called function calls', response.functionCalls());
 
+
         // Generate the final response with the updated context (if functions were called)
         // @ts-ignore
         if (contents.some(c => c.parts.some(p => p.functionResponse))) {
@@ -155,13 +192,9 @@ class StreamCopilot {
         }
 
 
-
-
-
-
         console.log('Final response', response.text());
 
-        return { response, context };
+        return { response, context, history };
     }
 
 }

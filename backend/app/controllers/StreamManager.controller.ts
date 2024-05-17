@@ -1,14 +1,12 @@
 import { type Request, type Response } from 'express'
 import { type ExpressUser } from '../interfaces/ExpressUser.interface'
-import { Bot } from '../../bot'
 import CurrentUser from '../../lib/CurrentUser'
-import MessageLogger from '../models/MessageLogger.model'
-import Notification from '../models/Notification.model'
 import Twitch from "../modules/Twitch.module"
 import StreamerSonglist from "../modules/StreamerSonglist.module"
 import { streamCopilot } from "../modules/StreamCopilot.module"
-import { context } from "esbuild"
 import SocketIO from "../modules/SocketIO.module"
+import chalk from "chalk"
+import CopilotMessage from "../models/CopilotMessage.model"
 
 export class StreamManagerController {
     async index(req: Request, res: Response): Promise<Response> {
@@ -119,14 +117,30 @@ export class StreamManagerController {
 
             let thought = null;
             let responseMessage = response.response.text();
+            let inmediateUserReply = false;
+
+            // Extract the json from the response, for example if Gemini returns a Codeblock or mixed response
+
+            const cleanResponse = () => {
+                // This pattern matches a string that starts with '{' and ends with '}'
+                let pattern = /\{[^{}]*\}/;
+                let match = responseMessage.match(pattern);
+                if (match) {
+                    console.log(chalk.blueBright('[Copilot]'), 'Matched JSON:', match[0]);
+                    responseMessage = match[0];
+                }
+            }
 
 
             try {
-                const parsedResponse = JSON.parse(response.response.text());
+                cleanResponse();
+                const parsedResponse = JSON.parse(responseMessage);
                 thought = parsedResponse.thought;
                 responseMessage = parsedResponse.response;
+                inmediateUserReply = parsedResponse.inmediate_user_reply;
             } catch (parseError) {
                 console.error('Error parsing Copilot response:', parseError);
+                console.error('Response:', response.response.text());
             }
 
             SocketIO.getInstance().emitEvent(`events:channel.${channel.twitchId}`, 'copilot-response', {
@@ -139,12 +153,23 @@ export class StreamManagerController {
                 response: responseMessage
             });
 
+
+            await CopilotMessage.create({
+                channel_id: channel.twitchId,
+                message: responseMessage,
+                role: 'copilot',
+                thought,
+                timestamp: new Date()
+            });
+
             return res.json({
                 data: {
                     thought,
                     context: response.context,
                     response: responseMessage,
-                    candidates: response.response.candidates
+                    candidates: response.response.candidates,
+                    inmediate_user_reply: inmediateUserReply,
+                    history: response.history
                 }
             });
         } catch (error) {

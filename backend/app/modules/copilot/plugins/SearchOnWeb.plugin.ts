@@ -1,5 +1,6 @@
 import { FunctionDeclarationSchema, FunctionDeclarationSchemaType } from "@google/generative-ai";
-import { CopilotPlugin } from "./CopilotPlugin";
+import { CopilotPlugin, HandlerArgs } from "./CopilotPlugin";
+import Utils from "@/lib/Utils";
 
 export class SearchOnWebPlugin extends CopilotPlugin {
     name = "searchOnWeb"
@@ -7,15 +8,15 @@ export class SearchOnWebPlugin extends CopilotPlugin {
     version = "1.0.0"
     enabled = true
     icon = "fa6-brands-google"
-    contextKey = 'web_results'
+    contextKey = 'webResults'
+    private webResults: any
 
 
-    async handler(args: any): Promise<any> {
-        return {
-            data: {
-                result: 'Search on Web' // Placeholder to test the plugin
-            }
-        }
+    async handler(data: HandlerArgs): Promise<any> {
+        const { query } = data.args
+        const webResults = await Utils.googleSearch(query)
+        this.webResults = webResults
+        return webResults
     }
 
     getParameters(): FunctionDeclarationSchema | undefined {
@@ -40,6 +41,6 @@ export class SearchOnWebPlugin extends CopilotPlugin {
     }
 
     getContextData() {
-        return null
+        return this.webResults
     }
 }

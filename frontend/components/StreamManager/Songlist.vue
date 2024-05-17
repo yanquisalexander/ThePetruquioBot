@@ -58,7 +58,7 @@ const SOCKET_EVENTS = {
 
 const fetchQueue = async () => {
     try {
-        const response = await axios.get(`http://api.streamersonglist.com/v1/streamers/${props.songlistUserId}/queue`)
+        const response = await axios.get(`https://api.streamersonglist.com/v1/streamers/${props.songlistUserId}/queue`)
         songRequests.value = response.data
     } catch (error) {
         toast.add({
@@ -73,7 +73,7 @@ const fetchQueue = async () => {
 
 const connectSocket = () => {
     console.log('Connecting to StreamerSonglist socket')
-    sslSocket.value = io('http://api.streamersonglist.com', {
+    sslSocket.value = io('https://api.streamersonglist.com', {
         host: 'api.streamersonglist.com',
         multiplex: false,
 
