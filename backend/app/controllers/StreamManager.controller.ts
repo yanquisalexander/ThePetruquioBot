@@ -115,31 +115,41 @@ export class StreamManagerController {
                 prompt: message,
                 user,
                 channel
-            })
+            });
+
+            let thought = null;
+            let responseMessage = response.response.text();
+
+
+            try {
+                const parsedResponse = JSON.parse(response.response.text());
+                thought = parsedResponse.thought;
+                responseMessage = parsedResponse.response;
+            } catch (parseError) {
+                console.error('Error parsing Copilot response:', parseError);
+            }
 
             SocketIO.getInstance().emitEvent(`events:channel.${channel.twitchId}`, 'copilot-response', {
                 rawResponse: response,
                 prompt: message,
                 user,
                 channel,
+                thought,
                 timestamp: new Date(),
-                response: response.response.text()
-            })
+                response: responseMessage
+            });
 
             return res.json({
                 data: {
+                    thought,
                     context: response.context,
-                    response: response.response.text(),
+                    response: responseMessage,
                     candidates: response.response.candidates
                 }
-            })
-
+            });
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({ error: 'Copilot failed to generate text. Please try again later' })
+            console.error('Error generating Copilot text:', error);
+            return res.status(500).json({ error: 'Copilot failed to generate text. Please try again later' });
         }
-
-
-
     }
 }

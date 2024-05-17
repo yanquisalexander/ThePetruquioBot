@@ -1,142 +1,41 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, FunctionDeclarationsTool, FunctionDeclarationSchemaType, EnhancedGenerateContentResponse } from '@google/generative-ai';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold, GenerativeModel, EnhancedGenerateContentResponse } from '@google/generative-ai';
 import { Configuration } from "../config";
 import Channel from "../models/Channel.model";
 import User from "../models/User.model";
-import Twitch from "./Twitch.module";
 import { Bot } from "@/bot";
-import { HelixUser } from "@twurple/api";
-import { ExternalAccountProvider } from "../models/ExternalAccount.model";
-import Utils, { getSpotifyCurrentlyPlayingSong } from "@/lib/Utils";
-import MemoryVariables from "@/lib/MemoryVariables";
-import StreamerSonglist from "./StreamerSonglist.module";
-
-interface CopilotAction {
-    id: string
-    args?: any
-}
-
-interface CopilotSuggestedAction {
-    id: string
-    args?: any
-    actions?: any[]
-}
-
-interface CopilotContextUsed {
-    spotify: any | null
-    webResults: any[] | null
-    twitchChannel: any | null
-    actions?: CopilotAction[]
-    suggested_actions?: CopilotSuggestedAction[]
-}
+import { CopilotPlugins } from "./copilot/plugins";
+import { CopilotPlugin } from "./copilot/plugins/CopilotPlugin";
+import { CopilotContextUsed } from "./copilot/types";
+import { CopilotFunctionDeclarations } from "./copilot/CopilotFunctions";
 
 
-const MODEL_NAME = "gemini-1.5-pro-latest";
+const MODEL_NAME = "gemini-1.5-pro-latest"
 
 const BASE_SYSTEM_PROMPT = `
-You are a Twitch chatbot named Petruquio.LIVE, created by @Alexitoo_UY.
-Your duty is to entertain and inform users, and to help the streamer in question with smart features.
+You are Stream Copilot (Or simply Copilot), a bot from Petruquio.LIVE created by Alexitoo_UY.
+Your duty is to be the streamer's copilot, helping them with the chat, the stream, and the audience.
+You can use emojis.
 
-You can use emojis, mention users, and ask questions to the audience.
-Respond as smoothly and naturally as possible.
+Do NOT include links because you have TTS on and it will read them aloud.
 
-Your are powered by Google Gemini.
+You can search the internet (Wikipedia, Google, etc.) to provide more information about the current context or answer a question.
+NEVER make up answers, when necessary search the internet to secure your information.
+You should reply in the language that the user is speaking.
+You are powered by Google Gemini.
 
-Don't include links because you have TTS on and it will read them.
+When you need to take an action, like execute or call a function or tool, just DO it.
 
-You can search on the internet to get more information.
+ALWAYS respond in the following format:
 
-DON'T send JSON responses, for example if you have tool_outputs in the response, don't send them.
-
---- Prompt personalizado impuesto por el streamer ---
-`
-
-
-const FunctionsConst = {
-    getChannelInfo: 'get_channel_info',
-    changeStreamTitle: 'change_stream_title',
-    toggleEmoteOnly: 'toggle_emote_only',
-    clearChat: 'clear_chat',
-    getCurrentSpotifySong: 'get_current_spotify_song',
-    sendMessageToChat: 'send_message_to_chat',
-    searchOnWeb: 'search_on_web',
-    getCurrentLiveChannels: 'get_current_live_channels',
-    suggestChannelToRaid: 'suggest_channel_to_raid',
-    getSongRequestsQueue: 'get_song_requests_queue',
+{
+    "thought": "A summary of what has been done or said, explaining how the bot decides to respond or take action",
+    "response": "The response to the user"
 }
 
-const functionDeclarations: FunctionDeclarationsTool[] = [
-    {
-        functionDeclarations: [
-            {
-                name: FunctionsConst.getChannelInfo,
-                description: "Search for a channel on Twitch and get information about it, for example, the stream title, viewers, and description",
-                parameters: {
-                    type: FunctionDeclarationSchemaType.OBJECT,
-                    properties: {
-                        channel: { type: FunctionDeclarationSchemaType.STRING }
-                    }
-                }
-            },
-            {
-                name: FunctionsConst.changeStreamTitle,
-                description: 'Change the title of the stream',
-                parameters: {
-                    type: FunctionDeclarationSchemaType.OBJECT,
-                    properties: {
-                        title: { type: FunctionDeclarationSchemaType.STRING }
-                    },
-                    required: ['title']
-                }
-            },
-            {
-                name: FunctionsConst.toggleEmoteOnly,
-                description: 'Toggle emote-only mode',
-                parameters: {
-                    type: FunctionDeclarationSchemaType.OBJECT,
-                    properties: {
-                        enabled: { type: FunctionDeclarationSchemaType.BOOLEAN }
-                    },
-                    required: ['enabled']
-                }
-            },
-            {
-                name: FunctionsConst.clearChat,
-                description: 'Clear the chat',
-            },
-            {
-                name: FunctionsConst.getCurrentSpotifySong,
-                description: 'Get the current song that is playing on Spotify',
-            },
-            {
-                name: FunctionsConst.sendMessageToChat,
-                description: 'Send an AI-generated message to the chat using current context',
-            },
-            {
-                name: FunctionsConst.searchOnWeb,
-                description: 'Search on internet to provide more information about current context',
-                parameters: {
-                    type: FunctionDeclarationSchemaType.OBJECT,
-                    properties: {
-                        query: { type: FunctionDeclarationSchemaType.STRING }
-                    },
-                    required: ['query']
-                }
-            },
-            {
-                name: FunctionsConst.getCurrentLiveChannels,
-                description: 'Get the current live channels on Twitch that have joined Petruquio.LIVE'
-            },
-            {
-                name: FunctionsConst.suggestChannelToRaid,
-                description: 'Suggest a channel to raid based on the current live channels',
-            },
-            {
-                name: FunctionsConst.getSongRequestsQueue,
-                description: 'Get the current song requests queue, from Streamer SongList',
-            }
-        ]
-    }
-]
+Even with the custom prompt, you should follow the same format, and rules.
+
+--- Below is the custom prompt configured by the streamer ---
+`;
 
 class StreamCopilot {
     private googleGenerativeAI: GoogleGenerativeAI;
@@ -146,12 +45,9 @@ class StreamCopilot {
         this.googleGenerativeAI = new GoogleGenerativeAI(Configuration.GOOGLE_GENERATIVE_AI_API_KEY);
         this.model = this.googleGenerativeAI.getGenerativeModel({
             model: MODEL_NAME,
-            generationConfig: {
-                topP: 0.95,
-                topK: 64,
-                maxOutputTokens: 8192,
-            },
-            tools: functionDeclarations,
+            tools: [{
+                functionDeclarations: CopilotFunctionDeclarations,
+            }],
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
                 { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -165,202 +61,109 @@ class StreamCopilot {
         const bot = await Bot.getInstance();
         const currentStream = await channel.getStream();
         let context: CopilotContextUsed = { spotify: null, webResults: null, twitchChannel: null, actions: [], suggested_actions: [] };
+
+        // Initialize the conversation contents
+        let contents = [
+            { role: 'user', parts: [{ text: prompt }] }
+        ];
+
         const generate = async ({ modelResponse, functionCall }: { modelResponse?: string, functionCall?: { name: string, response: any } }) => {
+            // Update system instruction with the current context
             // @ts-ignore
             this.model.systemInstruction = `
-            ${BASE_SYSTEM_PROMPT}
+                ${BASE_SYSTEM_PROMPT}
+                ${channel.preferences.smartAssistantPrompt.value}
+                ---
+                Current time (UTC): ${new Date().toUTCString()}
+                Current channel: ${channel.user.displayName}
+                ${currentStream ? `Current stream of ${channel.user.displayName}: ${currentStream.title} - ${currentStream.viewers} viewers` : `${channel.user.displayName} is not streaming right now`}
+                Replying to: ${user.displayName}
+            `;
 
-            ${channel.preferences.smartAssistantPrompt.value}
+            if (modelResponse) {
+                contents.push({ role: 'model', parts: [{ text: modelResponse }] });
+            }
 
-            ---
+            if (functionCall) {
+                // @ts-ignore
+                contents.push({ role: 'system', parts: [{ functionResponse: { name: functionCall.name, response: functionCall.response } }] });
+            }
 
-            Current time (UTC): ${new Date().toUTCString()}
-        
-            Current channel: ${channel.user.displayName}
-
-            ${currentStream ? `Current stream of ${channel.user.displayName}: ${currentStream.title} - ${currentStream.viewers} viewers` : `${channel.user.displayName} is not streaming right now`}
-            
-            Replying to: ${user.displayName}
-
-            `
-
-            const contents = [
-                { role: 'user', parts: [{ text: prompt }] }
-            ];
-            if (modelResponse) contents.push({ role: 'model', parts: [{ text: modelResponse }] });
-            // @ts-ignore
-            if (functionCall) contents.push({ role: 'system', parts: [{ functionResponse: { name: functionCall.name, response: functionCall.response } }] });
             const { response } = await this.model.generateContent({ systemInstruction: this.model.systemInstruction, contents });
             return response;
         };
 
+        // Initial generation
         let response = await generate({ modelResponse: prompt });
+        const plugins: { [key: string]: new () => CopilotPlugin } = CopilotPlugins;
 
-        console.log('Function calls:', response.functionCalls())
 
-        while (response.functionCalls()) {
-            for (const functionCalling of response.functionCalls() || []) {
-                switch (functionCalling.name) {
-                    case FunctionsConst.searchOnWeb:
-                        const { query } = functionCalling.args as { query: string };
-                        const webResults = await Utils.googleSearch(query);
-                        context.webResults = webResults;
-                        response = await generate({
-                            functionCall: {
-                                name: FunctionsConst.searchOnWeb, response: {
-                                    webResults
-                                }
-                            }
-                        });
-                        break;
-                    case FunctionsConst.getCurrentSpotifySong:
-                        const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
-                        if (!spotifyAccount) {
-                            response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { error: `No Spotify account linked` } } });
-                            break;
-                        }
-                        const currentSong = await getSpotifyCurrentlyPlayingSong(channel)
-                        context.spotify = currentSong;
-                        response = await generate({ functionCall: { name: FunctionsConst.getCurrentSpotifySong, response: { currentSong } } });
-                        break;
-                    case FunctionsConst.changeStreamTitle:
-                        const { title } = functionCalling.args as { title: string };
-                        await channel.changeStreamTitle(title);
-                        await bot.sendMessage(channel, `/me ✨ Copilot: Stream title changed to: ${title}`)
-                        context.actions?.push({ id: FunctionsConst.changeStreamTitle, args: { title } })
-                        response = await generate({ functionCall: { name: FunctionsConst.changeStreamTitle, response: { success: true, title } } });
-                        break;
-                    case FunctionsConst.getChannelInfo:
-                        const { channel: channelName } = functionCalling.args as { channel: string };
-                        const searchResult = await Twitch.Helix.search.searchChannels(channelName);
-                        const isSelfOnList = searchResult.data.some(c => c.id === channel.twitchId.toString());
-                        const user = isSelfOnList ? await channel.user.fromHelix() as HelixUser : await searchResult.data[0].getUser();
-                        const { description, displayName } = user
-                        const stream = await user.getStream();
-                        const streamInfo = stream ? { title: stream.title, viewers: stream.viewers } : null;
-                        const res = {
-                            description,
-                            displayName,
-                            stream: streamInfo,
-                            avatar: user.profilePictureUrl
-                        }
-                        context.twitchChannel = res;
-                        response = await generate({
-                            functionCall: {
-                                name: FunctionsConst.getChannelInfo, response: res
-                            }
-                        });
-                        break;
-                    case FunctionsConst.toggleEmoteOnly:
-                        const { enabled } = functionCalling.args as { enabled: boolean };
-                        await channel.toggleEmoteOnly(enabled);
-                        await bot.sendMessage(channel, `/me ✨ Copilot: Emote-only mode ${enabled ? 'enabled' : 'disabled'}`)
-                        context.actions?.push({ id: FunctionsConst.toggleEmoteOnly, args: { enabled } })
-                        response = await generate({ functionCall: { name: FunctionsConst.toggleEmoteOnly, response: { success: true } } });
-                        break;
-                    case FunctionsConst.clearChat:
-                        await channel.clearChat();
-                        await bot.sendMessage(channel, `/me ✨ Copilot: Chat cleared`)
-                        context.actions?.push({ id: FunctionsConst.clearChat })
-                        response = await generate({ functionCall: { name: FunctionsConst.clearChat, response: { success: true } } });
-                        break;
-                    case FunctionsConst.sendMessageToChat:
-                        // this function don't have args
-                        const aiMessage = await generate({ modelResponse: response.text() });
-                        await bot.sendMessage(channel, `/me ✨ Copilot: ${aiMessage.text()}`)
-                        response = await generate({ functionCall: { name: FunctionsConst.sendMessageToChat, response: { success: true } } });
-                        break;
-                    case FunctionsConst.getCurrentLiveChannels:
-                        const liveChannels = MemoryVariables.getLiveChannels();
-                        response = await generate({
-                            functionCall: {
-                                name: FunctionsConst.getCurrentLiveChannels, response: {
-                                    live_channels: liveChannels.map(stream => {
-                                        return {
-                                            username: stream.userName,
-                                            display_name: stream.userDisplayName,
-                                            title: stream.title,
-                                            viewers: stream.viewers,
-                                            thumbnail_url: stream.thumbnailUrl,
-                                            started_at: stream.startDate,
-                                            language: stream.language,
-                                            tags: stream.tags,
-                                            game_id: stream.gameId,
-                                            game_name: stream.gameName,
-                                            type: stream.type,
-                                            is_mature: stream.isMature,
-                                        }
-                                    }),
-                                }
-                            }
-                        });
-                        break;
-                    case FunctionsConst.suggestChannelToRaid:
-                        const liveChannelsToRaid = MemoryVariables.getLiveChannels();
-                        const randomChannel = liveChannelsToRaid[Math.floor(Math.random() * liveChannelsToRaid.length)];
+        let functionCalls = response.functionCalls();
 
-                        if (!randomChannel) {
-                            response = await generate({ functionCall: { name: FunctionsConst.suggestChannelToRaid, response: { error: 'No live channels to raid' } } });
-                            break;
-                        }
-                        context.suggested_actions?.push({
-                            id: FunctionsConst.suggestChannelToRaid, args: {
-                                channel: {
-                                    display_name: randomChannel.userDisplayName || randomChannel.userName,
-                                    title: randomChannel.title,
-                                    viewers: randomChannel.viewers,
-                                    started_at: randomChannel.startDate,
-                                    language: randomChannel.language,
-                                    game_name: randomChannel.gameName,
-                                    thumbnail_url: randomChannel.getThumbnailUrl(440, 248),
-                                }
-                            }
-                        })
-                        response = await generate({
-                            functionCall: {
-                                name: FunctionsConst.suggestChannelToRaid, response: {
-                                    suggested_channel: {
-                                        username: randomChannel.userName,
-                                        display_name: randomChannel.userDisplayName,
-                                        title: randomChannel.title,
-                                        viewers: randomChannel.viewers,
-                                        thumbnail_url: randomChannel.thumbnailUrl,
-                                        started_at: randomChannel.startDate,
-                                        language: randomChannel.language,
-                                        tags: randomChannel.tags,
-                                        game_id: randomChannel.gameId,
-                                        game_name: randomChannel.gameName,
-                                        type: randomChannel.type,
-                                        is_mature: randomChannel.isMature,
-                                    }
-                                }
-                            }
-                        });
-                        break;
-                    case FunctionsConst.getSongRequestsQueue:
-                        const sslChannel = await StreamerSonglist.getChannel(channel.user.username)
-
-                        if (!sslChannel) {
-                            response = await generate({ functionCall: { name: FunctionsConst.getSongRequestsQueue, response: { error: 'This channel does not have a Streamer SongList account' } } });
-                            break;
-                        }
-
-                        const queue = await sslChannel.getQueue();
-                        context.actions?.push({ id: FunctionsConst.getSongRequestsQueue, args: { queue } })
-                        response = await generate({
-                            functionCall: {
-                                name: FunctionsConst.getSongRequestsQueue, response: {
-                                    queue
-                                }
-                            }
-                        });
-                        break;
+        while ((functionCalls ?? []).length > 0) {
+            for (const functionCalling of functionCalls || []) {
+                // Instantiate the plugin
+                const PluginClass = plugins[functionCalling.name];
+                if (!PluginClass) {
+                    console.error('Plugin not found', functionCalling.name);
+                    continue;
                 }
+                const plugin = new PluginClass();
+
+                const handlerArgs = { bot, user, channel, args: functionCalling.args };
+                const pluginResponse = await plugin.handler(handlerArgs);
+                const pluginContextData = plugin.getContextData();
+
+                if (plugin.contextKey && pluginContextData) {
+                    context[plugin.contextKey] = pluginResponse;
+                }
+
+                // Add the function response to the conversation contents
+                // @ts-ignore
+                contents.push({ role: 'system', parts: [{ functionResponse: { name: functionCalling.name, response: pluginResponse } }] });
+
+                const suggestedAction = plugin.getSuggestedAction();
+                if (suggestedAction !== null) {
+                    context.suggested_actions?.push(suggestedAction);
+                }
+
+                const takenAction = plugin.getTakedAction();
+                if (takenAction !== null) {
+                    context.actions?.push(takenAction);
+                }
+
+                console.log('Plugin response', pluginResponse);
+                console.log('Plugin context', context);
+                console.log('Plugin suggested actions', context.suggested_actions);
+                console.log('Plugin taken actions', context.actions);
+                console.log('Plugin', plugin);
+
+                plugin.release();
             }
+
+            // Filter out the processed function calls
+            // @ts-ignore
+            functionCalls = functionCalls.filter(fc => !contents.some(c => c.parts.some(p => p.functionResponse && p.functionResponse.name === fc.name)));
         }
+
+        console.log('Called function calls', response.functionCalls());
+
+        // Generate the final response with the updated context (if functions were called)
+        // @ts-ignore
+        if (contents.some(c => c.parts.some(p => p.functionResponse))) {
+            response = await generate({ modelResponse: response.text() });
+        }
+
+
+
+
+
+
+        console.log('Final response', response.text());
 
         return { response, context };
     }
+
 }
 
 export const streamCopilot = new StreamCopilot();

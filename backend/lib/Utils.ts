@@ -11,7 +11,6 @@ export const getSpotifyCurrentlyPlayingSong = async (channel: Channel, retryAtte
   try {
     const spotifyAccount = await channel.user.getLinkedAccount(ExternalAccountProvider.SPOTIFY)
     if (!spotifyAccount) return null
-    console.log(spotifyAccount)
 
     const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
