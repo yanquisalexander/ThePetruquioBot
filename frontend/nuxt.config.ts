@@ -60,7 +60,7 @@ export default defineNuxtConfig({
     },
     // @ts-ignore
     defaultProvider: 'twitch',
-    origin: 'https://petruquio.live',
+    origin: 'https://petruquiolive.vercel.app',
   },
 
 

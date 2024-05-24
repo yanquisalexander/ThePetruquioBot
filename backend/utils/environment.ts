@@ -9,7 +9,7 @@ class Environment {
 
   static get websiteUrl(): string {
     if (process.env.WEBSITE_URL && !process.env.WEBSITE_URL.startsWith('http')) throw new Error('WEBSITE_URL must start with http or https')
-    return process.env.WEBSITE_URL ?? process.env.NODE_ENV === 'development' ? 'http://localhost:8888' : 'https://petruquio.live'
+    return process.env.WEBSITE_URL ?? process.env.NODE_ENV === 'development' ? 'http://localhost:8888' : 'https://petruquiolive.vercel.app'
   }
 
   static get rootDir(): string {
