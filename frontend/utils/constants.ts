@@ -2,17 +2,17 @@ export const isDevelopment = process.env.NODE_ENV === 'development'
 
 export enum FRONTEND_URLS {
   development = 'localhost',
-  production = 'petruquio.live'
+  production = 'petruquiolive.vercel.app'
 }
 
 export enum ENDPOINTS {
   development = 'http://localhost:3000/v2',
-  production = 'https://api-prod-home.petruquio.live/v2',
+  production = 'https://api-petruquio.abstudios.tech/v2',
 }
 
 export enum SOCKET_ENDPOINTS {
   development = 'localhost:3000',
-  production = 'api-prod-home.petruquio.live',
+  production = 'api-petruquio.abstudios.tech',
 }
 
 export const FRONTEND_URL = isDevelopment ? FRONTEND_URLS.development : FRONTEND_URLS.production
