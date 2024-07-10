@@ -1,6 +1,8 @@
 import { relations, sql } from 'drizzle-orm'
 import { integer, text, timestamp, pgTable, boolean, serial, jsonb, primaryKey, uuid, unique, json, pgEnum } from 'drizzle-orm/pg-core'
 
+export const copilotRoleEnum = pgEnum('role', ['copilot', 'streamer'])
+
 export const UsersTable = pgTable('users', {
   twitch_id: integer('twitch_id').primaryKey(),
   username: text('username').notNull(),
@@ -16,13 +18,13 @@ export const ChannelsTable = pgTable('channels', {
   id: serial('id').primaryKey(),
   preferences: jsonb('preferences').default('{}'),
   auto_join: boolean('auto_join').default(false),
-  twitch_id: integer('twitch_id').references(() => UsersTable.twitch_id)
+  twitch_id: integer('twitch_id').references(() => UsersTable.twitch_id).unique(),
 })
 
 export const AuditsTable = pgTable('audits', {
   id: serial('id').primaryKey(),
-  channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id),
-  user_id: integer('user_id').references(() => UsersTable.twitch_id),
+  channelId: integer('channel_id').references(() => ChannelsTable.twitch_id),
+  userId: integer('user_id').references(() => UsersTable.twitch_id),
   type: text('type').notNull(),
   data: jsonb('data').default('{}'),
   created_at: timestamp('created_at').default(sql.raw('now()'))
@@ -71,7 +73,6 @@ export const MessagesTable = pgTable('messages', {
   channel_id: integer('channel_id').references(() => ChannelsTable.twitch_id),
   content: text('content').notNull(),
   timestamp: timestamp('timestamp').default(sql.raw('now()')),
-  message_id: text('message_id').notNull()
 })
 
 export const RedemptionHistoryTable = pgTable('redemption_history', {
@@ -213,7 +214,6 @@ export const MediaRequestsTable = pgTable('media_requests', {
   requested_at: timestamp('requested_at').default(sql.raw('now()')),
 })
 
-const copilotRoleEnum = pgEnum('role', ['copilot', 'streamer'])
 
 export const StreamCopilotMessagesTable = pgTable('stream_copilot_messages', {
   id: serial('id').primaryKey(),

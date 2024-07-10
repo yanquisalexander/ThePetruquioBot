@@ -5,43 +5,22 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1711035809911,
-      "tag": "0000_wise_katie_power",
+      "when": 1720569453299,
+      "tag": "0000_misty_ma_gnuci",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1715035435262,
-      "tag": "0001_deep_pretty_boy",
+      "when": 1720569531676,
+      "tag": "0001_dapper_morph",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "5",
-      "when": 1715087535626,
-      "tag": "0002_short_talon",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1715091850022,
-      "tag": "0003_even_deathbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1715100252505,
-      "tag": "0004_melted_carlie_cooper",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1715968211788,
-      "tag": "0005_loving_joseph",
+      "when": 1720570084750,
+      "tag": "0002_odd_lizard",
       "breakpoints": true
     }
   ]

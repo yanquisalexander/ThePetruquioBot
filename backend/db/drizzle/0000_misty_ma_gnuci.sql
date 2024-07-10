@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS "channels" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"preferences" jsonb DEFAULT '{}',
 	"auto_join" boolean DEFAULT false,
-	"twitch_id" integer
+	"twitch_id" integer,
+	CONSTRAINT "channels_twitch_id_unique" UNIQUE("twitch_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "commands" (
@@ -37,6 +38,20 @@ CREATE TABLE IF NOT EXISTS "core_widgets" (
 	CONSTRAINT "core_widgets_channel_id_widget_type_unique" UNIQUE("channel_id","widget_type")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "custom_widgets" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"channel_id" integer NOT NULL,
+	"widget_name" text NOT NULL,
+	"widget_description" text,
+	"custom_html" text,
+	"custom_css" text,
+	"custom_js" text,
+	"properties" json DEFAULT '{}',
+	"published_as_template" boolean DEFAULT false,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "external_accounts" (
 	"user_id" integer,
 	"provider" text NOT NULL,
@@ -55,6 +70,21 @@ CREATE TABLE IF NOT EXISTS "greetings" (
 	"last_seen" timestamp DEFAULT now(),
 	"shoutouted_at" timestamp DEFAULT now(),
 	"enabled" boolean DEFAULT true
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "media_requests" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"channel_id" integer,
+	"user_id" integer,
+	"media_url" text NOT NULL,
+	"media_title" text NOT NULL,
+	"media_author" text,
+	"media_thumbnail" text,
+	"media_duration" integer NOT NULL,
+	"media_type" text NOT NULL,
+	"media_id" text NOT NULL,
+	"status" text DEFAULT 'pending',
+	"requested_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "messages" (
@@ -110,6 +140,25 @@ CREATE TABLE IF NOT EXISTS "spectator_locations" (
 	"longitude" text,
 	"location" text,
 	"country_code" text
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "stream_copilot_messages" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"channel_id" integer NOT NULL,
+	"message" text NOT NULL,
+	"thought" text,
+	"timestamp" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "uploads" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"filename" text NOT NULL,
+	"path" text NOT NULL,
+	"size" integer NOT NULL,
+	"mimetype" text NOT NULL,
+	"uploaded_by" integer,
+	"uploaded_at" timestamp DEFAULT now(),
+	"key" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_tokens" (
@@ -191,6 +240,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "custom_widgets" ADD CONSTRAINT "custom_widgets_channel_id_channels_twitch_id_fk" FOREIGN KEY ("channel_id") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "external_accounts" ADD CONSTRAINT "external_accounts_user_id_users_twitch_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("twitch_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -204,6 +259,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "greetings" ADD CONSTRAINT "greetings_channel_channels_twitch_id_fk" FOREIGN KEY ("channel") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "media_requests" ADD CONSTRAINT "media_requests_channel_id_channels_twitch_id_fk" FOREIGN KEY ("channel_id") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "media_requests" ADD CONSTRAINT "media_requests_user_id_users_twitch_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("twitch_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -258,6 +325,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "spectator_locations" ADD CONSTRAINT "spectator_locations_user_id_users_twitch_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "stream_copilot_messages" ADD CONSTRAINT "stream_copilot_messages_channel_id_channels_twitch_id_fk" FOREIGN KEY ("channel_id") REFERENCES "channels"("twitch_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "uploads" ADD CONSTRAINT "uploads_uploaded_by_users_twitch_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "users"("twitch_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

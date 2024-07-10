@@ -1,0 +1,1 @@
+ALTER TABLE "messages" DROP COLUMN IF EXISTS "message_id";

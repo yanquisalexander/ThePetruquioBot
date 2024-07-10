@@ -42,6 +42,7 @@ class CommandExecutor {
   constructor() {
     this.loadCommands().then((commands) => {
       this.systemCommands = commands
+      console.log(chalk.green('[COMMAND EXECUTOR]'), chalk.white('Commands loaded.'))
     }).catch((error) => {
       console.log(chalk.red('[COMMAND EXECUTOR]'), chalk.white(`Error while loading commands: ${error}`))
     })

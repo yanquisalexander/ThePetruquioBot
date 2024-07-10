@@ -13,9 +13,6 @@ import TwitchEvents from '@/app/modules/TwitchEvents.module';
 import Environment from '@/utils/environment';
 import Passport from '@/lib/Passport';
 import EmailManager from '@/app/modules/EmailManager.module';
-import { streamCopilot } from "./app/modules/StreamCopilot.module";
-import User from "./app/models/User.model";
-import Channel from "./app/models/Channel.model";
 
 
 MonkeyPatches.apply();

@@ -1,1 +1,0 @@
-ALTER TABLE "custom_widgets" ADD COLUMN "published_as_template" boolean DEFAULT false;
