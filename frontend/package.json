@@ -73,7 +73,7 @@
     "monaco-editor": "^0.48.0",
     "monaco-tailwindcss": "^0.6.0",
     "monaco-themes": "^0.4.4",
-    "next-auth": "4.21.1",
+    "next-auth": "4.24.5",
     "obs-websocket-js": "^5.0.5",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.0",
