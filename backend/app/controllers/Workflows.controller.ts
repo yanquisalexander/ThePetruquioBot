@@ -3,7 +3,7 @@ import { ExpressUser } from '../interfaces/ExpressUser.interface';
 import Workflow, { EventType } from '../models/Workflow.model';
 import CurrentUser from '../../lib/CurrentUser';
 import WorkflowLog from "../models/WorkflowLog.model";
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import jwt, { type JsonWebTokenError } from 'jsonwebtoken';
 import Channel from "../models/Channel.model";
 import User from "../models/User.model";
 
@@ -200,18 +200,15 @@ class WorkflowsController {
             try {
                 decodedPayload = jwt.verify(req.params.user_api_token, process.env.JWT_SECRET as string);
             } catch (JWTError) {
-                if (JWTError instanceof JsonWebTokenError) {
-                    return res.status(401).json({
-                        error_type: 'UNAUTHORIZED',
-                        errors: [
-                            'Invalid API token'
-                        ]
-                    });
-                } else {
-                    throw JWTError;
-                }
+                return res.status(401).json({
+                    error_type: 'UNAUTHORIZED',
+                    errors: [
+                        'Invalid API token'
+                    ]
+                });
+            }
 
-            } const channel = await Channel.findByTwitchId((decodedPayload as any).userId);
+            const channel = await Channel.findByTwitchId((decodedPayload as any).userId);
 
             if (!channel) {
                 return res.status(404).json({

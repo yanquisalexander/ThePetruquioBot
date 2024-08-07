@@ -9,6 +9,8 @@ import chalk from 'chalk'
 import Environment from '../utils/environment'
 import AdminDashboardProblems, { ProblemSeverity } from '../app/models/admin/DashboardProblems.model'
 import TwitchAuthenticator from '@/app/modules/TwitchAuthenticator.module'
+import { createRequire } from "module"
+const require = createRequire(import.meta.url)
 const SpotifyStrategy = require('passport-spotify').Strategy
 const DiscordStrategy = require('@soerenmetje/passport-discord').Strategy
 const PatreonStrategy = require('@oauth-everything/passport-patreon').Strategy

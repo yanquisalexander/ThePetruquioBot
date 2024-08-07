@@ -164,25 +164,25 @@ export class Bot {
       if (channel.preferences.useStreamerAccount?.value) {
         const userId = channel.user.twitchId;
         try {
-            if (!TwitchAuthenticator.RefreshingAuthProvider.hasUser(userId)) {
-                throw new Error('User not found in RefreshingAuthProvider');
-            }
-    
-            const userScopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(userId);
-            if (!userScopes.includes('user:write:chat')) {
-                throw new Error('User does not have user:write:chat scope');
-            }
-    
-            await Twitch.Helix.asUser(userId, async client => {
-                await client.chat.sendChatMessage(userId, message);
-            });
-            return;
+          if (!TwitchAuthenticator.RefreshingAuthProvider.hasUser(userId)) {
+            throw new Error('User not found in RefreshingAuthProvider');
+          }
+
+          const userScopes = TwitchAuthenticator.RefreshingAuthProvider.getCurrentScopesForUser(userId);
+          if (!userScopes.includes('user:write:chat')) {
+            throw new Error('User does not have user:write:chat scope');
+          }
+
+          await Twitch.Helix.asUser(userId, async client => {
+            await client.chat.sendChatMessage(userId, message);
+          });
+          return;
         } catch (error) {
-            console.error(chalk.red('[BOT]'), chalk.white('Error sending message as streamer:'), error);
-            return sendTwitchMessage(channel.user.username);
+          console.error(chalk.red('[BOT]'), chalk.white('Error sending message as streamer:'), error);
+          return sendTwitchMessage(channel.user.username);
         }
-    }
-    
+      }
+
 
       await sendTwitchMessage(channel.user.username)
       return

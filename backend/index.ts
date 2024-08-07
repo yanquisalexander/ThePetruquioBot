@@ -13,11 +13,10 @@ import TwitchEvents from '@/app/modules/TwitchEvents.module';
 import Environment from '@/utils/environment';
 import Passport from '@/lib/Passport';
 import EmailManager from '@/app/modules/EmailManager.module';
+import { PreBoot } from "./lib/PreBoot";
 
 
-MonkeyPatches.apply();
 
-Database.connect();
 
 const initializeApp = async (): Promise<void> => {
   try {
@@ -96,8 +95,15 @@ const handleAppError = (error: any): void => {
   process.exit(1);
 };
 
+await PreBoot.verify();
+
+MonkeyPatches.apply();
+Database.connect();
+
 // Inicializa la aplicación
 initializeApp().catch(handleAppError);
+
+
 
 // Maneja errores no capturados de manera global
 process.on('uncaughtException', (err) => {
